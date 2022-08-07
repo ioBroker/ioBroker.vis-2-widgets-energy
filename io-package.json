@@ -1,0 +1,68 @@
+{
+  "common": {
+    "name": "vis-2-widgets-energy",
+    "version": "0.1.0",
+    "news": {
+      "0.1.0": {
+        "en": "initial commit",
+        "de": "anfängliches Commit",
+        "ru": "начальная фиксация",
+        "pt": "commit inicial",
+        "nl": "initiële commit",
+        "fr": "validation initiale",
+        "it": "impegno iniziale",
+        "es": "Compromiso inicial",
+        "pl": "początkowe zatwierdzenie",
+        "zh-cn": "初始提交"
+      }
+    },
+    "title": "Vis 2 Widgets Energy",
+    "titleLang": {
+      "en": "Vis 2 Widgets Energy"
+    },
+    "desc": {
+      "en": "Vis 2 Widgets Energy"
+    },
+    "authors": [
+      "bluefox <dogafox@gmail.com>"
+    ],
+    "keywords": [
+      "vis-2-widgets-energy"
+    ],
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "icon": "vis-2-widgets-energy.png",
+    "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.vis-2-widgets-energy/master/admin/vis-2-widgets-energy.png",
+    "enabled": true,
+    "readme": "https://github.com/ioBroker/ioBroker.vis-2-widgets-energy/blob/master/README.md",
+    "loglevel": "info",
+    "mode": "schedule",
+    "adminUI": {
+      "config": "none"
+    },
+    "onlyWWW": true,
+    "type": "visualization-widgets",
+    "connectionType": "cloud",
+    "dataSource": "poll",
+    "visWidgets": {
+      "i18n": "component",
+      "vis2energyWidgets": {
+        "name": "vis2energyWidgets",
+        "url": "vis-2-widgets-energy/customWidgets.js",
+        "components": [
+          "ColorGauge",
+          "WaterGauge",
+          "BatteryGauge"
+        ]
+      }
+    },
+    "restartAdapters": [
+      "vis"
+    ]
+  },
+  "native": {
+
+  },
+  "objects": [],
+  "instanceObjects": []
+}
