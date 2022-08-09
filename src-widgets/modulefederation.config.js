@@ -4,5 +4,7 @@ module.exports = makeFederation(
     'vis2energyWidgets',
     {
         './ConsumptionComparation': './src/ConsumptionComparation',
+        './Distribution': './src/Distribution',
+        './translations': './src/translations',
     }
 );

@@ -50,7 +50,7 @@ class App extends WidgetDemoApp {
                 data={{
                     name: 'Color gauge',
                     oid: 'javascript.0.temperatureActual',
-                    levelsCount: 3,
+                    nodesCount: 6,
                     color1: 'rgba(155,211,134,1)',
                     range1: 10,
                     'g_level-1': true,

@@ -17,21 +17,21 @@ class ConsumptionComparation extends Generic {
 
     static getWidgetInfo() {
         return {
-            id: 'tplGauge2ConsumptionComparation',
+            id: 'tplEnergy2ConsumptionComparation',
             visSet: 'vis-2-widgets-energy',
             visWidgetLabel: 'vis_2_widgets_energy_consumption_comparation',  // Label of widget
-            visName: 'Color gauge',
+            visName: 'Consumption comparation',
             visAttrs: [{
                 name: 'common',
                 fields: [
                     {
                         name: 'name',
-                        label: 'vis_2_widgets_gauges_name',
+                        label: 'vis_2_widgets_energy_name',
                     },
                     {
                         name: 'oid',
                         type: 'id',
-                        label: 'vis_2_widgets_gauges_oid',
+                        label: 'vis_2_widgets_energy_oid',
                         onChange: async (field, data, changeData, socket) => {
                             const object = await socket.getObject(data.oid);
                             if (object && object.common) {
@@ -45,102 +45,102 @@ class ConsumptionComparation extends Generic {
                     {
                         name: 'min',
                         type: 'number',
-                        label: 'vis_2_widgets_gauges_min',
+                        label: 'vis_2_widgets_energy_min',
                     },
                     {
                         name: 'max',
                         type: 'number',
-                        label: 'vis_2_widgets_gauges_max',
+                        label: 'vis_2_widgets_energy_max',
                     },
                     {
                         name: 'unit',
-                        label: 'vis_2_widgets_gauges_unit',
+                        label: 'vis_2_widgets_energy_unit',
                     },
                     {
                         name: 'levelsCount',
                         type: 'number',
-                        label: 'vis_2_widgets_gauges_levels_count',
+                        label: 'vis_2_widgets_energy_levels_count',
                     },
                 ],
             },
             {
                 name: 'visual',
-                label: 'vis_2_widgets_gauges_visual',
+                label: 'vis_2_widgets_energy_visual',
                 fields: [
                     {
                         name: 'needleColor',
                         type: 'color',
-                        label: 'vis_2_widgets_gauges_needle_color',
+                        label: 'vis_2_widgets_energy_needle_color',
                     },
                     {
                         name: 'needleBaseColor',
                         type: 'color',
-                        label: 'vis_2_widgets_gauges_needle_base_color',
+                        label: 'vis_2_widgets_energy_needle_base_color',
                     },
                     {
                         name: 'marginInPercent',
                         type: 'number',
-                        label: 'vis_2_widgets_gauges_margin_in_percent',
-                        tooltip: 'vis_2_widgets_gauges_margin_in_percent_tooltip',
+                        label: 'vis_2_widgets_energy_margin_in_percent',
+                        tooltip: 'vis_2_widgets_energy_margin_in_percent_tooltip',
                     },
                     {
                         name: 'cornerRadius',
                         type: 'number',
-                        label: 'vis_2_widgets_gauges_corner_radius',
+                        label: 'vis_2_widgets_energy_corner_radius',
                     },
                     {
                         name: 'arcPadding',
                         type: 'number',
-                        label: 'vis_2_widgets_gauges_arc_padding',
-                        tooltip: 'vis_2_widgets_gauges_arc_padding_title',
+                        label: 'vis_2_widgets_energy_arc_padding',
+                        tooltip: 'vis_2_widgets_energy_arc_padding_title',
                     },
                     {
                         name: 'arcWidth',
                         type: 'number',
-                        label: 'vis_2_widgets_gauges_arc_width',
-                        tooltip: 'vis_2_widgets_gauges_arc_tooltip',
+                        label: 'vis_2_widgets_energy_arc_width',
+                        tooltip: 'vis_2_widgets_energy_arc_tooltip',
                     },
                 ],
             },
             {
                 name: 'anumation',
-                label: 'vis_2_widgets_gauges_animation',
+                label: 'vis_2_widgets_energy_animation',
                 fields: [
                     {
                         name: 'animate',
                         type: 'checkbox',
                         default: true,
-                        label: 'vis_2_widgets_gauges_animate',
+                        label: 'vis_2_widgets_energy_animate',
                     },
                     {
                         name: 'animDelay',
                         type: 'number',
-                        label: 'vis_2_widgets_gauges_anim_delay',
-                        tooltip: 'vis_2_widgets_gauges_anim_delay_tooltip',
+                        label: 'vis_2_widgets_energy_anim_delay',
+                        tooltip: 'vis_2_widgets_energy_anim_delay_tooltip',
                     },
                     {
                         name: 'animateDuration',
                         type: 'number',
-                        label: 'vis_2_widgets_gauges_animate_duration',
-                        tooltip: 'vis_2_widgets_gauges_animate_duration_tooltip',
+                        label: 'vis_2_widgets_energy_animate_duration',
+                        tooltip: 'vis_2_widgets_energy_animate_duration_tooltip',
                     },
                 ],
             },
             {
                 name: 'level',
-                label: 'vis_2_widgets_gauges_level',
+                label: 'vis_2_widgets_energy_level',
                 indexFrom: 1,
                 indexTo: 'levelsCount',
                 fields: [
                     {
                         name: 'color',
                         type: 'color',
-                        label: 'vis_2_widgets_gauges_color',
+                        label: 'vis_2_widgets_energy_color',
                     },
                     {
                         name: 'levelThreshold',
                         type: 'number',
-                        label: 'vis_2_widgets_gauges_level_threshold',
+                        label: 'vis_2_widgets_energy_level_threshold',
                         hidden: (data, index) => index === data.levelsCount,
                     },
                 ],
