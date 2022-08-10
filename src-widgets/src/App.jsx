@@ -8,6 +8,8 @@ import translations from './translations';
 
 import ConsumptionComparation from './ConsumptionComparation';
 import Distribution from './Distribution';
+import Consumption from './Consumption';
+import IntervalSelector from './IntervalSelector';
 
 const styles = theme => ({
     app: {
@@ -50,7 +52,7 @@ class App extends WidgetDemoApp {
                 data={{
                     name: 'Color gauge',
                     oid: 'javascript.0.temperatureActual',
-                    nodesCount: 6,
+                    nodesCount: 3,
                     color1: 'rgba(155,211,134,1)',
                     range1: 10,
                     'g_level-1': true,
@@ -65,6 +67,56 @@ class App extends WidgetDemoApp {
                 }}
             />
             <ConsumptionComparation
+                socket={this.socket}
+                themeType={this.state.themeType}
+                style={{
+                    width: 600,
+                    height: 650,
+                }}
+                systemConfig={this.state.systemConfig}
+                data={{
+                    name: 'Color gauge',
+                    oid: 'javascript.0.temperatureActual',
+                    levelsCount: 3,
+                    color1: 'rgba(155,211,134,1)',
+                    range1: 10,
+                    'g_level-1': true,
+                    color2: 'rgba(30,24,68,1)',
+                    range2: 2,
+                    'g_level-2': true,
+                    color3: 'rgba(199,194,220,1)',
+                    range3: 6,
+                    'g_level-3': true,
+                    max: 30,
+                    min: 12,
+                }}
+            />
+            <Consumption
+                socket={this.socket}
+                themeType={this.state.themeType}
+                style={{
+                    width: 600,
+                    height: 650,
+                }}
+                systemConfig={this.state.systemConfig}
+                data={{
+                    name: 'Color gauge',
+                    oid: 'javascript.0.temperatureActual',
+                    levelsCount: 3,
+                    color1: 'rgba(155,211,134,1)',
+                    range1: 10,
+                    'g_level-1': true,
+                    color2: 'rgba(30,24,68,1)',
+                    range2: 2,
+                    'g_level-2': true,
+                    color3: 'rgba(199,194,220,1)',
+                    range3: 6,
+                    'g_level-3': true,
+                    max: 30,
+                    min: 12,
+                }}
+            />
+            <IntervalSelector
                 socket={this.socket}
                 themeType={this.state.themeType}
                 style={{

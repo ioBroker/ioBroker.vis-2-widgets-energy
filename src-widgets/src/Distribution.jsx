@@ -17,9 +17,6 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     return returnValue;
 }
 
-const defaultRadius = 40;
-const defaultBetweenCircles = 100;
-
 class Distribution extends Generic {
     constructor(props) {
         super(props);
@@ -40,6 +37,39 @@ class Distribution extends Generic {
                         name: 'name',
                         label: 'vis_2_widgets_energy_name',
                     },
+                    {
+                        name: 'defaultColor',
+                        type: 'color',
+                        label: 'vis_2_widgets_energy_default_color',
+                    },
+                    {
+                        name: 'defaultCircleSize',
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_default_circle_size',
+                        default: 10,
+                    },
+                    {
+                        name: 'defaultDistanceSize',
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_default_distance_size',
+                        default: 20,
+                    },
+                    {
+                        name: 'defaultFontSize',
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_default_font_size',
+                        default: 16,
+                    },
+                    {
+                        name: 'nodesCount',
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_nodes_count',
+                    },
+                ],
+            },
+            {
+                name: 'home',
+                fields: [
                     {
                         name: 'home-oid',
                         type: 'id',
@@ -68,10 +98,16 @@ class Distribution extends Generic {
                         label: 'vis_2_widgets_energy_home_circle_size',
                     },
                     {
-                        name: 'nodesCount',
+                        name: 'homeDistanceSize',
                         type: 'number',
-                        label: 'vis_2_widgets_energy_nodes_count',
+                        label: 'vis_2_widgets_energy_home_distance_size',
                     },
+                    {
+                        name: 'homeFontSize',
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_home_font_size',
+                    },
+
                 ],
             },
             {
@@ -104,6 +140,17 @@ class Distribution extends Generic {
                         type: 'number',
                         label: 'vis_2_widgets_energy_power_line_circle_size',
                     },
+                    {
+                        name: 'powerLineDistanceSize',
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_power_line_distance_size',
+                    },
+                    {
+                        name: 'powerLineFontSize',
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_power_line_font_size',
+                    },
+
                 ],
             },
             {
@@ -139,6 +186,17 @@ class Distribution extends Generic {
                         type: 'number',
                         label: 'vis_2_widgets_energy_circle_size',
                     },
+                    {
+                        name: 'distanceSize',
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_distance_size',
+                    },
+                    {
+                        name: 'fontSize',
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_font_size',
+                    },
+
                 ],
             }],
             visDefaultStyle: {
@@ -177,13 +235,30 @@ class Distribution extends Generic {
     renderWidgetBody(props) {
         super.renderWidgetBody(props);
 
-        let maxRadius = defaultRadius;
-        const homeRadius = defaultRadius * (this.state.rxData.homeCircleSize || 1);
+        let size;
+        if (!this.refCardContent.current) {
+            setTimeout(() => this.forceUpdate(), 50);
+        } else {
+            size = this.refCardContent.current.offsetWidth;
+            if (size > this.refCardContent.current.offsetHeight) {
+                size = this.refCardContent.current.offsetHeight;
+            }
+        }
 
+        const defaultRadiusSize = this.state.rxData.defaultRadiusSize || 10;
+        const defaultDistanceSize = this.state.rxData.defaultDistanceSize || 20;
+        const defaultFontSize = this.state.rxData.defaultFontSize || 16;
+
+        const homeRadius = size * (this.state.rxData.homeCircleSize || defaultRadiusSize) / 100;
+        const homeFontSize = defaultFontSize || this.state.rxData.homeFontSize;
+
+        let maxRadius = 0;
         const circles = [{
             name: this.state.rxData.powerLineName,
             color: this.state.rxData.powerLineColor,
-            radius: defaultRadius * (this.state.rxData.powerLineCircleSize || 1),
+            radius: size * (this.state.rxData.powerLineCircleSize || defaultRadiusSize) / 100,
+            distance: size * (this.state.rxData.powerLineDistanceSize || defaultDistanceSize) / 100,
+            fontSize: defaultFontSize || this.state.rxData.powerLineFontSize,
             oid: this.state.rxData['powerLine-oid'],
             value: this.state.values[`${this.state.rxData['powerLine-oid']}.val`],
         }];
@@ -195,7 +270,9 @@ class Distribution extends Generic {
             circles.push({
                 name: this.state.rxData[`name${i}`],
                 color: this.state.rxData[`color${i}`],
-                radius: defaultRadius * (this.state.rxData[`circleSize${i}`] || 1),
+                radius: size * (this.state.rxData[`circleSize${i}`] || defaultRadiusSize) / 100,
+                distance: size * (this.state.rxData[`distanceSize${i}`] || defaultDistanceSize) / 100,
+                fontSize: defaultFontSize || this.state.rxData[`fontSize${i}`],
                 oid: this.state.rxData[`oid${i}`],
                 value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`],
             });
@@ -204,40 +281,29 @@ class Distribution extends Generic {
             }
         }
 
-        let size;
-        if (!this.refCardContent.current) {
-            setTimeout(() => this.forceUpdate(), 50);
-        } else {
-            size = this.refCardContent.current.offsetWidth;
-            if (size > this.refCardContent.current.offsetHeight) {
-                size = this.refCardContent.current.offsetHeight;
-            }
-        }
-
-        const widgetSize = defaultBetweenCircles * 2 + homeRadius * 2 + maxRadius * 6 + 20;
-
         const content = <div
             ref={this.refCardContent}
             style={{
                 flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', overflow: 'hidden',
             }}
         >
-            <div style={{ position: 'relative', zoom: size / widgetSize }}>
+            {size && <div style={{ position: 'relative' }}>
                 {circles.map((circle, i) => {
                     const angle = 180 + i * 360 / circles.length;
-                    const coordinates = polarToCartesian(0, 0, defaultBetweenCircles + circle.radius + homeRadius, angle);
+                    const coordinates = polarToCartesian(0, 0, circle.distance + circle.radius + homeRadius, angle);
                     return <div
                         key={i}
                         style={{
                             position: 'absolute',
-                            top: widgetSize / 2 + coordinates.y - circle.radius,
-                            left: widgetSize / 2 + coordinates.x - circle.radius,
+                            top: size / 2 + coordinates.y - circle.radius,
+                            left: size / 2 + coordinates.x - circle.radius,
                             width: circle.radius * 2,
                             height: circle.radius * 2,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             zIndex: 10,
+                            fontSize: circle.fontSize,
                         }}
                     >
                         <span>
@@ -247,21 +313,22 @@ class Distribution extends Generic {
                 })}
                 <div style={{
                     position: 'absolute',
-                    top: widgetSize / 2 - homeRadius,
-                    left: widgetSize / 2 - homeRadius,
+                    top: size / 2 - homeRadius,
+                    left: size / 2 - homeRadius,
                     width: homeRadius * 2,
                     height: homeRadius * 2,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     zIndex: 10,
+                    fontSize: homeFontSize,
                 }}
                 >
                     <span>
                         {this.state.rxData.homeName || this.state.rxData['home-oid']}
                     </span>
                 </div>
-                <svg style={{ width: widgetSize, height: widgetSize }}>
+                <svg style={{ width: size, height: size }}>
                     <circle
                         cx="50%"
                         cy="50%"
@@ -272,38 +339,39 @@ class Distribution extends Generic {
                     />
                     {circles.map((circle, i) => {
                         const angle = 180 + i * 360 / circles.length;
-                        const coordinates = polarToCartesian(0, 0, defaultBetweenCircles + circle.radius + homeRadius, angle);
+                        const coordinates = polarToCartesian(0, 0, circle.distance + circle.radius + homeRadius, angle);
                         const coordinatesFrom = polarToCartesian(0, 0, homeRadius, angle);
-                        const coordinatesTo = polarToCartesian(0, 0, homeRadius + defaultBetweenCircles, angle);
+                        const coordinatesTo = polarToCartesian(0, 0, homeRadius + circle.distance, angle);
                         const offset = circle.value < 0 ?
-                            (this.state.offset + i * 10) % defaultBetweenCircles :
-                            defaultBetweenCircles - (this.state.offset + i * 10) % defaultBetweenCircles;
+                            (this.state.offset + i * 10) % circle.distance :
+                            circle.distance - (this.state.offset + i * 10) % circle.distance;
                         const coordinatesOffset = polarToCartesian(0, 0, homeRadius + offset, angle);
+                        const color = circle.color || this.state.rxData.defaultColor || this.props.theme.palette.text.primary;
                         return <React.Fragment key={i}>
                             <circle
                                 cx="50%"
                                 cy="50%"
                                 r={circle.radius}
                                 fill="none"
-                                stroke={circle.color || this.props.theme.palette.text.primary}
+                                stroke={color}
                                 strokeWidth="3"
                                 transform={
                                     `translate(${coordinates.x}, ${coordinates.y})`
                                 }
                             />
                             <line
-                                x1={widgetSize / 2 + coordinatesFrom.x}
-                                y1={widgetSize / 2 + coordinatesFrom.y}
-                                x2={widgetSize / 2 + coordinatesTo.x}
-                                y2={widgetSize / 2 + coordinatesTo.y}
-                                stroke={circle.color || this.props.theme.palette.text.primary}
+                                x1={size / 2 + coordinatesFrom.x}
+                                y1={size / 2 + coordinatesFrom.y}
+                                x2={size / 2 + coordinatesTo.x}
+                                y2={size / 2 + coordinatesTo.y}
+                                stroke={color}
                             />
                             <circle
                                 cx="50%"
                                 cy="50%"
                                 r="2"
                                 fill="none"
-                                stroke={circle.color || this.props.theme.palette.text.primary}
+                                stroke={color}
                                 strokeWidth="3"
                                 transform={
                                     `translate(${coordinatesOffset.x}, ${coordinatesOffset.y})`
@@ -312,7 +380,7 @@ class Distribution extends Generic {
                         </React.Fragment>;
                     })}
                 </svg>
-            </div>
+            </div>}
         </div>;
         return this.wrapContent(content, null, { textAlign: 'center' });
     }
