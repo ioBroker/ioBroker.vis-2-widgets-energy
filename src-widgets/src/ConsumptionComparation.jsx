@@ -29,119 +29,39 @@ class ConsumptionComparation extends Generic {
                         label: 'vis_2_widgets_energy_name',
                     },
                     {
+                        name: 'devicesCount',
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_devices_count',
+                    },
+                ],
+            },
+            {
+                name: 'devices',
+                label: 'vis_2_widgets_energy_level',
+                indexFrom: 1,
+                indexTo: 'devicesCount',
+                fields: [
+                    {
                         name: 'oid',
                         type: 'id',
                         label: 'vis_2_widgets_energy_oid',
                         onChange: async (field, data, changeData, socket) => {
-                            const object = await socket.getObject(data.oid);
+                            const object = await socket.getObject(data[field.name]);
                             if (object && object.common) {
-                                data.min = object.common.min !== undefined ? object.common.min : 0;
-                                data.max = object.common.max !== undefined ? object.common.max : 100;
-                                data.unit = object.common.unit !== undefined ? object.common.unit : '';
+                                data[`color${field.index}`]  = object.common.color !== undefined ? object.common.color : null;
+                                data[`name${field.index}`]  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.lang()] : object.common.name;
                                 changeData(data);
                             }
                         },
                     },
                     {
-                        name: 'min',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_min',
+                        name: 'name',
+                        label: 'vis_2_widgets_energy_name',
                     },
-                    {
-                        name: 'max',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_max',
-                    },
-                    {
-                        name: 'unit',
-                        label: 'vis_2_widgets_energy_unit',
-                    },
-                    {
-                        name: 'levelsCount',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_levels_count',
-                    },
-                ],
-            },
-            {
-                name: 'visual',
-                label: 'vis_2_widgets_energy_visual',
-                fields: [
-                    {
-                        name: 'needleColor',
-                        type: 'color',
-                        label: 'vis_2_widgets_energy_needle_color',
-                    },
-                    {
-                        name: 'needleBaseColor',
-                        type: 'color',
-                        label: 'vis_2_widgets_energy_needle_base_color',
-                    },
-                    {
-                        name: 'marginInPercent',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_margin_in_percent',
-                        tooltip: 'vis_2_widgets_energy_margin_in_percent_tooltip',
-                    },
-                    {
-                        name: 'cornerRadius',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_corner_radius',
-                    },
-                    {
-                        name: 'arcPadding',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_arc_padding',
-                        tooltip: 'vis_2_widgets_energy_arc_padding_title',
-                    },
-                    {
-                        name: 'arcWidth',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_arc_width',
-                        tooltip: 'vis_2_widgets_energy_arc_tooltip',
-                    },
-                ],
-            },
-            {
-                name: 'anumation',
-                label: 'vis_2_widgets_energy_animation',
-                fields: [
-                    {
-                        name: 'animate',
-                        type: 'checkbox',
-                        default: true,
-                        label: 'vis_2_widgets_energy_animate',
-                    },
-                    {
-                        name: 'animDelay',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_anim_delay',
-                        tooltip: 'vis_2_widgets_energy_anim_delay_tooltip',
-                    },
-                    {
-                        name: 'animateDuration',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_animate_duration',
-                        tooltip: 'vis_2_widgets_energy_animate_duration_tooltip',
-                    },
-                ],
-            },
-            {
-                name: 'level',
-                label: 'vis_2_widgets_energy_level',
-                indexFrom: 1,
-                indexTo: 'levelsCount',
-                fields: [
                     {
                         name: 'color',
                         type: 'color',
                         label: 'vis_2_widgets_energy_color',
-                    },
-                    {
-                        name: 'levelThreshold',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_level_threshold',
-                        hidden: (data, index) => index === data.levelsCount,
                     },
                 ],
             }],
@@ -155,10 +75,6 @@ class ConsumptionComparation extends Generic {
     }
 
     async propertiesUpdate() {
-        if (this.state.rxData.oid && this.state.rxData.oid !== 'nothing_selected') {
-            const obj = await this.props.socket.getObject(this.state.rxData.oid);
-            this.setState({ object: obj });
-        }
     }
 
     componentDidMount() {
@@ -181,40 +97,30 @@ class ConsumptionComparation extends Generic {
      * @returns {echarts.EChartsOption}
      */
     getOption() {
+        const data = [];
+        for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
+            data.push({
+                name: this.state.rxData[`name${i}`],
+                value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`],
+                color: this.state.rxData[`color${i}`],
+            });
+        }
+
         return {
-            dataset: {
-                source: [
-                    ['score', 'amount', 'product'],
-                    [89.3, 58212, 'Matcha Latte'],
-                    [57.1, 78254, 'Milk Tea'],
-                    [74.4, 41032, 'Cheese Cocoa'],
-                    [50.1, 12755, 'Cheese Brownie'],
-                    [89.7, 20145, 'Matcha Cocoa'],
-                    [68.1, 79146, 'Tea'],
-                    [19.6, 91852, 'Orange Juice'],
-                    [10.6, 101852, 'Lemon Juice'],
-                    [32.7, 20112, 'Walnut Brownie'],
-                ],
-            },
             tooltip: {},
             grid: { containLabel: true },
             xAxis: { name: 'amount' },
-            yAxis: { type: 'category' },
-            visualMap: {
-                orient: 'horizontal',
-                left: 'center',
-                min: 10,
-                max: 100,
-                text: ['High Score', 'Low Score'],
-                // Map the score column to color
-                dimension: 0,
-                inRange: {
-                    color: ['#65B581', '#FFCE34', '#FD665F'],
-                },
-            },
+            yAxis: { type: 'category', data: data.map(item => item.name) },
             series: [
                 {
                     type: 'bar',
+                    data:
+                    data.map(item => ({
+                        value: item.value,
+                        itemStyle: {
+                            color: item.color,
+                        },
+                    })),
                     encode: {
                         // Map the "amount" column to X axis.
                         x: 'amount',

@@ -1,17 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
+import moment from 'moment';
 
-import ReactEchartsCore from 'echarts-for-react';
+import { I18n } from '@iobroker/adapter-react-v5';
+import { Button, ButtonGroup } from '@mui/material';
 import Generic from './Generic';
 
 const styles = () => ({
-
+    nowButton: {
+        marginRight: 20,
+    },
 });
 
 class IntervalSelector extends Generic {
     constructor(props) {
         super(props);
+        this.state.period = 'now';
         this.refCardContent = React.createRef();
     }
 
@@ -176,65 +181,47 @@ class IntervalSelector extends Generic {
         return IntervalSelector.getWidgetInfo();
     }
 
-    /**
-     *
-     * @returns {echarts.EChartsOption}
-     */
-    getOption() {
-        return {
-            dataset: {
-                source: [
-                    ['score', 'amount', 'product'],
-                    [89.3, 58212, 'Matcha Latte'],
-                    [57.1, 78254, 'Milk Tea'],
-                    [74.4, 41032, 'Cheese Cocoa'],
-                    [50.1, 12755, 'Cheese Brownie'],
-                    [89.7, 20145, 'Matcha Cocoa'],
-                    [68.1, 79146, 'Tea'],
-                    [19.6, 91852, 'Orange Juice'],
-                    [10.6, 101852, 'Lemon Juice'],
-                    [32.7, 20112, 'Walnut Brownie'],
-                ],
-            },
-            tooltip: {},
-            grid: { containLabel: true },
-            xAxis: { name: 'amount' },
-            yAxis: { type: 'category' },
-            visualMap: {
-                orient: 'horizontal',
-                left: 'center',
-                min: 10,
-                max: 100,
-                text: ['High Score', 'Low Score'],
-                // Map the score column to color
-                dimension: 0,
-                inRange: {
-                    color: ['#65B581', '#FFCE34', '#FD665F'],
-                },
-            },
-            series: [
-                {
-                    type: 'bar',
-                    encode: {
-                        // Map the "amount" column to X axis.
-                        x: 'amount',
-                        // Map the "product" column to Y axis
-                        y: 'product',
-                    },
-                },
-            ],
-        };
-    }
-
     renderWidgetBody(props) {
         super.renderWidgetBody(props);
 
-        const content = <ReactEchartsCore
-            option={this.getOption()}
-            theme={this.props.themeType === 'dark' ? 'dark' : ''}
-            style={{ height: '100%', width: '100%' }}
-            opts={{ renderer: 'svg' }}
-        />;
+        let periodName = '';
+
+        if (this.state.period === 'now') {
+            periodName = moment().format('DD.MM.YYYY, hh:mm:ss');
+        } else if (this.state.period === 'day') {
+            periodName = moment().format('DD.MM.YYYY');
+        } else if (this.state.period === 'week') {
+            periodName = `${moment(new Date() - 7 * 24 * 60 * 60 * 1000).format('DD.MM.YYYY')} - ${moment().format('DD.MM.YYYY')}`;
+        } else if (this.state.period === 'month') {
+            periodName = `${moment(new Date() - 30 * 24 * 60 * 60 * 1000).format('DD.MM.YYYY')} - ${moment().format('DD.MM.YYYY')}`;
+        } else if (this.state.period === 'year') {
+            periodName = `${moment(new Date() - 365 * 24 * 60 * 60 * 1000).format('DD.MM.YYYY')} - ${moment().format('DD.MM.YYYY')}`;
+        }
+        const content = <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%',
+        }}
+        >
+            {periodName}
+            <Button
+                variant="contained"
+                color={this.state.period === 'now' ? 'primary' : 'grey'}
+                onClick={() => this.setState({ period: 'now' })}
+                className={this.props.classes.nowButton}
+            >
+                {I18n.t('vis_2_widgets_energy_now')}
+            </Button>
+            <ButtonGroup>
+                {['day', 'week', 'month', 'year'].map(period =>
+                    <Button
+                        key={period}
+                        variant="contained"
+                        color={period === this.state.period ? 'primary' : 'grey'}
+                        onClick={() => this.setState({ period })}
+                    >
+                        {I18n.t(`vis_2_widgets_energy_${period}`)}
+                    </Button>)}
+            </ButtonGroup>
+        </div>;
         return this.wrapContent(content, null, { textAlign: 'center' });
     }
 }
