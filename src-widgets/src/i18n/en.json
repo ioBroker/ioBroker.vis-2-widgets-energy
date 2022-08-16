@@ -1,1 +1,9 @@
-{}
+{
+    "vis_2_widgets_energy_distribution": "Distribution",
+    "vis_2_widgets_energy_consumption_comparation": "Consumption comparation",
+    "vis_2_widgets_energy_now": "Now",
+    "vis_2_widgets_energy_day": "Day",
+    "vis_2_widgets_energy_week": "Week",
+    "vis_2_widgets_energy_month": "Month",
+    "vis_2_widgets_energy_year": "Year"
+}

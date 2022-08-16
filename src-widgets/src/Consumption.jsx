@@ -3,13 +3,14 @@ import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
 
 import ReactEchartsCore from 'echarts-for-react';
+import moment from 'moment';
 import Generic from './Generic';
 
 const styles = () => ({
 
 });
 
-class ConsumptionComparation extends Generic {
+class Consumption extends Generic {
     constructor(props) {
         super(props);
         this.refCardContent = React.createRef();
@@ -17,10 +18,10 @@ class ConsumptionComparation extends Generic {
 
     static getWidgetInfo() {
         return {
-            id: 'tplEnergy2ConsumptionComparation',
+            id: 'tplEnergy2Consumption',
             visSet: 'vis-2-widgets-energy',
-            visWidgetLabel: 'vis_2_widgets_energy_consumption_comparation',  // Label of widget
-            visName: 'Consumption comparation',
+            visWidgetLabel: 'vis_2_widgets_energy_consumption',  // Label of widget
+            visName: 'Consumption',
             visAttrs: [{
                 name: 'common',
                 fields: [
@@ -75,6 +76,34 @@ class ConsumptionComparation extends Generic {
     }
 
     async propertiesUpdate() {
+        const timeInterval = this.state.rxData.timeInterval || 12;
+        const now = new Date();
+        now.setHours(now.getHours() - timeInterval);
+        now.setMinutes(0);
+        now.setSeconds(0);
+        now.setMilliseconds(0);
+        const start = now.getTime();
+        const end = Date.now();
+
+        for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
+            if (this.state.rxData[`oid${i}`] && this.state.rxData[`oid${i}`] !== 'nothing_selected') {
+                const options = {
+                    instance: this.props.systemConfig?.common?.defaultHistory || 'history.0',
+                    start,
+                    end,
+                    step: 1800000, // 30 minutes
+                    from: false,
+                    ack: false,
+                    q: false,
+                    addID: false,
+                    aggregate: 'minmax',
+                };
+
+                const history = await this.props.socket.getHistory(this.state.rxData[`oid${i}`], options);
+                console.log(history);
+                this.setState({ [`history${i}`]: history });
+            }
+        }
     }
 
     componentDidMount() {
@@ -89,7 +118,7 @@ class ConsumptionComparation extends Generic {
 
     // eslint-disable-next-line class-methods-use-this
     getWidgetInfo() {
-        return ConsumptionComparation.getWidgetInfo();
+        return Consumption.getWidgetInfo();
     }
 
     /**
@@ -102,33 +131,44 @@ class ConsumptionComparation extends Generic {
             data.push({
                 name: this.state.rxData[`name${i}`],
                 value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`],
+                values: this.state[`history${i}`],
                 color: this.state.rxData[`color${i}`],
             });
         }
 
+        console.log(data);
+
         return {
             tooltip: {},
+            legend: { data: data.map(item => item.name) },
+            toolbox: {
+                feature: {
+                    magicType: {
+                        type: ['stack'],
+                    },
+                    dataView: {},
+                },
+            },
             grid: { containLabel: true },
-            xAxis: { name: 'amount' },
-            yAxis: { type: 'category', data: data.map(item => item.name) },
-            series: [
+            yAxis: { name: 'amount' },
+            xAxis: { type: 'category', data: data?.[0]?.values?.map(dateValue => moment(dateValue.ts).format('DD.MM.YYYY hh:mm:ss')) },
+            series: data.map(item => (
                 {
                     type: 'bar',
-                    data:
-                    data.map(item => ({
-                        value: item.value,
-                        itemStyle: {
-                            color: item.color,
-                        },
-                    })),
+                    name: item.name,
+                    itemStyle: {
+                        color: item.color,
+                    },
+                    data: item.values?.map(dateValue => dateValue.val),
                     encode: {
                         // Map the "amount" column to X axis.
-                        x: 'amount',
+                        y: 'amount',
                         // Map the "product" column to Y axis
-                        y: 'product',
+                        x: 'product',
                     },
-                },
-            ],
+                    stack: 'one',
+                }
+            )),
         };
     }
 
@@ -145,7 +185,7 @@ class ConsumptionComparation extends Generic {
     }
 }
 
-ConsumptionComparation.propTypes = {
+Consumption.propTypes = {
     systemConfig: PropTypes.object,
     socket: PropTypes.object,
     themeType: PropTypes.string,
@@ -153,4 +193,4 @@ ConsumptionComparation.propTypes = {
     data: PropTypes.object,
 };
 
-export default withStyles(styles)(withTheme(ConsumptionComparation));
+export default withStyles(styles)(withTheme(Consumption));
