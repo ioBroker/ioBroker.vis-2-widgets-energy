@@ -93,6 +93,11 @@ class Distribution extends Generic {
                         label: 'vis_2_widgets_energy_home_color',
                     },
                     {
+                        name: 'homeIcon',
+                        type: 'image',
+                        label: 'vis_2_widgets_energy_home_icon',
+                    },
+                    {
                         name: 'homeCircleSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_home_circle_size',
@@ -127,6 +132,19 @@ class Distribution extends Generic {
                         },
                     },
                     {
+                        name: 'powerLineReturn-oid',
+                        type: 'id',
+                        label: 'vis_2_widgets_energy_power_line_return_oid',
+                        onChange: async (field, data, changeData, socket) => {
+                            const object = await socket.getObject(data[field.name]);
+                            if (object && object.common) {
+                                data.powerLineColor  = object.common.color !== undefined ? object.common.color : null;
+                                data.powerLineName  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.lang()] : object.common.name;
+                                changeData(data);
+                            }
+                        },
+                    },
+                    {
                         name: 'powerLineName',
                         label: 'vis_2_widgets_energy_power_line_name',
                     },
@@ -134,6 +152,11 @@ class Distribution extends Generic {
                         name: 'powerLineColor',
                         type: 'color',
                         label: 'vis_2_widgets_energy_power_line_color',
+                    },
+                    {
+                        name: 'powerLineIcon',
+                        type: 'image',
+                        label: 'vis_2_widgets_energy_power_line_icon',
                     },
                     {
                         name: 'powerLineCircleSize',
@@ -180,6 +203,11 @@ class Distribution extends Generic {
                         name: 'color',
                         type: 'color',
                         label: 'vis_2_widgets_energy_color',
+                    },
+                    {
+                        name: 'icon',
+                        type: 'image',
+                        label: 'vis_2_widgets_energy_icon',
                     },
                     {
                         name: 'circleSize',
@@ -306,9 +334,10 @@ class Distribution extends Generic {
                             fontSize: circle.fontSize,
                         }}
                     >
-                        <span>
-                            {circle.name || circle.oid}
-                        </span>
+                        <div>
+                            <div>{circle.name || circle.oid}</div>
+                            <div>{circle.value}</div>
+                        </div>
                     </div>;
                 })}
                 <div style={{
@@ -324,9 +353,10 @@ class Distribution extends Generic {
                     fontSize: homeFontSize,
                 }}
                 >
-                    <span>
-                        {this.state.rxData.homeName || this.state.rxData['home-oid']}
-                    </span>
+                    <div>
+                        <div>{this.state.rxData.homeName || this.state.rxData['home-oid']}</div>
+                        <div>{this.state.values[`${this.state.rxData['home-oid']}.val`]}</div>
+                    </div>
                 </div>
                 <svg style={{ width: size, height: size }}>
                     <circle

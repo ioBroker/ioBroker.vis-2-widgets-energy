@@ -26,11 +26,27 @@ class App extends WidgetDemoApp {
     constructor(props) {
         super(props);
 
+        this.state = {
+            ...this.state,
+            ...{
+                timeInterval: 'week',
+                timeStart: null,
+            },
+        };
+
         // init translations
         I18n.extendTranslations(translations);
 
         this.socket.registerConnectionHandler(this.onConnectionChanged);
     }
+
+    setTimeInterval = timeInterval => {
+        this.setState({ timeInterval });
+    };
+
+    setTimeStart = timeStart => {
+        this.setState({ timeStart });
+    };
 
     onConnectionChanged = isConnected => {
         if (isConnected) {
@@ -104,6 +120,10 @@ class App extends WidgetDemoApp {
                     name2: 'memory',
                     color2: 'rgba(201,83,80,1)',
                 }}
+                timeInterval={this.state.timeInterval}
+                setTimeInterval={this.setTimeInterval}
+                timeStart={this.state.timeStart}
+                setTimeStart={this.setTimeStart}
             />
             <IntervalSelector
                 socket={this.socket}
@@ -129,6 +149,10 @@ class App extends WidgetDemoApp {
                     max: 30,
                     min: 12,
                 }}
+                timeInterval={this.state.timeInterval}
+                setTimeInterval={this.setTimeInterval}
+                timeStart={this.state.timeStart}
+                setTimeStart={this.setTimeStart}
             />
         </div>;
     }

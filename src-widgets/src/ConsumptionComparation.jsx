@@ -63,6 +63,10 @@ class ConsumptionComparation extends Generic {
                         type: 'color',
                         label: 'vis_2_widgets_energy_color',
                     },
+                    {
+                        name: 'unit',
+                        label: 'vis_2_widgets_energy_unit',
+                    },
                 ],
             }],
             visDefaultStyle: {

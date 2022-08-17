@@ -34,6 +34,16 @@ class Consumption extends Generic {
                         type: 'number',
                         label: 'vis_2_widgets_energy_devices_count',
                     },
+                    {
+                        name: 'start-oid',
+                        type: 'id',
+                        label: 'vis_2_widgets_energy_start_oid',
+                    },
+                    {
+                        name: 'interval-oid',
+                        type: 'id',
+                        label: 'vis_2_widgets_energy_interval_oid',
+                    },
                 ],
             },
             {
@@ -64,6 +74,10 @@ class Consumption extends Generic {
                         type: 'color',
                         label: 'vis_2_widgets_energy_color',
                     },
+                    {
+                        name: 'unit',
+                        label: 'vis_2_widgets_energy_unit',
+                    },
                 ],
             }],
             visDefaultStyle: {
@@ -76,43 +90,61 @@ class Consumption extends Generic {
     }
 
     async propertiesUpdate() {
-        const timeInterval = this.state.rxData.timeInterval || 12;
-        const now = new Date();
-        now.setHours(now.getHours() - timeInterval);
-        now.setMinutes(0);
-        now.setSeconds(0);
-        now.setMilliseconds(0);
-        const start = now.getTime();
-        const end = Date.now();
+        const types = {
+            year: {
+                interval: 365 * 24 * 60 * 60 * 1000,
+                count: 12,
+            },
+            month: {
+                interval: 30 * 24 * 60 * 60 * 1000,
+                count: 30,
+            },
+            week: {
+                interval: 7 * 24 * 60 * 60 * 1000,
+                count: 7,
+            },
+            day: {
+                interval: 24 * 60 * 60 * 1000,
+                count: 24,
+            },
+        };
+        const now = this.props.timeStart ? new Date(this.props.timeStart) : new Date();
+        now.setHours(0, 0, 0, 0);
+        const start = now.getTime() - types[this.props.timeInterval].interval;
+        const end = now.getTime();
+        const count = types[this.props.timeInterval].count;
+
+        const options = {
+            instance: this.props.systemConfig?.common?.defaultHistory || 'history.0',
+            start,
+            end,
+            count,
+            from: false,
+            ack: false,
+            q: false,
+            addID: false,
+            aggregate: 'total',
+        };
 
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             if (this.state.rxData[`oid${i}`] && this.state.rxData[`oid${i}`] !== 'nothing_selected') {
-                const options = {
-                    instance: this.props.systemConfig?.common?.defaultHistory || 'history.0',
-                    start,
-                    end,
-                    step: 1800000, // 30 minutes
-                    from: false,
-                    ack: false,
-                    q: false,
-                    addID: false,
-                    aggregate: 'minmax',
-                };
-
-                const history = await this.props.socket.getHistory(this.state.rxData[`oid${i}`], options);
-                console.log(history);
+                const history = (await this.props.socket.getHistory(this.state.rxData[`oid${i}`], options))
+                    .sort((a, b) => (a.ts > b.ts ? 1 : -1));
                 this.setState({ [`history${i}`]: history });
             }
         }
     }
 
-    componentDidMount() {
-        super.componentDidMount();
-        this.propertiesUpdate();
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (super.componentDidUpdate) {
+            super.componentDidUpdate(prevProps, prevState, snapshot);
+        }
+        if (this.props.timeInterval !== prevProps.timeInterval) {
+            this.propertiesUpdate();
+        }
     }
 
-    onPropertiesUpdated() {
-        super.onPropertiesUpdated();
+    onStateUpdated() {
         this.propertiesUpdate();
     }
 
@@ -136,7 +168,12 @@ class Consumption extends Generic {
             });
         }
 
-        console.log(data);
+        const timeTypes = {
+            year: 'MMM',
+            month: 'DD.MM',
+            week: 'ddd',
+            day: 'HH:mm',
+        };
 
         return {
             tooltip: {},
@@ -151,7 +188,12 @@ class Consumption extends Generic {
             },
             grid: { containLabel: true },
             yAxis: { name: 'amount' },
-            xAxis: { type: 'category', data: data?.[0]?.values?.map(dateValue => moment(dateValue.ts).format('DD.MM.YYYY hh:mm:ss')) },
+            xAxis: {
+                type: 'category',
+                data: data?.[0]?.values?.map(dateValue => moment(dateValue.ts).format(
+                    timeTypes[this.props.timeInterval],
+                )),
+            },
             series: data.map(item => (
                 {
                     type: 'bar',
