@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
 
 import ReactEchartsCore from 'echarts-for-react';
+import { I18n } from '@iobroker/adapter-react-v5';
 import Generic from './Generic';
 
 const styles = () => ({
@@ -79,6 +80,24 @@ class ConsumptionComparation extends Generic {
     }
 
     async propertiesUpdate() {
+        let unit = '';
+        for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
+            try {
+                const object = await this.props.socket.getObject(this.state.rxData[`oid${i}`]);
+                if (object && object.common && object.common.unit) {
+                    unit = object.common.unit;
+                    break;
+                }
+            } catch (e) {
+            }
+        }
+        if (unit === 'kW') {
+            unit = 'kWh';
+        }
+        if (unit === 'W') {
+            unit = 'Wh';
+        }
+        this.setState({ unit });
     }
 
     componentDidMount() {
@@ -113,7 +132,7 @@ class ConsumptionComparation extends Generic {
         return {
             tooltip: {},
             grid: { containLabel: true },
-            xAxis: { name: 'amount' },
+            xAxis: { name: I18n.t(this.state.unit) || I18n.t('vis_2_widgets_energy_kwh') },
             yAxis: { type: 'category', data: data.map(item => item.name) },
             series: [
                 {
@@ -125,12 +144,6 @@ class ConsumptionComparation extends Generic {
                             color: item.color,
                         },
                     })),
-                    encode: {
-                        // Map the "amount" column to X axis.
-                        x: 'amount',
-                        // Map the "product" column to Y axis
-                        y: 'product',
-                    },
                 },
             ],
         };

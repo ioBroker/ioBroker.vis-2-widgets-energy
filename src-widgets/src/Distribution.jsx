@@ -6,7 +6,21 @@ import { I18n } from '@iobroker/adapter-react-v5';
 import Generic from './Generic';
 
 const styles = () => ({
-
+    cardContent: {
+        flex: 1,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        overflow: 'hidden',
+    },
+    circleContent: {
+        position: 'absolute',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10,
+    },
 });
 
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
@@ -177,8 +191,8 @@ class Distribution extends Generic {
                 ],
             },
             {
-                name: 'nodes',
-                label: 'vis_2_widgets_energy_level',
+                name: 'node',
+                label: 'vis_2_widgets_energy_node',
                 indexFrom: 1,
                 indexTo: 'nodesCount',
                 fields: [
@@ -281,6 +295,7 @@ class Distribution extends Generic {
         const homeFontSize = defaultFontSize || this.state.rxData.homeFontSize;
 
         let maxRadius = 0;
+        let valuesSum = 0;
         const circles = [{
             name: this.state.rxData.powerLineName,
             color: this.state.rxData.powerLineColor,
@@ -289,9 +304,11 @@ class Distribution extends Generic {
             fontSize: defaultFontSize || this.state.rxData.powerLineFontSize,
             oid: this.state.rxData['powerLine-oid'],
             value: this.state.values[`${this.state.rxData['powerLine-oid']}.val`],
+            icon: this.state.rxData[`${this.state.rxData.powerLineIcon}.val`],
         }];
         if (circles[0].radius > maxRadius) {
             maxRadius = circles[0].radius;
+            valuesSum += Math.abs(circles[0].value) || 0;
         }
 
         for (let i = 1; i <= this.state.rxData.nodesCount; i++) {
@@ -303,59 +320,91 @@ class Distribution extends Generic {
                 fontSize: defaultFontSize || this.state.rxData[`fontSize${i}`],
                 oid: this.state.rxData[`oid${i}`],
                 value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`],
+                icon: this.state.rxData[`icon${i}`],
             });
             if (circles[i].radius > maxRadius) {
                 maxRadius = circles[i].radius;
             }
+            valuesSum += Math.abs(this.state.values[`${this.state.rxData[`oid${i}`]}.val`]) || 0;
         }
+
+        let currentPart = 0;
 
         const content = <div
             ref={this.refCardContent}
-            style={{
-                flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', overflow: 'hidden',
-            }}
+            className={this.props.classes.cardContent}
         >
             {size && <div style={{ position: 'relative' }}>
                 {circles.map((circle, i) => {
                     const angle = 180 + i * 360 / circles.length;
                     const coordinates = polarToCartesian(0, 0, circle.distance + circle.radius + homeRadius, angle);
-                    return <div
-                        key={i}
-                        style={{
-                            position: 'absolute',
-                            top: size / 2 + coordinates.y - circle.radius,
-                            left: size / 2 + coordinates.x - circle.radius,
-                            width: circle.radius * 2,
-                            height: circle.radius * 2,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            zIndex: 10,
-                            fontSize: circle.fontSize,
-                        }}
-                    >
-                        <div>
-                            <div>{circle.name || circle.oid}</div>
-                            <div>{circle.value}</div>
+                    return <div key={i}>
+                        <div
+                            className={this.props.classes.circleContent}
+                            style={{
+                                top: size / 2 + coordinates.y - circle.radius,
+                                left: size / 2 + coordinates.x - circle.radius,
+                                width: circle.radius * 2,
+                                height: circle.radius * 2,
+                                fontSize: circle.fontSize,
+                            }}
+                        >
+                            <div>
+                                <div>{circle.icon ? <img src={circle.icon} alt="" width={circle.fontSize} /> : null}</div>
+                                <div>
+                                    {circle.value}
+                                    {' '}
+                                    {I18n.t('vis_2_widgets_energy_kwh')}
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            className={this.props.classes.circleContent}
+                            style={{
+                                top: size / 2 + coordinates.y + circle.radius,
+                                left: size / 2 + coordinates.x - circle.radius,
+                                width: circle.radius * 2,
+                                fontSize: circle.fontSize,
+                            }}
+                        >
+                            <div>
+                                <div>{circle.name || circle.oid}</div>
+                            </div>
                         </div>
                     </div>;
                 })}
-                <div style={{
-                    position: 'absolute',
-                    top: size / 2 - homeRadius,
-                    left: size / 2 - homeRadius,
-                    width: homeRadius * 2,
-                    height: homeRadius * 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 10,
-                    fontSize: homeFontSize,
-                }}
-                >
-                    <div>
-                        <div>{this.state.rxData.homeName || this.state.rxData['home-oid']}</div>
-                        <div>{this.state.values[`${this.state.rxData['home-oid']}.val`]}</div>
+                <div>
+                    <div
+                        className={this.props.classes.circleContent}
+                        style={{
+                            top: size / 2 - homeRadius,
+                            left: size / 2 - homeRadius,
+                            width: homeRadius * 2,
+                            height: homeRadius * 2,
+                            fontSize: homeFontSize,
+                        }}
+                    >
+                        <div>
+                            <div>{this.state.rxData.homeIcon ? <img src={this.state.rxData.homeIcon} alt="" width={homeFontSize} /> : null}</div>
+                            <div>
+                                {this.state.values[`${this.state.rxData['home-oid']}.val`]}
+                                {' '}
+                                {I18n.t('vis_2_widgets_energy_kwh')}
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        className={this.props.classes.circleContent}
+                        style={{
+                            top: size / 2 + homeRadius,
+                            left: size / 2 - homeRadius,
+                            width: homeRadius * 2,
+                            fontSize: homeFontSize,
+                        }}
+                    >
+                        <div>
+                            <div>{this.state.rxData.homeName || this.state.rxData['home-oid']}</div>
+                        </div>
                     </div>
                 </div>
                 <svg style={{ width: size, height: size }}>
@@ -367,6 +416,26 @@ class Distribution extends Generic {
                         stroke={this.state.rxData.homeColor || this.props.theme.palette.text.primary}
                         strokeWidth="3"
                     />
+                    {circles.map((circle, i) => {
+                        const partRadiusStroke = ((valuesSum - (Math.abs(circle.value) || 0)) / valuesSum) * (Math.PI * (homeRadius * 2));
+                        const result = <circle
+                            key={i}
+                            cx="50%"
+                            cy="50%"
+                            r={homeRadius}
+                            fill="none"
+                            stroke={circle.color || this.state.rxData.homeColor || this.props.theme.palette.text.primary}
+                            style={{
+                                strokeDashoffset: partRadiusStroke,
+                                strokeDasharray: Math.PI * (homeRadius * 2),
+                                transition: 'stroke-dashoffset 0.5s linear',
+                            }}
+                            transform={`rotate(${Math.round(currentPart / valuesSum * 360 + 135)},${size / 2},${size / 2})`}
+                            strokeWidth="3"
+                        />;
+                        currentPart += Math.abs(circle.value);
+                        return result;
+                    })}
                     {circles.map((circle, i) => {
                         const angle = 180 + i * 360 / circles.length;
                         const coordinates = polarToCartesian(0, 0, circle.distance + circle.radius + homeRadius, angle);

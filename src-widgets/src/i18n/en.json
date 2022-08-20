@@ -41,5 +41,6 @@
     "vis_2_widgets_energy_font_size": "Font size",
     "vis_2_widgets_energy_interval_selector": "Interval selector",
     "vis_2_widgets_energy_time_start_oid": "Time start OID",
-    "vis_2_widgets_energy_time_interval_oid": "Time interval OID"
+    "vis_2_widgets_energy_time_interval_oid": "Time interval OID",
+    "vis_2_widgets_energy_kwh": "kWh"
 }

@@ -5,6 +5,7 @@ import { withStyles, withTheme } from '@mui/styles';
 import ReactEchartsCore from 'echarts-for-react';
 import moment from 'moment';
 import Generic from './Generic';
+import { getFromToTime } from './Utils';
 
 const styles = () => ({
 
@@ -90,35 +91,28 @@ class Consumption extends Generic {
     }
 
     async propertiesUpdate() {
+        const interval = getFromToTime(this.props.timeStart, this.props.timeInterval);
+
         const types = {
             year: {
-                interval: 365 * 24 * 60 * 60 * 1000,
                 count: 12,
             },
             month: {
-                interval: 30 * 24 * 60 * 60 * 1000,
-                count: 30,
+                count: new Date(interval.from.getFullYear(), interval.from.getMonth, 0).getDate(),
             },
             week: {
-                interval: 7 * 24 * 60 * 60 * 1000,
                 count: 7,
             },
             day: {
-                interval: 24 * 60 * 60 * 1000,
                 count: 24,
             },
         };
-        const now = this.props.timeStart ? new Date(this.props.timeStart) : new Date();
-        now.setHours(0, 0, 0, 0);
-        const start = now.getTime() - types[this.props.timeInterval].interval;
-        const end = now.getTime();
-        const count = types[this.props.timeInterval].count;
 
         const options = {
             instance: this.props.systemConfig?.common?.defaultHistory || 'history.0',
-            start,
-            end,
-            count,
+            start: interval.from.getTime(),
+            end: interval.to.getTime(),
+            count: types[this.props.timeInterval].count,
             from: false,
             ack: false,
             q: false,
@@ -172,7 +166,7 @@ class Consumption extends Generic {
             year: 'MMM',
             month: 'DD.MM',
             week: 'ddd',
-            day: 'HH:mm',
+            day: 'HH:00',
         };
 
         return {
@@ -187,7 +181,7 @@ class Consumption extends Generic {
                 },
             },
             grid: { containLabel: true },
-            yAxis: { name: 'amount' },
+            yAxis: { },
             xAxis: {
                 type: 'category',
                 data: data?.[0]?.values?.map(dateValue => moment(dateValue.ts).format(
@@ -202,12 +196,6 @@ class Consumption extends Generic {
                         color: item.color,
                     },
                     data: item.values?.map(dateValue => dateValue.val),
-                    encode: {
-                        // Map the "amount" column to X axis.
-                        y: 'amount',
-                        // Map the "product" column to Y axis
-                        x: 'product',
-                    },
                     stack: 'one',
                 }
             )),

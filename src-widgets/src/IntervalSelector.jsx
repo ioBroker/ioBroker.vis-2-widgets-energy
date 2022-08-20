@@ -7,6 +7,7 @@ import { I18n } from '@iobroker/adapter-react-v5';
 import { Button, ButtonGroup, IconButton } from '@mui/material';
 import { NavigateBefore as NavigateBeforeIcon, NavigateNext as NavigateNextIcon } from '@mui/icons-material';
 import Generic from './Generic';
+import { getFromToTime } from './Utils';
 
 const styles = () => ({
     nowButton: {
@@ -76,69 +77,94 @@ class IntervalSelector extends Generic {
         return IntervalSelector.getWidgetInfo();
     }
 
+    onStateUpdated(id, value) {
+        if (id === this.state.rxData['timeStart-oid']) {
+            this.props.setTimeStart(value.val);
+        }
+        if (id === this.state.rxData['timeInterval-oid']) {
+            this.props.setTimeInterval(value.val);
+        }
+    }
+
+    setTimeStart = timeStart => {
+        this.props.setTimeStart(timeStart);
+        if (this.state.rxData['timeStart-oid']) {
+            this.props.socket.setState(this.state.rxData['timeStart-oid'], timeStart);
+        }
+    };
+
+    setTimeInterval = timeInterval => {
+        this.props.setTimeInterval(timeInterval);
+        if (this.state.rxData['timeInterval-oid']) {
+            this.props.socket.setState(this.state.rxData['timeInterval-oid'], timeInterval);
+        }
+    };
+
     renderWidgetBody(props) {
         super.renderWidgetBody(props);
 
         let periodName = '';
 
-        const end = this.props.timeStart || new Date().getTime();
+        const interval = getFromToTime(this.props.timeStart, this.props.timeInterval);
 
-        if (this.props.timeInterval === 'now') {
-            periodName = moment(end).format('DD.MM.YYYY, hh:mm:ss');
-        } else if (this.props.timeInterval === 'day') {
-            periodName = moment(end).format('DD.MM.YYYY');
+        if (this.props.timeInterval === 'day') {
+            periodName = moment(interval.from).format('DD.MM.YYYY');
         } else if (this.props.timeInterval === 'week') {
-            periodName = `${moment(new Date(end) - 7 * 24 * 60 * 60 * 1000).format('DD.MM.YYYY')} - ${moment(end).format('DD.MM.YYYY')}`;
+            periodName = `${moment(new Date(interval.from) - 7 * 24 * 60 * 60 * 1000).format('DD.MM')} - ${moment(interval.to).format('DD.MM')}`;
         } else if (this.props.timeInterval === 'month') {
-            periodName = `${moment(new Date(end) - 30 * 24 * 60 * 60 * 1000).format('DD.MM.YYYY')} - ${moment(end).format('DD.MM.YYYY')}`;
+            periodName = moment(new Date(interval.from)).format('MM.YYYY');
         } else if (this.props.timeInterval === 'year') {
-            periodName = `${moment(new Date(end) - 365 * 24 * 60 * 60 * 1000).format('DD.MM.YYYY')} - ${moment(end).format('DD.MM.YYYY')}`;
+            periodName = moment(new Date(interval.from)).format('YYYY');
         }
         const content = <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%',
         }}
         >
-            {periodName}
+            <span>{periodName}</span>
             <IconButton onClick={() => {
-                let newEnd = end;
+                const newEnd = new Date(interval.from);
                 if (this.props.timeInterval === 'day') {
-                    newEnd -= 24 * 60 * 60 * 1000;
+                    newEnd.setDate(newEnd.getDate() - 1);
                 } else if (this.props.timeInterval === 'week') {
-                    newEnd -= 7 * 24 * 60 * 60 * 1000;
+                    newEnd.setDate(newEnd.getDate() - 7);
                 } else if (this.props.timeInterval === 'month') {
-                    newEnd -= 30 * 24 * 60 * 60 * 1000;
+                    newEnd.setMonth(newEnd.getMonth() - 1);
                 } else if (this.props.timeInterval === 'year') {
-                    newEnd -= 365 * 24 * 60 * 60 * 1000;
+                    newEnd.setFullYear(newEnd.getFullYear() - 1);
                 }
-                this.props.setTimeStart(newEnd);
+                this.setTimeStart(newEnd.getTime());
             }}
             >
                 <NavigateBeforeIcon />
             </IconButton>
-            <IconButton onClick={() => {
-                let newEnd = end;
-                if (this.props.timeInterval === 'day') {
-                    newEnd += 24 * 60 * 60 * 1000;
-                } else if (this.props.timeInterval === 'week') {
-                    newEnd += 7 * 24 * 60 * 60 * 1000;
-                } else if (this.props.timeInterval === 'month') {
-                    newEnd += 30 * 24 * 60 * 60 * 1000;
-                } else if (this.props.timeInterval === 'year') {
-                    newEnd += 365 * 24 * 60 * 60 * 1000;
-                }
-                if (newEnd > new Date().getTime()) {
-                    newEnd = null;
-                }
-                this.props.setTimeStart(newEnd);
-            }}
+            <IconButton
+                disabled={!this.props.timeStart}
+                onClick={() => {
+                    const newEnd = new Date(interval.from);
+                    if (this.props.timeInterval === 'day') {
+                        newEnd.setDate(newEnd.getDate() + 1);
+                    } else if (this.props.timeInterval === 'week') {
+                        newEnd.setDate(newEnd.getDate() + 7);
+                    } else if (this.props.timeInterval === 'month') {
+                        newEnd.setMonth(newEnd.getMonth() + 1);
+                    } else if (this.props.timeInterval === 'year') {
+                        newEnd.setFullYear(newEnd.getFullYear() + 1);
+                    }
+                    this.setTimeStart(
+                        getFromToTime(newEnd, this.props.timeInterval).from.getTime() >= getFromToTime(null, this.props.timeInterval).from.getTime()
+                            ? null
+                            : newEnd.getTime(),
+                    );
+                }}
             >
 
                 <NavigateNextIcon />
             </IconButton>
             <Button
                 variant="contained"
-                color={this.props.timeInterval === 'now' ? 'primary' : 'grey'}
-                onClick={() => this.props.setTimeInterval('now')}
+                color="grey"
+                disabled={!this.props.timeStart}
+                onClick={() => this.setTimeStart(0)}
                 className={this.props.classes.nowButton}
             >
                 {I18n.t('vis_2_widgets_energy_now')}
@@ -153,8 +179,8 @@ class IntervalSelector extends Generic {
                             if (period === this.props.timeInterval) {
                                 return;
                             }
-                            this.props.setTimeInterval(period);
-                            this.props.setTimeStart(0);
+                            this.setTimeInterval(period);
+                            this.setTimeStart(0);
                         }}
                     >
                         {I18n.t(`vis_2_widgets_energy_${period}`)}
