@@ -75,7 +75,7 @@ class ConsumptionComparation extends Generic {
                 height: 182,
                 position: 'relative',
             },
-            visPrev: 'widgets/vis-2-widgets-energy/img/prev_color_gauge.png',
+            visPrev: 'widgets/vis-2-widgets-energy/img/prev_consumption_comparation.png',
         };
     }
 

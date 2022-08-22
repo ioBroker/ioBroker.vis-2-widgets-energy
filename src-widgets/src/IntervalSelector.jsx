@@ -13,6 +13,15 @@ const styles = () => ({
     nowButton: {
         marginRight: 20,
     },
+    contentContainer: {
+        display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%',
+    },
+    content: {
+        display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap',
+    },
+    periodName: {
+        flexShrink: 0,
+    },
 });
 
 class IntervalSelector extends Generic {
@@ -51,7 +60,7 @@ class IntervalSelector extends Generic {
                 height: 182,
                 position: 'relative',
             },
-            visPrev: 'widgets/vis-2-widgets-energy/img/prev_color_gauge.png',
+            visPrev: 'widgets/vis-2-widgets-energy/img/prev_interval_selector.png',
         };
     }
 
@@ -110,82 +119,87 @@ class IntervalSelector extends Generic {
         if (this.props.timeInterval === 'day') {
             periodName = moment(interval.from).format('DD.MM.YYYY');
         } else if (this.props.timeInterval === 'week') {
-            periodName = `${moment(new Date(interval.from) - 7 * 24 * 60 * 60 * 1000).format('DD.MM')} - ${moment(interval.to).format('DD.MM')}`;
+            periodName = <>
+                {moment(new Date(interval.from) - 7 * 24 * 60 * 60 * 1000).format('DD.MM')}
+                {' '}
+                &mdash;
+                {' '}
+                {moment(interval.to).format('DD.MM')}
+            </>;
         } else if (this.props.timeInterval === 'month') {
             periodName = moment(new Date(interval.from)).format('MM.YYYY');
         } else if (this.props.timeInterval === 'year') {
             periodName = moment(new Date(interval.from)).format('YYYY');
         }
-        const content = <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%',
-        }}
-        >
-            <span>{periodName}</span>
-            <IconButton onClick={() => {
-                const newEnd = new Date(interval.from);
-                if (this.props.timeInterval === 'day') {
-                    newEnd.setDate(newEnd.getDate() - 1);
-                } else if (this.props.timeInterval === 'week') {
-                    newEnd.setDate(newEnd.getDate() - 7);
-                } else if (this.props.timeInterval === 'month') {
-                    newEnd.setMonth(newEnd.getMonth() - 1);
-                } else if (this.props.timeInterval === 'year') {
-                    newEnd.setFullYear(newEnd.getFullYear() - 1);
-                }
-                this.setTimeStart(newEnd.getTime());
-            }}
-            >
-                <NavigateBeforeIcon />
-            </IconButton>
-            <IconButton
-                disabled={!this.props.timeStart}
-                onClick={() => {
+        const content = <div className={this.props.classes.contentContainer}>
+            <div className={this.props.classes.content}>
+                <span className={this.props.classes.periodName}>{periodName}</span>
+                <IconButton onClick={() => {
                     const newEnd = new Date(interval.from);
                     if (this.props.timeInterval === 'day') {
-                        newEnd.setDate(newEnd.getDate() + 1);
+                        newEnd.setDate(newEnd.getDate() - 1);
                     } else if (this.props.timeInterval === 'week') {
-                        newEnd.setDate(newEnd.getDate() + 7);
+                        newEnd.setDate(newEnd.getDate() - 7);
                     } else if (this.props.timeInterval === 'month') {
-                        newEnd.setMonth(newEnd.getMonth() + 1);
+                        newEnd.setMonth(newEnd.getMonth() - 1);
                     } else if (this.props.timeInterval === 'year') {
-                        newEnd.setFullYear(newEnd.getFullYear() + 1);
+                        newEnd.setFullYear(newEnd.getFullYear() - 1);
                     }
-                    this.setTimeStart(
-                        getFromToTime(newEnd, this.props.timeInterval).from.getTime() >= getFromToTime(null, this.props.timeInterval).from.getTime()
-                            ? null
-                            : newEnd.getTime(),
-                    );
+                    this.setTimeStart(newEnd.getTime());
                 }}
-            >
+                >
+                    <NavigateBeforeIcon />
+                </IconButton>
+                <IconButton
+                    disabled={!this.props.timeStart}
+                    onClick={() => {
+                        const newEnd = new Date(interval.from);
+                        if (this.props.timeInterval === 'day') {
+                            newEnd.setDate(newEnd.getDate() + 1);
+                        } else if (this.props.timeInterval === 'week') {
+                            newEnd.setDate(newEnd.getDate() + 7);
+                        } else if (this.props.timeInterval === 'month') {
+                            newEnd.setMonth(newEnd.getMonth() + 1);
+                        } else if (this.props.timeInterval === 'year') {
+                            newEnd.setFullYear(newEnd.getFullYear() + 1);
+                        }
+                        this.setTimeStart(
+                            getFromToTime(newEnd, this.props.timeInterval).from.getTime() >= getFromToTime(null, this.props.timeInterval).from.getTime()
+                                ? null
+                                : newEnd.getTime(),
+                        );
+                    }}
+                >
 
-                <NavigateNextIcon />
-            </IconButton>
-            <Button
-                variant="contained"
-                color="grey"
-                disabled={!this.props.timeStart}
-                onClick={() => this.setTimeStart(0)}
-                className={this.props.classes.nowButton}
-            >
-                {I18n.t('vis_2_widgets_energy_now')}
-            </Button>
-            <ButtonGroup>
-                {['day', 'week', 'month', 'year'].map(period =>
-                    <Button
-                        key={period}
-                        variant="contained"
-                        color={period === this.props.timeInterval ? 'primary' : 'grey'}
-                        onClick={() => {
-                            if (period === this.props.timeInterval) {
-                                return;
-                            }
-                            this.setTimeInterval(period);
-                            this.setTimeStart(0);
-                        }}
-                    >
-                        {I18n.t(`vis_2_widgets_energy_${period}`)}
-                    </Button>)}
-            </ButtonGroup>
+                    <NavigateNextIcon />
+                </IconButton>
+                <Button
+                    variant="contained"
+                    color="grey"
+                    disabled={!this.props.timeStart}
+                    onClick={() => this.setTimeStart(0)}
+                    className={this.props.classes.nowButton}
+                >
+                    {I18n.t('vis_2_widgets_energy_now')}
+                </Button>
+                <ButtonGroup>
+                    {['day', 'week', 'month', 'year'].map(period =>
+                        <Button
+                            key={period}
+                            variant="contained"
+                            color={period === this.props.timeInterval ? 'primary' : 'grey'}
+                            onClick={() => {
+                                if (period === this.props.timeInterval) {
+                                    return;
+                                }
+                                this.setTimeInterval(period);
+                                this.setTimeStart(0);
+                            }}
+                        >
+                            {I18n.t(`vis_2_widgets_energy_${period}`)}
+                        </Button>)}
+                </ButtonGroup>
+            </div>
         </div>;
         return this.wrapContent(content, null, { textAlign: 'center' });
     }

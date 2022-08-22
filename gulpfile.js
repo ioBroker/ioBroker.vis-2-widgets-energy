@@ -214,10 +214,8 @@ gulp.task('widget-3-copy', () => Promise.all([
         `!${SRC}build/static/media/Workspace.*.svg`,
     ]).pipe(gulp.dest(`widgets/${adapterName}/static`)),
     gulp.src([
-        `${SRC}build/static/js/vendors-node_modules_d3-array_src_index_js-node_modules_d3-collection_src_index_js-*.chunk.*`,
-        `${SRC}build/static/js/vendors-node_modules_react-battery-gauge_dist_react-battery-gauge*.*`,
-        `${SRC}build/static/js/vendors-node_modules_react-gauge-chart*.*`,
-        `${SRC}build/static/js/vendors-node_modules_react-liquid-gauge*.*`,
+        `${SRC}build/static/js/vendors-node_modules_echarts*.*`,
+        `${SRC}build/static/js/vendors-node_modules_moment*.*`,
     ]).pipe(gulp.dest(`widgets/${adapterName}/static/js`)),
     gulp.src([`${SRC}src/i18n/*.json`]).pipe(gulp.dest(`widgets/${adapterName}/i18n`)),
     new Promise(resolve =>

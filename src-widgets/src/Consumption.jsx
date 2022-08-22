@@ -48,6 +48,48 @@ class Consumption extends Generic {
                 ],
             },
             {
+                name: 'aggregation',
+                label: 'vis_2_widgets_energy_aggregation',
+                fields: [
+                    {
+                        name: 'aggregate',
+                        label: 'vis_2_widgets_energy_aggregate',
+                        type: 'select',
+                        options: ['minmax', 'max', 'min', 'average', 'total', 'count', 'percentile', 'quantile', 'integral', 'none'],
+                        default: 'total',
+                    },
+                    {
+                        name: 'percentile',
+                        default: 50,
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_percentile',
+                        hidden: data => data.aggregate !== 'percentile',
+                    },
+                    {
+                        name: 'quantile',
+                        default: 0.5,
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_quantile',
+                        hidden: data => data.aggregate !== 'quantile',
+                    },
+                    {
+                        name: 'integralUnit',
+                        default: 60,
+                        type: 'number',
+                        label: 'vis_2_widgets_energy_integral_unit',
+                        hidden: data => data.aggregate !== 'integral',
+                    },
+                    {
+                        name: 'integralInterpolation',
+                        default: 'none',
+                        type: 'select',
+                        options: ['linear', 'none'],
+                        label: 'vis_2_widgets_energy_integral_interpolation',
+                        hidden: data => data.aggregate !== 'integral',
+                    },
+                ],
+            },
+            {
                 name: 'devices',
                 label: 'vis_2_widgets_energy_level',
                 indexFrom: 1,
@@ -86,7 +128,7 @@ class Consumption extends Generic {
                 height: 182,
                 position: 'relative',
             },
-            visPrev: 'widgets/vis-2-widgets-energy/img/prev_color_gauge.png',
+            visPrev: 'widgets/vis-2-widgets-energy/img/prev_consumption.png',
         };
     }
 
@@ -117,7 +159,11 @@ class Consumption extends Generic {
             ack: false,
             q: false,
             addID: false,
-            aggregate: 'total',
+            aggregate: this.state.rxData.aggregate || 'total',
+            percentile: this.state.rxData.percentile,
+            quantile: this.state.rxData.quantile,
+            integralUnit: this.state.rxData.integralUnit,
+            integralInterpolation: this.state.rxData.integralInterpolation,
         };
 
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {

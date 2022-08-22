@@ -35,6 +35,7 @@ class Distribution extends Generic {
     constructor(props) {
         super(props);
         this.state.offset = 0;
+        this.state.objects = {};
         this.refCardContent = React.createRef();
     }
 
@@ -60,19 +61,22 @@ class Distribution extends Generic {
                         name: 'defaultCircleSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_default_circle_size',
+                        tooltip: 'vis_2_widgets_energy_default_circle_size_tooltip',
                         default: 10,
                     },
                     {
                         name: 'defaultDistanceSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_default_distance_size',
-                        default: 20,
+                        tooltip: 'vis_2_widgets_energy_default_distance_size_tooltip',
+                        default: 18,
                     },
                     {
                         name: 'defaultFontSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_default_font_size',
-                        default: 16,
+                        tooltip: 'vis_2_widgets_energy_default_font_size_tooltip',
+                        default: 12,
                     },
                     {
                         name: 'nodesCount',
@@ -115,16 +119,19 @@ class Distribution extends Generic {
                         name: 'homeCircleSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_home_circle_size',
+                        tooltip: 'vis_2_widgets_energy_home_circle_size_tooltip',
                     },
                     {
                         name: 'homeDistanceSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_home_distance_size',
+                        tooltip: 'vis_2_widgets_energy_home_distance_size_tooltip',
                     },
                     {
                         name: 'homeFontSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_home_font_size',
+                        tooltip: 'vis_2_widgets_energy_home_font_size_tooltip',
                     },
 
                 ],
@@ -176,16 +183,19 @@ class Distribution extends Generic {
                         name: 'powerLineCircleSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_power_line_circle_size',
+                        tooltip: 'vis_2_widgets_energy_power_line_circle_size_tooltip',
                     },
                     {
                         name: 'powerLineDistanceSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_power_line_distance_size',
+                        tooltip: 'vis_2_widgets_energy_power_line_distance_size_tooltip',
                     },
                     {
                         name: 'powerLineFontSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_power_line_font_size',
+                        tooltip: 'vis_2_widgets_energy_power_line_font_size_tooltip',
                     },
 
                 ],
@@ -227,16 +237,19 @@ class Distribution extends Generic {
                         name: 'circleSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_circle_size',
+                        tooltip: 'vis_2_widgets_energy_circle_size_tooltip',
                     },
                     {
                         name: 'distanceSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_distance_size',
+                        tooltip: 'vis_2_widgets_energy_distance_size_tooltip',
                     },
                     {
                         name: 'fontSize',
                         type: 'number',
                         label: 'vis_2_widgets_energy_font_size',
+                        tooltip: 'vis_2_widgets_energy_font_size_tooltip',
                     },
 
                 ],
@@ -246,11 +259,57 @@ class Distribution extends Generic {
                 height: 182,
                 position: 'relative',
             },
-            visPrev: 'widgets/vis-2-widgets-energy/img/prev_color_gauge.png',
+            visPrev: 'widgets/vis-2-widgets-energy/img/prev_distribution.png',
         };
     }
 
+    async loadObject(oid, iconExists) {
+        if (oid) {
+            // read object itself
+            const object = await this.props.socket.getObject(oid);
+            if (!object) {
+                return { common: {} };
+            }
+            object.common = object.common || {};
+            if (!iconExists && !object.common.icon && (object.type === 'state' || object.type === 'channel')) {
+                const idArray = oid.split('.');
+
+                // read channel
+                const parentObject = await this.props.socket.getObject(idArray.slice(0, -1).join('.'));
+                if (!parentObject?.common?.icon && (object.type === 'state' || object.type === 'channel')) {
+                    const grandParentObject = await this.props.socket.getObject(idArray.slice(0, -2).join('.'));
+                    if (grandParentObject?.common?.icon) {
+                        object.common.icon = grandParentObject.common.icon;
+                    }
+                } else {
+                    object.common.icon = parentObject.common.icon;
+                }
+            }
+            return { common: object.common, _id: object._id };
+        }
+        return { common: {} };
+    }
+
     async propertiesUpdate() {
+        const actualRxData = JSON.stringify(this.state.rxData);
+        if (this.lastRxData === actualRxData) {
+            return;
+        }
+
+        this.lastRxData = actualRxData;
+
+        const objects = {};
+
+        // try to find icons for all OIDs
+        for (let i = 1; i <= this.state.rxData.nodesCount; i++) {
+            objects[`object${i}`] = await this.loadObject(this.state.rxData[`oid${i}`], this.state.rxData[`icon${i}`]);
+        }
+        objects.home = await this.loadObject(this.state.rxData['home-oid'], this.state.rxData.homeIcon);
+        objects.powerLine = await this.loadObject(this.state.rxData['powerLine-oid'], this.state.rxData.powerLineIcon);
+
+        if (JSON.stringify(objects) !== JSON.stringify(this.state.objects)) {
+            this.setState({ objects });
+        }
     }
 
     componentDidMount() {
@@ -288,11 +347,12 @@ class Distribution extends Generic {
         }
 
         const defaultRadiusSize = this.state.rxData.defaultRadiusSize || 10;
-        const defaultDistanceSize = this.state.rxData.defaultDistanceSize || 20;
-        const defaultFontSize = this.state.rxData.defaultFontSize || 16;
+        const defaultDistanceSize = this.state.rxData.defaultDistanceSize || 18;
+        const defaultFontSize = this.state.rxData.defaultFontSize || 12;
 
         const homeRadius = size * (this.state.rxData.homeCircleSize || defaultRadiusSize) / 100;
         const homeFontSize = defaultFontSize || this.state.rxData.homeFontSize;
+        const homeIcon = this.state.rxData.homeIcon || this.state.objects.home?.common?.icon;
 
         let maxRadius = 0;
         let valuesSum = 0;
@@ -304,7 +364,7 @@ class Distribution extends Generic {
             fontSize: defaultFontSize || this.state.rxData.powerLineFontSize,
             oid: this.state.rxData['powerLine-oid'],
             value: this.state.values[`${this.state.rxData['powerLine-oid']}.val`],
-            icon: this.state.rxData[`${this.state.rxData.powerLineIcon}.val`],
+            icon: this.state.rxData.powerLineIcon || this.state.objects.powerLine?.common?.icon,
         }];
         if (circles[0].radius > maxRadius) {
             maxRadius = circles[0].radius;
@@ -320,7 +380,7 @@ class Distribution extends Generic {
                 fontSize: defaultFontSize || this.state.rxData[`fontSize${i}`],
                 oid: this.state.rxData[`oid${i}`],
                 value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`],
-                icon: this.state.rxData[`icon${i}`],
+                icon: this.state.rxData[`icon${i}`] || this.state.objects[`object${i}`]?.common?.icon,
             });
             if (circles[i].radius > maxRadius) {
                 maxRadius = circles[i].radius;
@@ -350,7 +410,7 @@ class Distribution extends Generic {
                             }}
                         >
                             <div>
-                                <div>{circle.icon ? <img src={circle.icon} alt="" width={circle.fontSize} /> : null}</div>
+                                <div>{circle.icon ? <img src={circle.icon} alt="" width={Math.round(circle.fontSize * 1.5)} /> : null}</div>
                                 <div>
                                     {circle.value}
                                     {' '}
@@ -385,7 +445,7 @@ class Distribution extends Generic {
                         }}
                     >
                         <div>
-                            <div>{this.state.rxData.homeIcon ? <img src={this.state.rxData.homeIcon} alt="" width={homeFontSize} /> : null}</div>
+                            <div>{homeIcon ? <img src={homeIcon} alt="" width={Math.round(homeFontSize * 1.5)} /> : null}</div>
                             <div>
                                 {this.state.values[`${this.state.rxData['home-oid']}.val`]}
                                 {' '}
