@@ -467,7 +467,7 @@ class Distribution extends Generic {
                         </div>
                     </div>
                 </div>
-                <svg style={{ width: size, height: size }}>
+                <svg style={{ width: size, height: size, overflow: 'visible' }}>
                     <circle
                         cx="50%"
                         cy="50%"
