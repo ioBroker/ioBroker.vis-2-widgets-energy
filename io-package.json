@@ -50,7 +50,7 @@
         "name": "vis2energyWidgets",
         "url": "vis-2-widgets-energy/customWidgets.js",
         "components": [
-          "ConsumptionComparaison",
+          "ConsumptionComparison",
           "Consumption",
           "IntervalSelector",
           "Distribution"

@@ -6,7 +6,7 @@ import { i18n as I18n } from '@iobroker/adapter-react-v5';
 
 import translations from './translations';
 
-import ConsumptionComparaison from './ConsumptionComparaison';
+import ConsumptionComparison from './ConsumptionComparison';
 import Distribution from './Distribution';
 import Consumption from './Consumption';
 import IntervalSelector from './IntervalSelector';
@@ -86,7 +86,7 @@ class App extends WidgetDemoApp {
                     min: 12,
                 }}
             />
-            <ConsumptionComparaison
+            <ConsumptionComparison
                 socket={this.socket}
                 themeType={this.state.themeType}
                 style={{
@@ -95,7 +95,7 @@ class App extends WidgetDemoApp {
                 }}
                 systemConfig={this.state.systemConfig}
                 data={{
-                    name: 'ConsumptionComparaison',
+                    name: 'ConsumptionComparison',
                     devicesCount: 2,
                     oid1: 'javascript.0.temperatureActual',
                     name1: 'temperatureActual',

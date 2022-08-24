@@ -10,7 +10,7 @@ const styles = () => ({
 
 });
 
-class ConsumptionComparaison extends Generic {
+class ConsumptionComparison extends Generic {
     constructor(props) {
         super(props);
         this.refCardContent = React.createRef();
@@ -18,10 +18,10 @@ class ConsumptionComparaison extends Generic {
 
     static getWidgetInfo() {
         return {
-            id: 'tplEnergy2ConsumptionComparaison',
+            id: 'tplEnergy2ConsumptionComparison',
             visSet: 'vis-2-widgets-energy',
-            visWidgetLabel: 'vis_2_widgets_energy_consumption_comparaison',  // Label of widget
-            visName: 'Consumption comparaison',
+            visWidgetLabel: 'vis_2_widgets_energy_consumption_comparison',  // Label of widget
+            visName: 'Consumption comparison',
             visAttrs: [{
                 name: 'common',
                 fields: [
@@ -75,7 +75,7 @@ class ConsumptionComparaison extends Generic {
                 height: 182,
                 position: 'relative',
             },
-            visPrev: 'widgets/vis-2-widgets-energy/img/prev_consumption_comparaison.png',
+            visPrev: 'widgets/vis-2-widgets-energy/img/prev_consumption_comparison.png',
         };
     }
 
@@ -113,7 +113,7 @@ class ConsumptionComparaison extends Generic {
 
     // eslint-disable-next-line class-methods-use-this
     getWidgetInfo() {
-        return ConsumptionComparaison.getWidgetInfo();
+        return ConsumptionComparison.getWidgetInfo();
     }
 
     /**
@@ -163,7 +163,7 @@ class ConsumptionComparaison extends Generic {
     }
 }
 
-ConsumptionComparaison.propTypes = {
+ConsumptionComparison.propTypes = {
     systemConfig: PropTypes.object,
     socket: PropTypes.object,
     themeType: PropTypes.string,
@@ -171,4 +171,4 @@ ConsumptionComparaison.propTypes = {
     data: PropTypes.object,
 };
 
-export default withStyles(styles)(withTheme(ConsumptionComparaison));
+export default withStyles(styles)(withTheme(ConsumptionComparison));
