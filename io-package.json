@@ -50,9 +50,10 @@
         "name": "vis2energyWidgets",
         "url": "vis-2-widgets-energy/customWidgets.js",
         "components": [
-          "ColorGauge",
-          "WaterGauge",
-          "BatteryGauge"
+          "ConsumptionComparaison",
+          "Consumption",
+          "IntervalSelector",
+          "Distribution"
         ]
       }
     },

@@ -10,7 +10,7 @@ const styles = () => ({
 
 });
 
-class ConsumptionComparation extends Generic {
+class ConsumptionComparaison extends Generic {
     constructor(props) {
         super(props);
         this.refCardContent = React.createRef();
@@ -18,10 +18,10 @@ class ConsumptionComparation extends Generic {
 
     static getWidgetInfo() {
         return {
-            id: 'tplEnergy2ConsumptionComparation',
+            id: 'tplEnergy2ConsumptionComparaison',
             visSet: 'vis-2-widgets-energy',
-            visWidgetLabel: 'vis_2_widgets_energy_consumption_comparation',  // Label of widget
-            visName: 'Consumption comparation',
+            visWidgetLabel: 'vis_2_widgets_energy_consumption_comparaison',  // Label of widget
+            visName: 'Consumption comparaison',
             visAttrs: [{
                 name: 'common',
                 fields: [
@@ -75,7 +75,7 @@ class ConsumptionComparation extends Generic {
                 height: 182,
                 position: 'relative',
             },
-            visPrev: 'widgets/vis-2-widgets-energy/img/prev_consumption_comparation.png',
+            visPrev: 'widgets/vis-2-widgets-energy/img/prev_consumption_comparaison.png',
         };
     }
 
@@ -89,6 +89,7 @@ class ConsumptionComparation extends Generic {
                     break;
                 }
             } catch (e) {
+                // ignore
             }
         }
         if (unit === 'kW') {
@@ -112,7 +113,7 @@ class ConsumptionComparation extends Generic {
 
     // eslint-disable-next-line class-methods-use-this
     getWidgetInfo() {
-        return ConsumptionComparation.getWidgetInfo();
+        return ConsumptionComparaison.getWidgetInfo();
     }
 
     /**
@@ -162,7 +163,7 @@ class ConsumptionComparation extends Generic {
     }
 }
 
-ConsumptionComparation.propTypes = {
+ConsumptionComparaison.propTypes = {
     systemConfig: PropTypes.object,
     socket: PropTypes.object,
     themeType: PropTypes.string,
@@ -170,4 +171,4 @@ ConsumptionComparation.propTypes = {
     data: PropTypes.object,
 };
 
-export default withStyles(styles)(withTheme(ConsumptionComparation));
+export default withStyles(styles)(withTheme(ConsumptionComparaison));

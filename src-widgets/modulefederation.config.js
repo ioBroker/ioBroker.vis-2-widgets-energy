@@ -3,7 +3,7 @@ const makeFederation = require('@iobroker/vis-2-widgets-react-dev/modulefederati
 module.exports = makeFederation(
     'vis2energyWidgets',
     {
-        './ConsumptionComparation': './src/ConsumptionComparation',
+        './ConsumptionComparaison': './src/ConsumptionComparaison',
         './Consumption': './src/Consumption',
         './IntervalSelector': './src/IntervalSelector',
         './Distribution': './src/Distribution',
