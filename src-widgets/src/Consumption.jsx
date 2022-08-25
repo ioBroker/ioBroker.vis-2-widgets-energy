@@ -4,6 +4,9 @@ import { withStyles, withTheme } from '@mui/styles';
 
 import ReactEchartsCore from 'echarts-for-react';
 import moment from 'moment';
+
+import { I18n } from '@iobroker/adapter-react-v5';
+
 import Generic from './Generic';
 import { getFromToTime } from './Utils';
 

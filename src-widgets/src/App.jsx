@@ -2,7 +2,7 @@ import React from 'react';
 import { withStyles } from '@mui/styles';
 
 import WidgetDemoApp from '@iobroker/vis-2-widgets-react-dev/widgetDemoApp';
-import { i18n as I18n } from '@iobroker/adapter-react-v5';
+import { I18n } from '@iobroker/adapter-react-v5';
 
 import translations from './translations';
 

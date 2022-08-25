@@ -3,7 +3,12 @@ import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
 
 import { I18n } from '@iobroker/adapter-react-v5';
+import { Home as HomeIcon } from '@mui/icons-material';
+
 import Generic from './Generic';
+import PowerLine from './icons/PowerLine';
+import SolarIcon from './icons/Solar';
+import LeafIcon from './icons/Leaf';
 
 const styles = () => ({
     cardContent: {
@@ -17,6 +22,7 @@ const styles = () => ({
     circleContent: {
         position: 'absolute',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 10,
@@ -25,17 +31,46 @@ const styles = () => ({
 
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     const returnValue = {};
-    const angleInRadians =  angleInDegrees * Math.PI / 180.0;
-    returnValue.x =    Math.round(centerX + radius * Math.cos(angleInRadians));
-    returnValue.y =    Math.round(centerY + radius * Math.sin(angleInRadians));
+    const angleInRadians = (angleInDegrees * Math.PI) / 180.0;
+    returnValue.x = Math.round((centerX + radius * Math.cos(angleInRadians)) * 100) / 100;
+    returnValue.y = Math.round((centerY + radius * Math.sin(angleInRadians)) * 100) / 100;
     return returnValue;
 }
+
+const STANDARD_ICONS = [
+    { value: '', label: 'vis_2_widgets_energy_icons_none' },
+    {
+        value: 'home',
+        label: 'vis_2_widgets_energy_icons_home',
+        icon: <HomeIcon width={24} />,
+        component: HomeIcon,
+    },
+    {
+        value: 'powerLIne',
+        label: 'vis_2_widgets_energy_icons_powerline',
+        icon: <PowerLine width={24} />,
+        component: PowerLine,
+    },
+    {
+        value: 'solar',
+        label: 'vis_2_widgets_energy_icons_solar',
+        icon: <SolarIcon width={24} />,
+        component: SolarIcon,
+    },
+    {
+        value: 'leaf',
+        label: 'vis_2_widgets_energy_icons_leaf',
+        icon: <LeafIcon width={24} />,
+        component: LeafIcon,
+    },
+];
 
 class Distribution extends Generic {
     constructor(props) {
         super(props);
         this.state.offset = 0;
         this.state.objects = {};
+        this.state.units = {};
         this.refCardContent = React.createRef();
     }
 
@@ -81,12 +116,15 @@ class Distribution extends Generic {
                     {
                         name: 'nodesCount',
                         type: 'number',
+                        min: 0,
+                        max: 10,
                         label: 'vis_2_widgets_energy_nodes_count',
                     },
                 ],
             },
             {
                 name: 'home',
+                label: 'vis_2_widgets_energy_group_home',
                 fields: [
                     {
                         name: 'home-oid',
@@ -111,19 +149,36 @@ class Distribution extends Generic {
                         label: 'vis_2_widgets_energy_home_color',
                     },
                     {
+                        name: 'homeStandardIcon',
+                        type: 'select',
+                        label: 'vis_2_widgets_energy_standard_icon',
+                        options: STANDARD_ICONS.map(item => ({
+                            value: item.value,
+                            label: item.label,
+                            icon: item.icon,
+                            color: item.color,
+                        })),
+                        default: '',
+                    },
+                    {
                         name: 'homeIcon',
                         type: 'image',
-                        label: 'vis_2_widgets_energy_home_icon',
+                        hidden: data => !!data.homeStandardIcon,
+                        label: 'vis_2_widgets_energy_custom_icon',
                     },
                     {
                         name: 'homeCircleSize',
-                        type: 'number',
+                        type: 'slider',
+                        min: 0,
+                        max: 50,
                         label: 'vis_2_widgets_energy_home_circle_size',
                         tooltip: 'vis_2_widgets_energy_home_circle_size_tooltip',
                     },
                     {
                         name: 'homeDistanceSize',
-                        type: 'number',
+                        type: 'slider',
+                        min: 0,
+                        max: 50,
                         label: 'vis_2_widgets_energy_home_distance_size',
                         tooltip: 'vis_2_widgets_energy_home_distance_size_tooltip',
                     },
@@ -138,6 +193,7 @@ class Distribution extends Generic {
             },
             {
                 name: 'powerLine',
+                label: 'vis_2_widgets_energy_group_powerLine',
                 fields: [
                     {
                         name: 'powerLine-oid',
@@ -175,19 +231,43 @@ class Distribution extends Generic {
                         label: 'vis_2_widgets_energy_power_line_color',
                     },
                     {
+                        name: 'powerLineReturnColor',
+                        hidden: data => !data['powerLineReturn-oid'],
+                        type: 'color',
+                        label: 'vis_2_widgets_energy_power_line_return_color',
+                        default: '#208020',
+                    },
+                    {
+                        name: 'powerLineStandardIcon',
+                        type: 'select',
+                        label: 'vis_2_widgets_energy_standard_icon',
+                        options: STANDARD_ICONS.map(item => ({
+                            value: item.value,
+                            label: item.label,
+                            icon: item.icon,
+                            color: item.color,
+                        })),
+                        default: 'powerLIne',
+                    },
+                    {
                         name: 'powerLineIcon',
+                        hidden: data => !!data.powerLineStandardIcon,
                         type: 'image',
-                        label: 'vis_2_widgets_energy_power_line_icon',
+                        label: 'vis_2_widgets_energy_custom_icon',
                     },
                     {
                         name: 'powerLineCircleSize',
-                        type: 'number',
+                        type: 'slider',
+                        min: 0,
+                        max: 50,
                         label: 'vis_2_widgets_energy_power_line_circle_size',
                         tooltip: 'vis_2_widgets_energy_power_line_circle_size_tooltip',
                     },
                     {
                         name: 'powerLineDistanceSize',
-                        type: 'number',
+                        type: 'slider',
+                        min: 0,
+                        max: 50,
                         label: 'vis_2_widgets_energy_power_line_distance_size',
                         tooltip: 'vis_2_widgets_energy_power_line_distance_size_tooltip',
                     },
@@ -202,7 +282,7 @@ class Distribution extends Generic {
             },
             {
                 name: 'node',
-                label: 'vis_2_widgets_energy_node',
+                label: 'vis_2_widgets_energy_group_node',
                 indexFrom: 1,
                 indexTo: 'nodesCount',
                 fields: [
@@ -229,19 +309,36 @@ class Distribution extends Generic {
                         label: 'vis_2_widgets_energy_color',
                     },
                     {
+                        name: 'standardIcon',
+                        type: 'select',
+                        label: 'vis_2_widgets_energy_standard_icon',
+                        options: STANDARD_ICONS.map(item => ({
+                            value: item.value,
+                            label: item.label,
+                            icon: item.icon,
+                            color: item.color,
+                        })),
+                        default: '',
+                    },
+                    {
                         name: 'icon',
                         type: 'image',
-                        label: 'vis_2_widgets_energy_icon',
+                        hidden: (data, index) => !!data[`standardIcon${index}`],
+                        label: 'vis_2_widgets_energy_custom_icon',
                     },
                     {
                         name: 'circleSize',
-                        type: 'number',
+                        type: 'slider',
+                        min: 0,
+                        max: 50,
                         label: 'vis_2_widgets_energy_circle_size',
                         tooltip: 'vis_2_widgets_energy_circle_size_tooltip',
                     },
                     {
                         name: 'distanceSize',
-                        type: 'number',
+                        type: 'slider',
+                        min: 0,
+                        max: 50,
                         label: 'vis_2_widgets_energy_distance_size',
                         tooltip: 'vis_2_widgets_energy_distance_size_tooltip',
                     },
@@ -255,7 +352,7 @@ class Distribution extends Generic {
                 ],
             }],
             visDefaultStyle: {
-                width: '100%',
+                width: 220,
                 height: 182,
                 position: 'relative',
             },
@@ -299,23 +396,33 @@ class Distribution extends Generic {
         this.lastRxData = actualRxData;
 
         const objects = {};
+        const units = {};
 
         // try to find icons for all OIDs
         for (let i = 1; i <= this.state.rxData.nodesCount; i++) {
             objects[`object${i}`] = await this.loadObject(this.state.rxData[`oid${i}`], this.state.rxData[`icon${i}`]);
+            units[this.state.rxData[`oid${i}`]] = objects[`object${i}`].common.unit;
         }
         objects.home = await this.loadObject(this.state.rxData['home-oid'], this.state.rxData.homeIcon);
         objects.powerLine = await this.loadObject(this.state.rxData['powerLine-oid'], this.state.rxData.powerLineIcon);
+        units[this.state.rxData['home-oid']] = objects.home.common.unit;
+        units[this.state.rxData['powerLine-oid']] = objects.powerLine.common.unit;
 
         if (JSON.stringify(objects) !== JSON.stringify(this.state.objects)) {
-            this.setState({ objects });
+            this.setState({ objects, units });
         }
     }
 
     componentDidMount() {
         super.componentDidMount();
         this.propertiesUpdate();
-        this.offsetInterval = setInterval(() => this.setState({ offset: this.state.offset + 1 }), 20);
+        this.offsetInterval = setInterval(() => {
+            let offset = this.state.offset + 1;
+            if (offset > 0x0FFFFFFF) {
+                offset = 0;
+            }
+            this.setState({ offset });
+        }, 50);
     }
 
     componentWillUnmount() {
@@ -328,9 +435,17 @@ class Distribution extends Generic {
         this.propertiesUpdate();
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    getWidgetInfo() {
-        return Distribution.getWidgetInfo();
+    getValue(oid) {
+        let value;
+        if (oid) {
+            value = this.state.values[`${oid}.val`];
+            if (value === null || value === undefined) {
+                value = '--';
+            } else if (this.state.units[oid] === 'Wh') {
+                value = Math.round(value / 10) / 100;
+            }
+        }
+        return { unit: this.state.units[oid], value };
     }
 
     renderWidgetBody(props) {
@@ -350,45 +465,98 @@ class Distribution extends Generic {
         const defaultDistanceSize = this.state.rxData.defaultDistanceSize || 18;
         const defaultFontSize = this.state.rxData.defaultFontSize || 12;
 
-        const homeRadius = size * (this.state.rxData.homeCircleSize || defaultRadiusSize) / 100;
+        const homeRadius = (size * (this.state.rxData.homeCircleSize || defaultRadiusSize)) / 100;
         const homeFontSize = defaultFontSize || this.state.rxData.homeFontSize;
-        const homeIcon = this.state.rxData.homeIcon || this.state.objects.home?.common?.icon;
+        let homeIcon = this.state.rxData.homeStandardIcon || this.state.rxData.homeIcon || this.state.objects.home?.common?.icon;
+
+        if (homeIcon && homeIcon.startsWith('_PRJ_NAME/')) {
+            homeIcon = homeIcon.replace('_PRJ_NAME/', `${this.props.adapterName}.${this.props.instance}/${this.props.projectName}${homeIcon.substring(9)}`);
+        }
 
         let maxRadius = 0;
         let valuesSum = 0;
+        // prepare power line as first circle
+        const valueAndUnit = this.getValue(this.state.rxData['powerLine-oid']);
+
         const circles = [{
             name: this.state.rxData.powerLineName,
             color: this.state.rxData.powerLineColor,
-            radius: size * (this.state.rxData.powerLineCircleSize || defaultRadiusSize) / 100,
-            distance: size * (this.state.rxData.powerLineDistanceSize || defaultDistanceSize) / 100,
+            radius: (size * (this.state.rxData.powerLineCircleSize || defaultRadiusSize)) / 100,
+            distance: (size * (this.state.rxData.powerLineDistanceSize || defaultDistanceSize)) / 100,
             fontSize: defaultFontSize || this.state.rxData.powerLineFontSize,
             oid: this.state.rxData['powerLine-oid'],
-            value: this.state.values[`${this.state.rxData['powerLine-oid']}.val`],
-            icon: this.state.rxData.powerLineIcon || this.state.objects.powerLine?.common?.icon,
+            unit: valueAndUnit.unit || I18n.t('vis_2_widgets_energy_kwh'),
+            value: valueAndUnit.value,
+            icon: this.state.rxData.powerLineStandardIcon || this.state.rxData.powerLineIcon || this.state.objects.powerLine?.common?.icon,
+            arrow: '→', // '↦',
+            secondaryValue: this.getValue(this.state.rxData['powerLineReturn-oid']),
+            secondaryArrow: '←',
         }];
+
         if (circles[0].radius > maxRadius) {
             maxRadius = circles[0].radius;
-            valuesSum += Math.abs(circles[0].value) || 0;
+            valuesSum += Number.isFinite(circles[0].value) ? Math.abs(circles[0].value) : 0;
         }
 
+        // add all other nodes, like solar and so on
         for (let i = 1; i <= this.state.rxData.nodesCount; i++) {
-            circles.push({
+            const _valueAndUnit = this.getValue(this.state.rxData[`oid${i}`]);
+            const circle = {
                 name: this.state.rxData[`name${i}`],
                 color: this.state.rxData[`color${i}`],
-                radius: size * (this.state.rxData[`circleSize${i}`] || defaultRadiusSize) / 100,
-                distance: size * (this.state.rxData[`distanceSize${i}`] || defaultDistanceSize) / 100,
+                radius: (size * (this.state.rxData[`circleSize${i}`] || defaultRadiusSize)) / 100,
+                distance: (size * (this.state.rxData[`distanceSize${i}`] || defaultDistanceSize)) / 100,
                 fontSize: defaultFontSize || this.state.rxData[`fontSize${i}`],
                 oid: this.state.rxData[`oid${i}`],
-                value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`],
-                icon: this.state.rxData[`icon${i}`] || this.state.objects[`object${i}`]?.common?.icon,
-            });
-            if (circles[i].radius > maxRadius) {
-                maxRadius = circles[i].radius;
+                unit: _valueAndUnit.unit || I18n.t('vis_2_widgets_energy_kwh'),
+                value: _valueAndUnit.value,
+                icon: this.state.rxData[`standardIcon${i}`] || this.state.rxData[`icon${i}`] || this.state.objects[`object${i}`]?.common?.icon,
+                arrow: '',
+            };
+            circles.push(circle);
+
+            if (circle.radius > maxRadius) {
+                maxRadius = circle.radius;
             }
-            valuesSum += Math.abs(this.state.values[`${this.state.rxData[`oid${i}`]}.val`]) || 0;
+            valuesSum += Number.isFinite(_valueAndUnit.value) ? Math.abs(_valueAndUnit.value) : 0;
         }
 
         let currentPart = 0;
+        const homeValueAndUnit = this.getValue(this.state.rxData['home-oid']);
+        let xOffset = 0;
+        let max = size / 2;
+        let min = size / 2;
+        const allCoordinates = [];
+        for (let i = 0; i < circles.length; i++) {
+            const angle = 180 + (i * 360) / circles.length;
+            const _coordinates = polarToCartesian(0, 0, circles[i].distance + circles[i].radius + homeRadius, angle);
+            const position = {
+                top:       size / 2 + _coordinates.y - circles[i].radius,
+                left:      size / 2 + _coordinates.x - circles[i].radius,
+                topLabel:  size / 2 + _coordinates.y + circles[i].radius + 2,
+                leftLabel: size / 2 + _coordinates.x - circles[i].radius,
+            };
+            allCoordinates.push(position);
+            if (max < position.left + circles[i].radius * 2) {
+                max = position.left + circles[i].radius * 2;
+            }
+            if (min > position.left) {
+                min = position.left;
+            }
+        }
+        // compare with home
+        if (max < size / 2 + homeRadius) {
+            max = size / 2 + homeRadius;
+        }
+        if (min > size / 2 - homeRadius) {
+            min = size / 2 - homeRadius;
+        }
+        if (Math.abs((max - min) / 2 - (size / 2)) > 5) {
+            xOffset = (size / 2) - (max - min) / 2;
+        }
+
+        const standardHomeIcon = STANDARD_ICONS.find(item => item.value === homeIcon);
+        const CustomHomeIcon = standardHomeIcon ? standardHomeIcon.component : null;
 
         const content = <div
             ref={this.refCardContent}
@@ -396,88 +564,93 @@ class Distribution extends Generic {
         >
             {size && <div style={{ position: 'relative' }}>
                 {circles.map((circle, i) => {
-                    const angle = 180 + i * 360 / circles.length;
-                    const coordinates = polarToCartesian(0, 0, circle.distance + circle.radius + homeRadius, angle);
+                    const icon = circle.icon && circle.icon.startsWith('_PRJ_NAME/') ?
+                        `${this.props.adapterName}.${this.props.instance}/${this.props.projectName}${circle.icon.substring(9)}`
+                        :
+                        circle.icon;
+
+                    const standardIcon = STANDARD_ICONS.find(item => item.value === icon);
+                    const CustomIcon = standardIcon ? standardIcon.component : null;
                     return <div key={i}>
                         <div
                             className={this.props.classes.circleContent}
                             style={{
-                                top: size / 2 + coordinates.y - circle.radius,
-                                left: size / 2 + coordinates.x - circle.radius,
-                                width: circle.radius * 2,
-                                height: circle.radius * 2,
+                                top:      allCoordinates[i].top,
+                                left:     xOffset + allCoordinates[i].left,
+                                width:    circle.radius * 2,
+                                height:   circle.radius * 2,
                                 fontSize: circle.fontSize,
                             }}
                         >
-                            <div>
-                                <div>{circle.icon ? <img src={circle.icon} alt="" width={Math.round(circle.fontSize * 1.5)} /> : null}</div>
-                                <div>
-                                    {circle.value}
-                                    {' '}
-                                    {I18n.t('vis_2_widgets_energy_kwh')}
-                                </div>
-                            </div>
+                            {icon && !CustomIcon ?
+                                <img src={icon} alt="" style={{ width: Math.round(circle.radius * 0.666), height: Math.round(circle.radius * 0.666) }} />
+                                :
+                                (CustomIcon ? <CustomIcon style={{ width: Math.round(circle.radius * 0.666), height: Math.round(circle.radius * 0.666) }} /> : null)}
+                            {circle.secondaryValue?.value !== undefined ? <div style={{ color: this.state.rxData.powerLineReturnColor }}>
+                                {`${circle.secondaryArrow}${circle.secondaryValue.value} ${circle.secondaryValue.unit || I18n.t('vis_2_widgets_energy_kwh')}`}
+                            </div> : null}
+                            {circle.value !== undefined ? <div>
+                                {`${circle.arrow}${circle.value} ${circle.unit}`}
+                            </div> : null}
                         </div>
                         <div
                             className={this.props.classes.circleContent}
                             style={{
-                                top: size / 2 + coordinates.y + circle.radius,
-                                left: size / 2 + coordinates.x - circle.radius,
+                                top: allCoordinates[i].topLabel,
+                                left: xOffset + allCoordinates[i].leftLabel,
                                 width: circle.radius * 2,
                                 fontSize: circle.fontSize,
                             }}
                         >
-                            <div>
-                                <div>{circle.name || circle.oid}</div>
-                            </div>
+                            <div>{circle.name || circle.oid}</div>
                         </div>
                     </div>;
                 })}
-                <div>
-                    <div
-                        className={this.props.classes.circleContent}
-                        style={{
-                            top: size / 2 - homeRadius,
-                            left: size / 2 - homeRadius,
-                            width: homeRadius * 2,
-                            height: homeRadius * 2,
-                            fontSize: homeFontSize,
-                        }}
-                    >
-                        <div>
-                            <div>{homeIcon ? <img src={homeIcon} alt="" width={Math.round(homeFontSize * 1.5)} /> : null}</div>
-                            <div>
-                                {this.state.values[`${this.state.rxData['home-oid']}.val`]}
-                                {' '}
-                                {I18n.t('vis_2_widgets_energy_kwh')}
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        className={this.props.classes.circleContent}
-                        style={{
-                            top: size / 2 + homeRadius,
-                            left: size / 2 - homeRadius,
-                            width: homeRadius * 2,
-                            fontSize: homeFontSize,
-                        }}
-                    >
-                        <div>
-                            <div>{this.state.rxData.homeName || this.state.rxData['home-oid']}</div>
-                        </div>
-                    </div>
+                <div
+                    className={this.props.classes.circleContent}
+                    style={{
+                        top: size / 2 - homeRadius,
+                        left: xOffset + size / 2 - homeRadius,
+                        width: homeRadius * 2,
+                        height: homeRadius * 2,
+                        fontSize: homeFontSize,
+                    }}
+                >
+                    {homeIcon && !CustomHomeIcon ?
+                        <img src={homeIcon} alt="" style={{ width: Math.round(homeRadius * 0.666), height: Math.round(homeRadius * 0.666) }} />
+                        :
+                        (CustomHomeIcon ?
+                            <CustomHomeIcon style={{ width: Math.round(homeRadius * 0.666), height: Math.round(homeRadius * 0.666) }} />
+                            :
+                            null)}
+                    {homeValueAndUnit.value !== undefined ? <div>
+                        {`${homeValueAndUnit.value} ${homeValueAndUnit.unit || I18n.t('vis_2_widgets_energy_kwh')}`}
+                    </div> : null}
+                </div>
+                <div
+                    className={this.props.classes.circleContent}
+                    style={{
+                        top: size / 2 + homeRadius,
+                        left: xOffset + size / 2 - homeRadius,
+                        width: homeRadius * 2,
+                        fontSize: homeFontSize,
+                    }}
+                >
+                    <div>{this.state.rxData.homeName || this.state.rxData['home-oid'] || I18n.t('vis_2_widgets_energy_home')}</div>
                 </div>
                 <svg style={{ width: size, height: size, overflow: 'visible' }}>
                     <circle
                         cx="50%"
                         cy="50%"
                         r={homeRadius}
+                        transform={`translate(${xOffset}, 0)`}
                         fill="none"
                         stroke={this.state.rxData.homeColor || this.props.theme.palette.text.primary}
                         strokeWidth="3"
                     />
-                    {circles.map((circle, i) => {
-                        const partRadiusStroke = ((valuesSum - (Math.abs(circle.value) || 0)) / valuesSum) * (Math.PI * (homeRadius * 2));
+                    {valuesSum ? circles.map((circle, i) => {
+                        // Show parts of home circle
+                        const partRadiusStroke = ((valuesSum - (Number.isFinite(circle.value) ? Math.abs(circle.value) : 0)) / valuesSum) * (Math.PI * (homeRadius * 2));
                         const result = <circle
                             key={i}
                             cx="50%"
@@ -490,22 +663,30 @@ class Distribution extends Generic {
                                 strokeDasharray: Math.PI * (homeRadius * 2),
                                 transition: 'stroke-dashoffset 0.5s linear',
                             }}
-                            transform={`rotate(${Math.round(currentPart / valuesSum * 360 + 135)},${size / 2},${size / 2})`}
+                            transform={`translate(${xOffset}, 0), rotate(${Math.round((currentPart / valuesSum) * 360 + 135)},${size / 2},${size / 2})`}
                             strokeWidth="3"
                         />;
-                        currentPart += Math.abs(circle.value);
+                        currentPart += Number.isFinite(circle.value) ? Math.abs(circle.value) : 0;
                         return result;
-                    })}
+                    }) : null}
                     {circles.map((circle, i) => {
-                        const angle = 180 + i * 360 / circles.length;
-                        const coordinates = polarToCartesian(0, 0, circle.distance + circle.radius + homeRadius, angle);
+                        // Show connection lines with moving circle
+                        const angle           = 180 + (i * 360) / circles.length;
+                        const coordinates     = polarToCartesian(0, 0, circle.distance + circle.radius + homeRadius, angle);
                         const coordinatesFrom = polarToCartesian(0, 0, homeRadius, angle);
-                        const coordinatesTo = polarToCartesian(0, 0, homeRadius + circle.distance, angle);
-                        const offset = circle.value < 0 ?
-                            (this.state.offset + i * 10) % circle.distance :
-                            circle.distance - (this.state.offset + i * 10) % circle.distance;
+                        const coordinatesTo   = polarToCartesian(0, 0, homeRadius + circle.distance, angle);
+                        let step = Number.isFinite(circle.value) ? Math.abs(circle.value) / 50 : 0;
+                        if (step > 2) {
+                            step = 2;
+                        }
+                        let offset = (this.state.offset * step + i * 10) % circle.distance;
+                        if (circle.value > 0) {
+                            offset = circle.distance - offset;
+                        }
+
                         const coordinatesOffset = polarToCartesian(0, 0, homeRadius + offset, angle);
                         const color = circle.color || this.state.rxData.defaultColor || this.props.theme.palette.text.primary;
+
                         return <React.Fragment key={i}>
                             <circle
                                 cx="50%"
@@ -514,34 +695,36 @@ class Distribution extends Generic {
                                 fill="none"
                                 stroke={color}
                                 strokeWidth="3"
-                                transform={
-                                    `translate(${coordinates.x}, ${coordinates.y})`
-                                }
+                                transform={`translate(${xOffset + coordinates.x}, ${coordinates.y})`}
                             />
                             <line
-                                x1={size / 2 + coordinatesFrom.x}
+                                x1={xOffset + size / 2 + coordinatesFrom.x}
                                 y1={size / 2 + coordinatesFrom.y}
-                                x2={size / 2 + coordinatesTo.x}
+                                x2={xOffset + size / 2 + coordinatesTo.x}
                                 y2={size / 2 + coordinatesTo.y}
                                 stroke={color}
                             />
-                            <circle
+                            {circle.value ? <circle
                                 cx="50%"
                                 cy="50%"
-                                r="2"
-                                fill="none"
+                                r={step < 0.5 ? 1.5 : step * 3}
+                                fill={color}
                                 stroke={color}
                                 strokeWidth="3"
-                                transform={
-                                    `translate(${coordinatesOffset.x}, ${coordinatesOffset.y})`
-                                }
-                            />
+                                transform={`translate(${xOffset + coordinatesOffset.x}, ${coordinatesOffset.y})`}
+                            /> : null}
                         </React.Fragment>;
                     })}
                 </svg>
             </div>}
         </div>;
+
         return this.wrapContent(content, null, { textAlign: 'center' });
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    getWidgetInfo() {
+        return Distribution.getWidgetInfo();
     }
 }
 
