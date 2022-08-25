@@ -546,15 +546,15 @@ class Distribution extends Generic {
             }
         }
         // compare with home
-        if (max < size / 2 + homeRadius) {
+        if (max < (size / 2 + homeRadius)) {
             max = size / 2 + homeRadius;
         }
-        if (min > size / 2 - homeRadius) {
+        if (min > (size / 2 - homeRadius)) {
             min = size / 2 - homeRadius;
         }
-        if (Math.abs((max - min) / 2 - (size / 2)) > 5) {
-            xOffset = (size / 2) - (max - min) / 2;
-        }
+        // if (Math.abs(size - max - min) > 5) {
+        xOffset = (size - max - min) / 2;
+        // }
 
         const standardHomeIcon = STANDARD_ICONS.find(item => item.value === homeIcon);
         const CustomHomeIcon = standardHomeIcon ? standardHomeIcon.component : null;
