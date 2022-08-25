@@ -97,11 +97,11 @@ class App extends WidgetDemoApp {
                 data={{
                     name: 'ConsumptionComparison',
                     devicesCount: 2,
-                    oid1: 'javascript.0.temperatureActual',
-                    name1: 'temperatureActual',
+                    oid1: 'javascript.0.random1',
+                    name1: 'random1',
                     color1: 'rgba(28,71,38,1)',
-                    oid2: 'javascript.0.temperatureSet',
-                    name2: 'temperatureSet',
+                    oid2: 'javascript.0.random2',
+                    name2: 'random2',
                     color2: 'rgba(201,83,80,1)',
                 }}
             />

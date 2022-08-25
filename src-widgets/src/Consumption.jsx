@@ -229,7 +229,13 @@ class Consumption extends Generic {
                     dataView: {},
                 },
             },
-            grid: { containLabel: true },
+            grid: {
+                containLabel: true,
+                left: 10,
+                top: 40,
+                right: 10,
+                bottom: 10,
+            },
             yAxis: { },
             xAxis: {
                 type: 'category',

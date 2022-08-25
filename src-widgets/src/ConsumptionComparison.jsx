@@ -137,7 +137,13 @@ class ConsumptionComparison extends Generic {
 
         return {
             tooltip: {},
-            grid: { containLabel: true },
+            grid: {
+                containLabel: true,
+                left: 10,
+                top: 0,
+                right: 50,
+                bottom: 10,
+            },
             xAxis: { name: I18n.t(this.state.unit) || I18n.t('vis_2_widgets_energy_kwh') },
             yAxis: { type: 'category', data: data.map(item => item.name) },
             series: [
