@@ -56,8 +56,8 @@ class IntervalSelector extends Generic {
                 ],
             }],
             visDefaultStyle: {
-                width: '100%',
-                height: 182,
+                width: 320,
+                height: 60,
                 position: 'relative',
             },
             visPrev: 'widgets/vis-2-widgets-energy/img/prev_interval_selector.png',

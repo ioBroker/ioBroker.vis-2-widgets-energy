@@ -22,56 +22,59 @@ class ConsumptionComparison extends Generic {
             visSet: 'vis-2-widgets-energy',
             visWidgetLabel: 'vis_2_widgets_energy_consumption_comparison',  // Label of widget
             visName: 'Consumption comparison',
-            visAttrs: [{
-                name: 'common',
-                fields: [
-                    {
-                        name: 'name',
-                        label: 'vis_2_widgets_energy_name',
-                    },
-                    {
-                        name: 'devicesCount',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_devices_count',
-                    },
-                ],
-            },
-            {
-                name: 'devices',
-                label: 'vis_2_widgets_energy_level',
-                indexFrom: 1,
-                indexTo: 'devicesCount',
-                fields: [
-                    {
-                        name: 'oid',
-                        type: 'id',
-                        label: 'vis_2_widgets_energy_oid',
-                        onChange: async (field, data, changeData, socket) => {
-                            const object = await socket.getObject(data[field.name]);
-                            if (object && object.common) {
-                                data[`color${field.index}`]  = object.common.color !== undefined ? object.common.color : null;
-                                data[`name${field.index}`]  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.lang()] : object.common.name;
-                                changeData(data);
-                            }
+            visAttrs: [
+                {
+                    name: 'common',
+                    fields: [
+                        {
+                            name: 'name',
+                            label: 'vis_2_widgets_energy_name',
                         },
-                    },
-                    {
-                        name: 'name',
-                        label: 'vis_2_widgets_energy_name',
-                    },
-                    {
-                        name: 'color',
-                        type: 'color',
-                        label: 'vis_2_widgets_energy_color',
-                    },
-                    {
-                        name: 'unit',
-                        label: 'vis_2_widgets_energy_unit',
-                    },
-                ],
-            }],
+                        {
+                            name: 'devicesCount',
+                            type: 'number',
+                            label: 'vis_2_widgets_energy_devices_count',
+                            default: 2,
+                        },
+                    ],
+                },
+                {
+                    name: 'devices',
+                    label: 'vis_2_widgets_energy_level',
+                    indexFrom: 1,
+                    indexTo: 'devicesCount',
+                    fields: [
+                        {
+                            name: 'oid',
+                            type: 'id',
+                            label: 'vis_2_widgets_energy_oid',
+                            onChange: async (field, data, changeData, socket) => {
+                                const object = await socket.getObject(data[field.name]);
+                                if (object && object.common) {
+                                    data[`color${field.index}`] = object.common.color !== undefined ? object.common.color : null;
+                                    data[`name${field.index}`] = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
+                                    changeData(data);
+                                }
+                            },
+                        },
+                        {
+                            name: 'name',
+                            label: 'vis_2_widgets_energy_name',
+                        },
+                        {
+                            name: 'color',
+                            type: 'color',
+                            label: 'vis_2_widgets_energy_color',
+                        },
+                        {
+                            name: 'unit',
+                            label: 'vis_2_widgets_energy_unit',
+                        },
+                    ],
+                },
+            ],
             visDefaultStyle: {
-                width: '100%',
+                width: 320,
                 height: 182,
                 position: 'relative',
             },
@@ -98,7 +101,9 @@ class ConsumptionComparison extends Generic {
         if (unit === 'W') {
             unit = 'Wh';
         }
-        this.setState({ unit });
+        if (JSON.stringify(unit) !== JSON.stringify(this.state.unit)) {
+            this.setState({ unit });
+        }
     }
 
     componentDidMount() {
@@ -124,9 +129,9 @@ class ConsumptionComparison extends Generic {
         const data = [];
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             data.push({
-                name: this.state.rxData[`name${i}`],
-                value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`],
-                color: this.state.rxData[`color${i}`],
+                name: this.state.rxData[`name${i}`] || '',
+                value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || 0,
+                color: this.state.rxData[`color${i}`] || undefined,
             });
         }
 
@@ -138,8 +143,7 @@ class ConsumptionComparison extends Generic {
             series: [
                 {
                     type: 'bar',
-                    data:
-                    data.map(item => ({
+                    data: data.map(item => ({
                         value: item.value,
                         itemStyle: {
                             color: item.color,

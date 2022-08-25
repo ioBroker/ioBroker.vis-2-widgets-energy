@@ -106,7 +106,7 @@ class Consumption extends Generic {
                             const object = await socket.getObject(data[field.name]);
                             if (object && object.common) {
                                 data[`color${field.index}`]  = object.common.color !== undefined ? object.common.color : null;
-                                data[`name${field.index}`]  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.lang()] : object.common.name;
+                                data[`name${field.index}`]  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
                                 changeData(data);
                             }
                         },
@@ -127,7 +127,7 @@ class Consumption extends Generic {
                 ],
             }],
             visDefaultStyle: {
-                width: '100%',
+                width: 320,
                 height: 182,
                 position: 'relative',
             },

@@ -78,279 +78,279 @@ class Distribution extends Generic {
         return {
             id: 'tplEnergy2Distribution',
             visSet: 'vis-2-widgets-energy',
+            visSetLabel: 'vis_2_widgets_energy_set_label', // Label of widget set
             visWidgetLabel: 'vis_2_widgets_energy_distribution',  // Label of widget
             visName: 'Distribution',
-            visAttrs: [{
-                name: 'common',
-                fields: [
-                    {
-                        name: 'name',
-                        label: 'vis_2_widgets_energy_name',
-                    },
-                    {
-                        name: 'defaultColor',
-                        type: 'color',
-                        label: 'vis_2_widgets_energy_default_color',
-                    },
-                    {
-                        name: 'defaultCircleSize',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_default_circle_size',
-                        tooltip: 'vis_2_widgets_energy_default_circle_size_tooltip',
-                        default: 10,
-                    },
-                    {
-                        name: 'defaultDistanceSize',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_default_distance_size',
-                        tooltip: 'vis_2_widgets_energy_default_distance_size_tooltip',
-                        default: 18,
-                    },
-                    {
-                        name: 'defaultFontSize',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_default_font_size',
-                        tooltip: 'vis_2_widgets_energy_default_font_size_tooltip',
-                        default: 12,
-                    },
-                    {
-                        name: 'nodesCount',
-                        type: 'number',
-                        min: 0,
-                        max: 10,
-                        label: 'vis_2_widgets_energy_nodes_count',
-                    },
-                ],
-            },
-            {
-                name: 'home',
-                label: 'vis_2_widgets_energy_group_home',
-                fields: [
-                    {
-                        name: 'home-oid',
-                        type: 'id',
-                        label: 'vis_2_widgets_energy_home_oid',
-                        onChange: async (field, data, changeData, socket) => {
-                            const object = await socket.getObject(data[field.name]);
-                            if (object && object.common) {
-                                data.homeColor  = object.common.color !== undefined ? object.common.color : null;
-                                data.homeName  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.lang()] : object.common.name;
-                                changeData(data);
-                            }
+            visAttrs: [
+                {
+                    name: 'common',
+                    fields: [
+                        {
+                            name: 'name',
+                            label: 'vis_2_widgets_energy_name',
                         },
-                    },
-                    {
-                        name: 'homeName',
-                        label: 'vis_2_widgets_energy_home_name',
-                    },
-                    {
-                        name: 'homeColor',
-                        type: 'color',
-                        label: 'vis_2_widgets_energy_home_color',
-                    },
-                    {
-                        name: 'homeStandardIcon',
-                        type: 'select',
-                        label: 'vis_2_widgets_energy_standard_icon',
-                        options: STANDARD_ICONS.map(item => ({
-                            value: item.value,
-                            label: item.label,
-                            icon: item.icon,
-                            color: item.color,
-                        })),
-                        default: '',
-                    },
-                    {
-                        name: 'homeIcon',
-                        type: 'image',
-                        hidden: data => !!data.homeStandardIcon,
-                        label: 'vis_2_widgets_energy_custom_icon',
-                    },
-                    {
-                        name: 'homeCircleSize',
-                        type: 'slider',
-                        min: 0,
-                        max: 50,
-                        label: 'vis_2_widgets_energy_home_circle_size',
-                        tooltip: 'vis_2_widgets_energy_home_circle_size_tooltip',
-                    },
-                    {
-                        name: 'homeDistanceSize',
-                        type: 'slider',
-                        min: 0,
-                        max: 50,
-                        label: 'vis_2_widgets_energy_home_distance_size',
-                        tooltip: 'vis_2_widgets_energy_home_distance_size_tooltip',
-                    },
-                    {
-                        name: 'homeFontSize',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_home_font_size',
-                        tooltip: 'vis_2_widgets_energy_home_font_size_tooltip',
-                    },
-
-                ],
-            },
-            {
-                name: 'powerLine',
-                label: 'vis_2_widgets_energy_group_powerLine',
-                fields: [
-                    {
-                        name: 'powerLine-oid',
-                        type: 'id',
-                        label: 'vis_2_widgets_energy_power_line_oid',
-                        onChange: async (field, data, changeData, socket) => {
-                            const object = await socket.getObject(data[field.name]);
-                            if (object && object.common) {
-                                data.powerLineColor  = object.common.color !== undefined ? object.common.color : null;
-                                data.powerLineName  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.lang()] : object.common.name;
-                                changeData(data);
-                            }
+                        {
+                            name: 'defaultColor',
+                            type: 'color',
+                            label: 'vis_2_widgets_energy_default_color',
                         },
-                    },
-                    {
-                        name: 'powerLineReturn-oid',
-                        type: 'id',
-                        label: 'vis_2_widgets_energy_power_line_return_oid',
-                        onChange: async (field, data, changeData, socket) => {
-                            const object = await socket.getObject(data[field.name]);
-                            if (object && object.common) {
-                                data.powerLineColor  = object.common.color !== undefined ? object.common.color : null;
-                                data.powerLineName  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.lang()] : object.common.name;
-                                changeData(data);
-                            }
+                        {
+                            name: 'defaultCircleSize',
+                            type: 'number',
+                            label: 'vis_2_widgets_energy_default_circle_size',
+                            tooltip: 'vis_2_widgets_energy_default_circle_size_tooltip',
+                            default: 10,
                         },
-                    },
-                    {
-                        name: 'powerLineName',
-                        label: 'vis_2_widgets_energy_power_line_name',
-                    },
-                    {
-                        name: 'powerLineColor',
-                        type: 'color',
-                        label: 'vis_2_widgets_energy_power_line_color',
-                    },
-                    {
-                        name: 'powerLineReturnColor',
-                        hidden: data => !data['powerLineReturn-oid'],
-                        type: 'color',
-                        label: 'vis_2_widgets_energy_power_line_return_color',
-                        default: '#208020',
-                    },
-                    {
-                        name: 'powerLineStandardIcon',
-                        type: 'select',
-                        label: 'vis_2_widgets_energy_standard_icon',
-                        options: STANDARD_ICONS.map(item => ({
-                            value: item.value,
-                            label: item.label,
-                            icon: item.icon,
-                            color: item.color,
-                        })),
-                        default: 'powerLIne',
-                    },
-                    {
-                        name: 'powerLineIcon',
-                        hidden: data => !!data.powerLineStandardIcon,
-                        type: 'image',
-                        label: 'vis_2_widgets_energy_custom_icon',
-                    },
-                    {
-                        name: 'powerLineCircleSize',
-                        type: 'slider',
-                        min: 0,
-                        max: 50,
-                        label: 'vis_2_widgets_energy_power_line_circle_size',
-                        tooltip: 'vis_2_widgets_energy_power_line_circle_size_tooltip',
-                    },
-                    {
-                        name: 'powerLineDistanceSize',
-                        type: 'slider',
-                        min: 0,
-                        max: 50,
-                        label: 'vis_2_widgets_energy_power_line_distance_size',
-                        tooltip: 'vis_2_widgets_energy_power_line_distance_size_tooltip',
-                    },
-                    {
-                        name: 'powerLineFontSize',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_power_line_font_size',
-                        tooltip: 'vis_2_widgets_energy_power_line_font_size_tooltip',
-                    },
-
-                ],
-            },
-            {
-                name: 'node',
-                label: 'vis_2_widgets_energy_group_node',
-                indexFrom: 1,
-                indexTo: 'nodesCount',
-                fields: [
-                    {
-                        name: 'oid',
-                        type: 'id',
-                        label: 'vis_2_widgets_energy_oid',
-                        onChange: async (field, data, changeData, socket) => {
-                            const object = await socket.getObject(data[field.name]);
-                            if (object && object.common) {
-                                data[`color${field.index}`]  = object.common.color !== undefined ? object.common.color : null;
-                                data[`name${field.index}`]  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.lang()] : object.common.name;
-                                changeData(data);
-                            }
+                        {
+                            name: 'defaultDistanceSize',
+                            type: 'number',
+                            label: 'vis_2_widgets_energy_default_distance_size',
+                            tooltip: 'vis_2_widgets_energy_default_distance_size_tooltip',
+                            default: 18,
                         },
-                    },
-                    {
-                        name: 'name',
-                        label: 'vis_2_widgets_energy_name',
-                    },
-                    {
-                        name: 'color',
-                        type: 'color',
-                        label: 'vis_2_widgets_energy_color',
-                    },
-                    {
-                        name: 'standardIcon',
-                        type: 'select',
-                        label: 'vis_2_widgets_energy_standard_icon',
-                        options: STANDARD_ICONS.map(item => ({
-                            value: item.value,
-                            label: item.label,
-                            icon: item.icon,
-                            color: item.color,
-                        })),
-                        default: '',
-                    },
-                    {
-                        name: 'icon',
-                        type: 'image',
-                        hidden: (data, index) => !!data[`standardIcon${index}`],
-                        label: 'vis_2_widgets_energy_custom_icon',
-                    },
-                    {
-                        name: 'circleSize',
-                        type: 'slider',
-                        min: 0,
-                        max: 50,
-                        label: 'vis_2_widgets_energy_circle_size',
-                        tooltip: 'vis_2_widgets_energy_circle_size_tooltip',
-                    },
-                    {
-                        name: 'distanceSize',
-                        type: 'slider',
-                        min: 0,
-                        max: 50,
-                        label: 'vis_2_widgets_energy_distance_size',
-                        tooltip: 'vis_2_widgets_energy_distance_size_tooltip',
-                    },
-                    {
-                        name: 'fontSize',
-                        type: 'number',
-                        label: 'vis_2_widgets_energy_font_size',
-                        tooltip: 'vis_2_widgets_energy_font_size_tooltip',
-                    },
-
-                ],
-            }],
+                        {
+                            name: 'defaultFontSize',
+                            type: 'number',
+                            label: 'vis_2_widgets_energy_default_font_size',
+                            tooltip: 'vis_2_widgets_energy_default_font_size_tooltip',
+                            default: 12,
+                        },
+                        {
+                            name: 'nodesCount',
+                            type: 'number',
+                            min: 0,
+                            max: 10,
+                            label: 'vis_2_widgets_energy_nodes_count',
+                        },
+                    ],
+                },
+                {
+                    name: 'home',
+                    label: 'vis_2_widgets_energy_group_home',
+                    fields: [
+                        {
+                            name: 'home-oid',
+                            type: 'id',
+                            label: 'vis_2_widgets_energy_home_oid',
+                            onChange: async (field, data, changeData, socket) => {
+                                const object = await socket.getObject(data[field.name]);
+                                if (object && object.common) {
+                                    data.homeColor  = object.common.color !== undefined ? object.common.color : null;
+                                    data.homeName  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
+                                    changeData(data);
+                                }
+                            },
+                        },
+                        {
+                            name: 'homeName',
+                            label: 'vis_2_widgets_energy_home_name',
+                        },
+                        {
+                            name: 'homeColor',
+                            type: 'color',
+                            label: 'vis_2_widgets_energy_home_color',
+                        },
+                        {
+                            name: 'homeStandardIcon',
+                            type: 'select',
+                            label: 'vis_2_widgets_energy_standard_icon',
+                            options: STANDARD_ICONS.map(item => ({
+                                value: item.value,
+                                label: item.label,
+                                icon: item.icon,
+                                color: item.color,
+                            })),
+                            default: '',
+                        },
+                        {
+                            name: 'homeIcon',
+                            type: 'image',
+                            hidden: data => !!data.homeStandardIcon,
+                            label: 'vis_2_widgets_energy_custom_icon',
+                        },
+                        {
+                            name: 'homeCircleSize',
+                            type: 'slider',
+                            min: 0,
+                            max: 50,
+                            label: 'vis_2_widgets_energy_home_circle_size',
+                            tooltip: 'vis_2_widgets_energy_home_circle_size_tooltip',
+                        },
+                        {
+                            name: 'homeDistanceSize',
+                            type: 'slider',
+                            min: 0,
+                            max: 50,
+                            label: 'vis_2_widgets_energy_home_distance_size',
+                            tooltip: 'vis_2_widgets_energy_home_distance_size_tooltip',
+                        },
+                        {
+                            name: 'homeFontSize',
+                            type: 'number',
+                            label: 'vis_2_widgets_energy_home_font_size',
+                            tooltip: 'vis_2_widgets_energy_home_font_size_tooltip',
+                        },
+                    ],
+                },
+                {
+                    name: 'powerLine',
+                    label: 'vis_2_widgets_energy_group_powerLine',
+                    fields: [
+                        {
+                            name: 'powerLine-oid',
+                            type: 'id',
+                            label: 'vis_2_widgets_energy_power_line_oid',
+                            onChange: async (field, data, changeData, socket) => {
+                                const object = await socket.getObject(data[field.name]);
+                                if (object && object.common) {
+                                    data.powerLineColor = object.common.color !== undefined ? object.common.color : null;
+                                    data.powerLineName = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
+                                    changeData(data);
+                                }
+                            },
+                        },
+                        {
+                            name: 'powerLineReturn-oid',
+                            type: 'id',
+                            label: 'vis_2_widgets_energy_power_line_return_oid',
+                            onChange: async (field, data, changeData, socket) => {
+                                const object = await socket.getObject(data[field.name]);
+                                if (object && object.common) {
+                                    data.powerLineColor = object.common.color !== undefined ? object.common.color : null;
+                                    data.powerLineName = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
+                                    changeData(data);
+                                }
+                            },
+                        },
+                        {
+                            name: 'powerLineName',
+                            label: 'vis_2_widgets_energy_power_line_name',
+                        },
+                        {
+                            name: 'powerLineColor',
+                            type: 'color',
+                            label: 'vis_2_widgets_energy_power_line_color',
+                        },
+                        {
+                            name: 'powerLineReturnColor',
+                            hidden: data => !data['powerLineReturn-oid'],
+                            type: 'color',
+                            label: 'vis_2_widgets_energy_power_line_return_color',
+                            default: '#208020',
+                        },
+                        {
+                            name: 'powerLineStandardIcon',
+                            type: 'select',
+                            label: 'vis_2_widgets_energy_standard_icon',
+                            options: STANDARD_ICONS.map(item => ({
+                                value: item.value,
+                                label: item.label,
+                                icon: item.icon,
+                                color: item.color,
+                            })),
+                            default: 'powerLIne',
+                        },
+                        {
+                            name: 'powerLineIcon',
+                            hidden: data => !!data.powerLineStandardIcon,
+                            type: 'image',
+                            label: 'vis_2_widgets_energy_custom_icon',
+                        },
+                        {
+                            name: 'powerLineCircleSize',
+                            type: 'slider',
+                            min: 0,
+                            max: 50,
+                            label: 'vis_2_widgets_energy_power_line_circle_size',
+                            tooltip: 'vis_2_widgets_energy_power_line_circle_size_tooltip',
+                        },
+                        {
+                            name: 'powerLineDistanceSize',
+                            type: 'slider',
+                            min: 0,
+                            max: 50,
+                            label: 'vis_2_widgets_energy_power_line_distance_size',
+                            tooltip: 'vis_2_widgets_energy_power_line_distance_size_tooltip',
+                        },
+                        {
+                            name: 'powerLineFontSize',
+                            type: 'number',
+                            label: 'vis_2_widgets_energy_power_line_font_size',
+                            tooltip: 'vis_2_widgets_energy_power_line_font_size_tooltip',
+                        },
+                    ],
+                },
+                {
+                    name: 'node',
+                    label: 'vis_2_widgets_energy_group_node',
+                    indexFrom: 1,
+                    indexTo: 'nodesCount',
+                    fields: [
+                        {
+                            name: 'oid',
+                            type: 'id',
+                            label: 'vis_2_widgets_energy_oid',
+                            onChange: async (field, data, changeData, socket) => {
+                                const object = await socket.getObject(data[field.name]);
+                                if (object && object.common) {
+                                    data[`color${field.index}`] = object.common.color !== undefined ? object.common.color : null;
+                                    data[`name${field.index}`] = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
+                                    changeData(data);
+                                }
+                            },
+                        },
+                        {
+                            name: 'name',
+                            label: 'vis_2_widgets_energy_name',
+                        },
+                        {
+                            name: 'color',
+                            type: 'color',
+                            label: 'vis_2_widgets_energy_color',
+                        },
+                        {
+                            name: 'standardIcon',
+                            type: 'select',
+                            label: 'vis_2_widgets_energy_standard_icon',
+                            options: STANDARD_ICONS.map(item => ({
+                                value: item.value,
+                                label: item.label,
+                                icon: item.icon,
+                                color: item.color,
+                            })),
+                            default: '',
+                        },
+                        {
+                            name: 'icon',
+                            type: 'image',
+                            hidden: (data, index) => !!data[`standardIcon${index}`],
+                            label: 'vis_2_widgets_energy_custom_icon',
+                        },
+                        {
+                            name: 'circleSize',
+                            type: 'slider',
+                            min: 0,
+                            max: 50,
+                            label: 'vis_2_widgets_energy_circle_size',
+                            tooltip: 'vis_2_widgets_energy_circle_size_tooltip',
+                        },
+                        {
+                            name: 'distanceSize',
+                            type: 'slider',
+                            min: 0,
+                            max: 50,
+                            label: 'vis_2_widgets_energy_distance_size',
+                            tooltip: 'vis_2_widgets_energy_distance_size_tooltip',
+                        },
+                        {
+                            name: 'fontSize',
+                            type: 'number',
+                            label: 'vis_2_widgets_energy_font_size',
+                            tooltip: 'vis_2_widgets_energy_font_size_tooltip',
+                        },
+                    ],
+                },
+            ],
             visDefaultStyle: {
                 width: 220,
                 height: 182,
@@ -524,6 +524,7 @@ class Distribution extends Generic {
         let currentPart = 0;
         const homeValueAndUnit = this.getValue(this.state.rxData['home-oid']);
         let xOffset = 0;
+        // calculate max and min position of circles to place it in center
         let max = size / 2;
         let min = size / 2;
         const allCoordinates = [];
