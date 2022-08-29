@@ -72,5 +72,6 @@
     "vis_2_widgets_energy_home_custom_icon": "Custom icon",
     "vis_2_widgets_energy_group_powerLine": "Power line circle",
     "vis_2_widgets_energy_power_line_return_color": "Return energy color",
-    "vis_2_widgets_energy_set_label": "Vis 2 - Energy widgets"
+    "vis_2_widgets_energy_set_label": "Vis 2 - Energy widgets",
+    "vis_2_widgets_energy_start_oid_tooltip": "Leave it empty to use default interval"
 }

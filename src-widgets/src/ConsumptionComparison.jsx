@@ -7,7 +7,13 @@ import { I18n } from '@iobroker/adapter-react-v5';
 import Generic from './Generic';
 
 const styles = () => ({
-
+    chart: {
+        height: '100%',
+        width: '100%',
+        '&>div': {
+            borderRadius: 5,
+        },
+    },
 });
 
 class ConsumptionComparison extends Generic {
@@ -83,26 +89,26 @@ class ConsumptionComparison extends Generic {
     }
 
     async propertiesUpdate() {
-        let unit = '';
+        const units = [];
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             try {
                 const object = await this.props.socket.getObject(this.state.rxData[`oid${i}`]);
                 if (object && object.common && object.common.unit) {
-                    unit = object.common.unit;
-                    break;
+                    units[i] = object.common.unit;
+                    if (units[i] === 'kW') {
+                        units[i] = 'kWh';
+                    } else
+                    if (units[i] === 'W') {
+                        units[i] = 'Wh';
+                    }
                 }
             } catch (e) {
                 // ignore
             }
         }
-        if (unit === 'kW') {
-            unit = 'kWh';
-        }
-        if (unit === 'W') {
-            unit = 'Wh';
-        }
-        if (JSON.stringify(unit) !== JSON.stringify(this.state.unit)) {
-            this.setState({ unit });
+
+        if (JSON.stringify(units) !== JSON.stringify(this.state.units)) {
+            this.setState({ units });
         }
     }
 
@@ -128,19 +134,31 @@ class ConsumptionComparison extends Generic {
     getOption() {
         const data = [];
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
+            let value = this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || 0;
+            if (this.state.units && this.state.units[i] === 'Wh') {
+                value /= 1000;
+            }
+            value = Math.round(value * 100) / 100;
+
             data.push({
                 name: this.state.rxData[`name${i}`] || '',
-                value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || 0,
+                value,
                 color: this.state.rxData[`color${i}`] || undefined,
             });
         }
 
         return {
-            tooltip: {},
+            tooltip: {
+                // formatter: '{b}: {c} kWh',
+                formatter: (params, ticket, callback) => {
+                    return `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`;
+                },
+            },
+            backgroundColor: 'transparent',
             grid: {
                 containLabel: true,
                 left: 10,
-                top: 0,
+                top: 5,
                 right: 50,
                 bottom: 10,
             },
@@ -166,10 +184,10 @@ class ConsumptionComparison extends Generic {
         const content = <ReactEchartsCore
             option={this.getOption()}
             theme={this.props.themeType === 'dark' ? 'dark' : ''}
-            style={{ height: '100%', width: '100%' }}
+            className={this.props.classes.chart}
             opts={{ renderer: 'svg' }}
         />;
-        return this.wrapContent(content, null, { textAlign: 'center' });
+        return this.wrapContent(content, null, { textAlign: 'center', height: 'calc(100% - 32px)' });
     }
 }
 

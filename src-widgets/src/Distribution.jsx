@@ -720,7 +720,7 @@ class Distribution extends Generic {
             </div>}
         </div>;
 
-        return this.wrapContent(content, null, { textAlign: 'center' });
+        return this.wrapContent(content, null, { textAlign: 'center', height: 'calc(100% - 32px)' });
     }
 
     // eslint-disable-next-line class-methods-use-this

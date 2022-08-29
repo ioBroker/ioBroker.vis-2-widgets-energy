@@ -37,16 +37,20 @@ class Consumption extends Generic {
                         name: 'devicesCount',
                         type: 'number',
                         label: 'vis_2_widgets_energy_devices_count',
+                        default: 1,
                     },
                     {
                         name: 'start-oid',
                         type: 'id',
                         label: 'vis_2_widgets_energy_start_oid',
+                        tooltip: 'vis_2_widgets_energy_start_oid_tooltip',
                     },
                     {
                         name: 'interval-oid',
                         type: 'id',
+                        hidden: data => !data['start-oid'],
                         label: 'vis_2_widgets_energy_interval_oid',
+                        tooltip: 'vis_2_widgets_energy_start_oid_tooltip',
                     },
                 ],
             },
@@ -100,7 +104,7 @@ class Consumption extends Generic {
                 fields: [
                     {
                         name: 'oid',
-                        type: 'id',
+                        type: 'hid',
                         label: 'vis_2_widgets_energy_oid',
                         onChange: async (field, data, changeData, socket) => {
                             const object = await socket.getObject(data[field.name]);
@@ -219,6 +223,7 @@ class Consumption extends Generic {
         };
 
         return {
+            backgroundColor: 'transparent',
             tooltip: {},
             legend: { data: data.map(item => item.name) },
             toolbox: {
@@ -266,7 +271,7 @@ class Consumption extends Generic {
             style={{ height: '100%', width: '100%' }}
             opts={{ renderer: 'svg' }}
         />;
-        return this.wrapContent(content, null, { textAlign: 'center' });
+        return this.wrapContent(content, null, { textAlign: 'center', height: 'calc(100% - 32px)' });
     }
 }
 

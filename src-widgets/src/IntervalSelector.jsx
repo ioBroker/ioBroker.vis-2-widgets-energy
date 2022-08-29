@@ -201,7 +201,8 @@ class IntervalSelector extends Generic {
                 </ButtonGroup>
             </div>
         </div>;
-        return this.wrapContent(content, null, { textAlign: 'center' });
+
+        return this.wrapContent(content, null, { textAlign: 'center', padding: 0 });
     }
 }
 

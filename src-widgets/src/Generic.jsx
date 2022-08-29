@@ -29,7 +29,7 @@ class Generic extends (window.visRxWidget || VisRxWidget) {
     // eslint-disable-next-line class-methods-use-this
     wrapContent(content, addToHeader, cardContentStyle, headerStyle, onCardClick) {
         return <Card style={{ width: 'calc(100% - 8px)', height: 'calc(100% - 8px)', margin: 4 }} onClick={onCardClick}>
-            <div
+            <CardContent
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -59,7 +59,7 @@ class Generic extends (window.visRxWidget || VisRxWidget) {
                     {addToHeader || null}
                 </div> : (addToHeader || null)}
                 {content}
-            </div>
+            </CardContent>
         </Card>;
     }
 }

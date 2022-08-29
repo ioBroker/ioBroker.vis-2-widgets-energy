@@ -26,3 +26,5 @@ export function getFromToTime(timeStart, timeInterval) {
 
     return { from, to };
 }
+
+export default getFromToTime;
