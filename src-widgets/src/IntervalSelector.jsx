@@ -87,25 +87,33 @@ class IntervalSelector extends Generic {
     }
 
     onStateUpdated(id, value) {
-        if (id === this.state.rxData['timeStart-oid']) {
-            this.props.setTimeStart(value.val);
-        }
-        if (id === this.state.rxData['timeInterval-oid']) {
-            this.props.setTimeInterval(value.val);
-        }
+    }
+
+    getTimeStart() {
+        return this.state.rxData['timeStart-oid'] ?
+            this.state.values[`${this.state.rxData['timeStart-oid']}.val`] :
+            this.props.timeStart;
     }
 
     setTimeStart = timeStart => {
-        this.props.setTimeStart(timeStart);
         if (this.state.rxData['timeStart-oid']) {
             this.props.socket.setState(this.state.rxData['timeStart-oid'], timeStart);
+        } else {
+            this.props.setTimeStart(timeStart);
         }
     };
 
+    getTimeInterval() {
+        return this.state.rxData['timeInterval-oid'] ?
+            this.state.values[`${this.state.rxData['timeInterval-oid']}.val`] :
+            this.props.timeInterval;
+    }
+
     setTimeInterval = timeInterval => {
-        this.props.setTimeInterval(timeInterval);
         if (this.state.rxData['timeInterval-oid']) {
             this.props.socket.setState(this.state.rxData['timeInterval-oid'], timeInterval);
+        } else {
+            this.props.setTimeInterval(timeInterval);
         }
     };
 
@@ -114,21 +122,21 @@ class IntervalSelector extends Generic {
 
         let periodName = '';
 
-        const interval = getFromToTime(this.props.timeStart, this.props.timeInterval);
+        const interval = getFromToTime(this.getTimeStart(), this.getTimeInterval());
 
-        if (this.props.timeInterval === 'day') {
+        if (this.getTimeInterval() === 'day') {
             periodName = moment(interval.from).format('DD.MM.YYYY');
-        } else if (this.props.timeInterval === 'week') {
+        } else if (this.getTimeInterval() === 'week') {
             periodName = <>
-                {moment(new Date(interval.from) - 7 * 24 * 60 * 60 * 1000).format('DD.MM')}
+                {moment(new Date(interval.from)).format('DD.MM')}
                 {' '}
                 &mdash;
                 {' '}
                 {moment(interval.to).format('DD.MM')}
             </>;
-        } else if (this.props.timeInterval === 'month') {
+        } else if (this.getTimeInterval() === 'month') {
             periodName = moment(new Date(interval.from)).format('MM.YYYY');
-        } else if (this.props.timeInterval === 'year') {
+        } else if (this.getTimeInterval() === 'year') {
             periodName = moment(new Date(interval.from)).format('YYYY');
         }
         const content = <div className={this.props.classes.contentContainer}>
@@ -136,13 +144,13 @@ class IntervalSelector extends Generic {
                 <span className={this.props.classes.periodName}>{periodName}</span>
                 <IconButton onClick={() => {
                     const newEnd = new Date(interval.from);
-                    if (this.props.timeInterval === 'day') {
+                    if (this.getTimeInterval() === 'day') {
                         newEnd.setDate(newEnd.getDate() - 1);
-                    } else if (this.props.timeInterval === 'week') {
+                    } else if (this.getTimeInterval() === 'week') {
                         newEnd.setDate(newEnd.getDate() - 7);
-                    } else if (this.props.timeInterval === 'month') {
+                    } else if (this.getTimeInterval() === 'month') {
                         newEnd.setMonth(newEnd.getMonth() - 1);
-                    } else if (this.props.timeInterval === 'year') {
+                    } else if (this.getTimeInterval() === 'year') {
                         newEnd.setFullYear(newEnd.getFullYear() - 1);
                     }
                     this.setTimeStart(newEnd.getTime());
@@ -151,20 +159,20 @@ class IntervalSelector extends Generic {
                     <NavigateBeforeIcon />
                 </IconButton>
                 <IconButton
-                    disabled={!this.props.timeStart}
+                    disabled={!this.getTimeStart()}
                     onClick={() => {
                         const newEnd = new Date(interval.from);
-                        if (this.props.timeInterval === 'day') {
+                        if (this.getTimeInterval() === 'day') {
                             newEnd.setDate(newEnd.getDate() + 1);
-                        } else if (this.props.timeInterval === 'week') {
+                        } else if (this.getTimeInterval() === 'week') {
                             newEnd.setDate(newEnd.getDate() + 7);
-                        } else if (this.props.timeInterval === 'month') {
+                        } else if (this.getTimeInterval() === 'month') {
                             newEnd.setMonth(newEnd.getMonth() + 1);
-                        } else if (this.props.timeInterval === 'year') {
+                        } else if (this.getTimeInterval() === 'year') {
                             newEnd.setFullYear(newEnd.getFullYear() + 1);
                         }
                         this.setTimeStart(
-                            getFromToTime(newEnd, this.props.timeInterval).from.getTime() >= getFromToTime(null, this.props.timeInterval).from.getTime()
+                            getFromToTime(newEnd, this.getTimeInterval()).from.getTime() >= getFromToTime(null, this.getTimeInterval()).from.getTime()
                                 ? null
                                 : newEnd.getTime(),
                         );
@@ -176,7 +184,7 @@ class IntervalSelector extends Generic {
                 <Button
                     variant="contained"
                     color="grey"
-                    disabled={!this.props.timeStart}
+                    disabled={!this.getTimeStart()}
                     onClick={() => this.setTimeStart(0)}
                     className={this.props.classes.nowButton}
                 >
@@ -187,9 +195,9 @@ class IntervalSelector extends Generic {
                         <Button
                             key={period}
                             variant="contained"
-                            color={period === this.props.timeInterval ? 'primary' : 'grey'}
+                            color={period === this.getTimeInterval() ? 'primary' : 'grey'}
                             onClick={() => {
-                                if (period === this.props.timeInterval) {
+                                if (period === this.getTimeInterval()) {
                                     return;
                                 }
                                 this.setTimeInterval(period);

@@ -11,7 +11,14 @@ import Generic from './Generic';
 import { getFromToTime } from './Utils';
 
 const styles = () => ({
-
+    cardContent: {
+        flex: 1,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        overflow: 'hidden',
+    },
 });
 
 class Consumption extends Generic {
@@ -40,15 +47,22 @@ class Consumption extends Generic {
                         default: 1,
                     },
                     {
+                        name: 'timeWidget',
+                        type: 'widget',
+                        label: 'vis_2_widgets_energy_time_widget',
+                        tpl: 'tplEnergy2IntervalSelector',
+                    },
+                    {
                         name: 'start-oid',
                         type: 'id',
+                        hidden: data => data.timeWidget,
                         label: 'vis_2_widgets_energy_start_oid',
                         tooltip: 'vis_2_widgets_energy_start_oid_tooltip',
                     },
                     {
                         name: 'interval-oid',
                         type: 'id',
-                        hidden: data => !data['start-oid'],
+                        hidden: data => !data['start-oid'] || data.timeWidget,
                         label: 'vis_2_widgets_energy_interval_oid',
                         tooltip: 'vis_2_widgets_energy_start_oid_tooltip',
                     },
@@ -140,28 +154,38 @@ class Consumption extends Generic {
     }
 
     async propertiesUpdate() {
-        const interval = getFromToTime(this.props.timeStart, this.props.timeInterval);
+        const interval = getFromToTime(this.getTimeStart(), this.getTimeInterval());
 
         const types = {
             year: {
                 count: 12,
+                format: 'MMM',
             },
             month: {
-                count: new Date(interval.from.getFullYear(), interval.from.getMonth, 0).getDate(),
+                count: new Date(interval.from.getFullYear(), interval.from.getMonth(), 0).getDate(),
+                format: 'DD',
             },
             week: {
                 count: 7,
+                format: 'ddd',
             },
             day: {
                 count: 24,
+                format: 'HH',
             },
         };
+
+        const times = new Array(types[this.getTimeInterval()].count).fill(0).map((_, i) => new Date(
+            interval.from.getTime() +
+            (interval.to.getTime() - interval.from.getTime()) / types[this.getTimeInterval()].count * i
+            + 1,
+        ));
 
         const options = {
             instance: this.props.systemConfig?.common?.defaultHistory || 'history.0',
             start: interval.from.getTime(),
             end: interval.to.getTime(),
-            count: types[this.props.timeInterval].count,
+            count: types[this.getTimeInterval()].count,
             from: false,
             ack: false,
             q: false,
@@ -177,18 +201,63 @@ class Consumption extends Generic {
             if (this.state.rxData[`oid${i}`] && this.state.rxData[`oid${i}`] !== 'nothing_selected') {
                 const history = (await this.props.socket.getHistory(this.state.rxData[`oid${i}`], options))
                     .sort((a, b) => (a.ts > b.ts ? 1 : -1));
-                this.setState({ [`history${i}`]: history });
+                const values = times.map(time => {
+                    const foundHistory = history.find(item => item && item.val && moment(item.ts).format(types[this.getTimeInterval()].format) === moment(time).format(types[this.getTimeInterval()].format));
+                    return foundHistory || { ts: time.getTime(), val: 0 };
+                });
+                this.setState({ [`history${i}`]: values });
             }
         }
     }
+
+    getSubscribeState = (id, cb) => this.props.socket.getState(id)
+        .then(result => {
+            cb(id, result);
+            return this.props.socket.subscribeState(id, (resultId, result) => cb(id, result));
+        });
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (super.componentDidUpdate) {
             super.componentDidUpdate(prevProps, prevState, snapshot);
         }
+        if (this.props.timeStart !== prevProps.timeStart) {
+            this.propertiesUpdate();
+        }
         if (this.props.timeInterval !== prevProps.timeInterval) {
             this.propertiesUpdate();
         }
+        if (!this.getTimeStart() && !this.updateInterval) {
+            this.updateInterval = setInterval(() => this.propertiesUpdate(), 1000 * 60 * 10);
+        }
+        if (this.getTimeStart() && this.updateInterval) {
+            clearInterval(this.updateInterval);
+            this.updateInterval = null;
+        }
+
+        if (this.state.rxData.timeWidget && this.props.views[this.props.view].widgets[this.state.rxData.timeWidget]) {
+            const timeStartOID = this.props.views[this.props.view].widgets[this.state.rxData.timeWidget].data['timeStart-oid'];
+            const timeIntervalOID = this.props.views[this.props.view].widgets[this.state.rxData.timeWidget].data['timeInterval-oid'];
+
+            if (this.subscribedTimeStart !== timeStartOID) {
+                this.subscribedTimeStart && this.props.socket.unsubscribeState(this.subscribedTimeStart);
+                this.subscribedTimeStart = timeStartOID;
+                timeStartOID && this.getSubscribeState(this.subscribedTimeStart, this.onTimeChange);
+            }
+            if (this.subscribedTimeInterval !== timeIntervalOID) {
+                this.subscribedTimeInterval && this.props.socket.unsubscribeState(this.subscribedTimeInterval);
+                this.subscribedTimeInterval = timeIntervalOID;
+                timeIntervalOID && this.getSubscribeState(this.subscribedTimeInterval, this.onTimeChange);
+            }
+        }
+    }
+
+    componentWillUnmount() {
+        if (super.componentWillUnmount) {
+            super.componentWillUnmount();
+        }
+        this.subscribedTimeStart && this.props.socket.unsubscribeState(this.subscribedTimeStart);
+        this.subscribedTimeInterval && this.props.socket.unsubscribeState(this.subscribedTimeInterval);
+        this.updateInterval && clearInterval(this.updateInterval);
     }
 
     onStateUpdated() {
@@ -245,7 +314,7 @@ class Consumption extends Generic {
             xAxis: {
                 type: 'category',
                 data: data?.[0]?.values?.map(dateValue => moment(dateValue.ts).format(
-                    timeTypes[this.props.timeInterval],
+                    timeTypes[this.getTimeInterval()],
                 )),
             },
             series: data.map(item => (
@@ -262,15 +331,56 @@ class Consumption extends Generic {
         };
     }
 
+    getTimeStart() {
+        if (this.state.rxData.timeWidget) {
+            return this.timeStart;
+        }
+        if (this.state.rxData['start-oid']) {
+            return this.state.values[`${this.state.rxData['start-oid']}.val`];
+        }
+        return this.props.timeStart;
+    }
+
+    getTimeInterval() {
+        if (this.state.rxData.timeWidget) {
+            return this.timeInterval;
+        }
+        if (this.state.rxData['interval-oid']) {
+            return this.state.values[`${this.state.rxData['interval-oid']}.val`];
+        }
+        return this.props.timeInterval;
+    }
+
+    onTimeChange = (id, state) => {
+        if (id === this.subscribedTimeStart) {
+            this.timeStart = state.val;
+        } else if (id === this.subscribedTimeInterval) {
+            this.timeInterval = state.val;
+        }
+        this.propertiesUpdate();
+    };
+
     renderWidgetBody(props) {
         super.renderWidgetBody(props);
 
-        const content = <ReactEchartsCore
-            option={this.getOption()}
-            theme={this.props.themeType === 'dark' ? 'dark' : ''}
-            style={{ height: '100%', width: '100%' }}
-            opts={{ renderer: 'svg' }}
-        />;
+        let size;
+        if (!this.refCardContent.current) {
+            setTimeout(() => this.forceUpdate(), 50);
+        } else {
+            size = this.refCardContent.current.offsetHeight;
+        }
+
+        const content = <div
+            ref={this.refCardContent}
+            className={this.props.classes.cardContent}
+        >
+            {size && <ReactEchartsCore
+                option={this.getOption()}
+                theme={this.props.themeType === 'dark' ? 'dark' : ''}
+                style={{ height: `${size}px`, width: '100%' }}
+                opts={{ renderer: 'svg' }}
+            /> }
+        </div>;
         return this.wrapContent(content, null, { textAlign: 'center', height: 'calc(100% - 32px)' });
     }
 }

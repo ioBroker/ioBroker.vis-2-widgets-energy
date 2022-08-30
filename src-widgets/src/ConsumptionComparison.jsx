@@ -8,11 +8,18 @@ import Generic from './Generic';
 
 const styles = () => ({
     chart: {
-        height: '100%',
         width: '100%',
         '&>div': {
             borderRadius: 5,
         },
+    },
+    cardContent: {
+        flex: 1,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        overflow: 'hidden',
     },
 });
 
@@ -150,9 +157,7 @@ class ConsumptionComparison extends Generic {
         return {
             tooltip: {
                 // formatter: '{b}: {c} kWh',
-                formatter: (params, ticket, callback) => {
-                    return `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`;
-                },
+                formatter: (params, ticket, callback) => `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
             },
             backgroundColor: 'transparent',
             grid: {
@@ -181,12 +186,25 @@ class ConsumptionComparison extends Generic {
     renderWidgetBody(props) {
         super.renderWidgetBody(props);
 
-        const content = <ReactEchartsCore
-            option={this.getOption()}
-            theme={this.props.themeType === 'dark' ? 'dark' : ''}
-            className={this.props.classes.chart}
-            opts={{ renderer: 'svg' }}
-        />;
+        let size;
+        if (!this.refCardContent.current) {
+            setTimeout(() => this.forceUpdate(), 50);
+        } else {
+            size = this.refCardContent.current.offsetHeight;
+        }
+
+        const content = <div
+            ref={this.refCardContent}
+            className={this.props.classes.cardContent}
+        >
+            {size && <ReactEchartsCore
+                option={this.getOption()}
+                theme={this.props.themeType === 'dark' ? 'dark' : ''}
+                className={this.props.classes.chart}
+                opts={{ renderer: 'svg' }}
+                style={{ height: size }}
+            />}
+        </div>;
         return this.wrapContent(content, null, { textAlign: 'center', height: 'calc(100% - 32px)' });
     }
 }
