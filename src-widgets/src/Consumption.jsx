@@ -55,14 +55,14 @@ class Consumption extends Generic {
                     {
                         name: 'start-oid',
                         type: 'id',
-                        hidden: data => data.timeWidget,
+                        hidden: data => !!data.timeWidget,
                         label: 'vis_2_widgets_energy_start_oid',
                         tooltip: 'vis_2_widgets_energy_start_oid_tooltip',
                     },
                     {
                         name: 'interval-oid',
                         type: 'id',
-                        hidden: data => !data['start-oid'] || data.timeWidget,
+                        hidden: data => !data['start-oid'] || !!data.timeWidget,
                         label: 'vis_2_widgets_energy_interval_oid',
                         tooltip: 'vis_2_widgets_energy_start_oid_tooltip',
                     },
