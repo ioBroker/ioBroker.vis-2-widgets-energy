@@ -152,6 +152,7 @@ class ConsumptionComparison extends Generic {
                 color: this.state.rxData[`color${i}`] || undefined,
             });
         }
+        data.reverse();
 
         return {
             tooltip: {

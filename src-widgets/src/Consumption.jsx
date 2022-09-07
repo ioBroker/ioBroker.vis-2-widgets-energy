@@ -332,23 +332,33 @@ class Consumption extends Generic {
     }
 
     getTimeStart() {
+        let result;
         if (this.state.rxData.timeWidget) {
-            return this.timeStart;
+            result = this.timeStart;
+        } else if (this.state.rxData['start-oid']) {
+            result = this.state.values[`${this.state.rxData['start-oid']}.val`];
+        } else {
+            result = this.props.timeStart;
         }
-        if (this.state.rxData['start-oid']) {
-            return this.state.values[`${this.state.rxData['start-oid']}.val`];
+        if (!result) {
+            result = 0;
         }
-        return this.props.timeStart;
+        return result;
     }
 
     getTimeInterval() {
+        let result;
         if (this.state.rxData.timeWidget) {
-            return this.timeInterval;
+            result = this.timeInterval;
+        } else if (this.state.rxData['start-oid'] && this.state.rxData['interval-oid']) {
+            result = this.state.values[`${this.state.rxData['interval-oid']}.val`];
+        } else {
+            result = this.props.timeInterval;
         }
-        if (this.state.rxData['interval-oid']) {
-            return this.state.values[`${this.state.rxData['interval-oid']}.val`];
+        if (!result) {
+            result = 'day';
         }
-        return this.props.timeInterval;
+        return result;
     }
 
     onTimeChange = (id, state) => {
