@@ -124,8 +124,7 @@ class ConsumptionComparison extends Generic {
         this.propertiesUpdate();
     }
 
-    onPropertiesUpdated() {
-        super.onPropertiesUpdated();
+    onRxDataChanged() {
         this.propertiesUpdate();
     }
 

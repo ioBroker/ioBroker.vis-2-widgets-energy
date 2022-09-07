@@ -430,8 +430,7 @@ class Distribution extends Generic {
         clearInterval(this.offsetInterval);
     }
 
-    onPropertiesUpdated() {
-        super.onPropertiesUpdated();
+    onRxDataChanged() {
         this.propertiesUpdate();
     }
 
