@@ -14,9 +14,8 @@
   },
   "keywords": [
     "ioBroker",
-    "weather",
-    "home automation",
-    "vis-2-widgets-energy"
+    "visualisation",
+    "Energy widgets"
   ],
   "devDependencies": {
     "@alcalzone/release-script": "^3.5.9",
@@ -43,6 +42,13 @@
     "del": "^6.1.1"
   },
   "main": "main.js",
+  "files": [
+    "admin/",
+    "img/",
+    "widgets/",
+    "io-package.json",
+    "LICENSE"
+  ],
   "scripts": {
     "check": "tsc --noEmit -p tsconfig.check.json",
     "lint": "eslint",
@@ -53,7 +59,7 @@
     "release-major": "release-script major --yes"
   },
   "bugs": {
-    "url": "https://github.com/ioBroker/ioBroker.vis-2-widgets-material/issues"
+    "url": "https://github.com/ioBroker/ioBroker.vis-2-widgets-energy/issues"
   },
   "readmeFilename": "README.md",
   "dependencies": {}

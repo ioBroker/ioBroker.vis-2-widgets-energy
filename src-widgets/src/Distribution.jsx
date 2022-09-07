@@ -3,7 +3,19 @@ import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
 
 import { I18n } from '@iobroker/adapter-react-v5';
-import { Home as HomeIcon } from '@mui/icons-material';
+import {
+    Home as HomeIcon,
+    ElectricCar as ElectricCarIcon,
+    Hvac as HvacIcon,
+    LocalFireDepartment as FireIcon,
+    Waves as PoolIcon,
+    HeatPump as HeatPumpIcon,
+    Microwave as MicrowaveIcon,
+    WindPower as WindPowerIcon,
+    SolarPower as SolarPowerIcon,
+    BatteryChargingFull as BatteryIcon,
+    EvStation as EvStationIcon,
+} from '@mui/icons-material';
 
 import Generic from './Generic';
 import PowerLine from './icons/PowerLine';
@@ -62,6 +74,66 @@ const STANDARD_ICONS = [
         label: 'vis_2_widgets_energy_icons_leaf',
         icon: <LeafIcon width={24} />,
         component: LeafIcon,
+    },
+    {
+        value: 'auto',
+        label: 'vis_2_widgets_energy_icons_auto',
+        icon: <ElectricCarIcon width={24} />,
+        component: ElectricCarIcon,
+    },
+    {
+        value: 'hvac',
+        label: 'vis_2_widgets_energy_icons_hvac',
+        icon: <HvacIcon width={24} />,
+        component: HvacIcon,
+    },
+    {
+        value: 'heat',
+        label: 'vis_2_widgets_energy_icons_heating',
+        icon: <FireIcon width={24} />,
+        component: FireIcon,
+    },
+    {
+        value: 'pool',
+        label: 'vis_2_widgets_energy_icons_pool',
+        icon: <PoolIcon width={24} />,
+        component: PoolIcon,
+    },
+    {
+        value: 'heatPump',
+        label: 'vis_2_widgets_energy_icons_heat_pump',
+        icon: <HeatPumpIcon width={24} />,
+        component: HeatPumpIcon,
+    },
+    {
+        value: 'microwave',
+        label: 'vis_2_widgets_energy_icons_microwave',
+        icon: <MicrowaveIcon width={24} />,
+        component: MicrowaveIcon,
+    },
+    {
+        value: 'wind',
+        label: 'vis_2_widgets_energy_icons_wind',
+        icon: <WindPowerIcon width={24} />,
+        component: WindPowerIcon,
+    },
+    {
+        value: 'solarPower',
+        label: 'vis_2_widgets_energy_icons_solar_power',
+        icon: <SolarPowerIcon width={24} />,
+        component: SolarPowerIcon,
+    },
+    {
+        value: 'battery',
+        label: 'vis_2_widgets_energy_icons_battery',
+        icon: <BatteryIcon width={24} />,
+        component: BatteryIcon,
+    },
+    {
+        value: 'evStation',
+        label: 'vis_2_widgets_energy_icons_solar_ev_station',
+        icon: <EvStationIcon width={24} />,
+        component: EvStationIcon,
     },
 ];
 

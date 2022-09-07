@@ -153,7 +153,34 @@ class Consumption extends Generic {
         };
     }
 
-    async propertiesUpdate() {
+    getHistory(id, options) {
+        if (options.timeout) {
+            return new Promise(resolve => {
+                let timeout = setTimeout(() => {
+                    if (timeout) {
+                        clearTimeout(timeout);
+                        timeout = null;
+                        resolve([]);
+                    }
+                }, options.timeout);
+
+                this.props.socket.getHistory(id, options)
+                    .then(result => {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                            timeout = null;
+                            resolve(result);
+                        } else {
+                            console.warn(`Too late answer for ${id}`);
+                        }
+                    });
+            });
+        } else {
+            return this.props.socket.getHistory(id, options);
+        }
+    }
+
+    propertiesUpdate() {
         const interval = getFromToTime(this.getTimeStart(), this.getTimeInterval());
 
         const types = {
@@ -195,19 +222,29 @@ class Consumption extends Generic {
             quantile: this.state.rxData.quantile,
             integralUnit: this.state.rxData.integralUnit,
             integralInterpolation: this.state.rxData.integralInterpolation,
+            timeout: 10000
         };
 
-        for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
-            if (this.state.rxData[`oid${i}`] && this.state.rxData[`oid${i}`] !== 'nothing_selected') {
-                const history = (await this.props.socket.getHistory(this.state.rxData[`oid${i}`], options))
-                    .sort((a, b) => (a.ts > b.ts ? 1 : -1));
-                const values = times.map(time => {
-                    const foundHistory = history.find(item => item && item.val && moment(item.ts).format(types[this.getTimeInterval()].format) === moment(time).format(types[this.getTimeInterval()].format));
-                    return foundHistory || { ts: time.getTime(), val: 0 };
-                });
-                this.setState({ [`history${i}`]: values });
+        this.setState({ loading: true }, async () => {
+            const newState = { loading: false };
+            const format = types[this.getTimeInterval()].format;
+
+            for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
+                if (this.state.rxData[`oid${i}`] && this.state.rxData[`oid${i}`] !== 'nothing_selected') {
+                    const history = (await this.getHistory(this.state.rxData[`oid${i}`], options))
+                        .sort((a, b) => (a.ts > b.ts ? 1 : -1))
+                        .map(item => item.tsF = moment(item.ts).format(format))
+                        .filter(item => item && item.val !== undefined && item.val !== null);
+
+                    newState[`history${i}`] = times.map(time => {
+                        const timeStr = moment(time).format(format);
+                        const foundHistory = history.find(item => item.tsF === timeStr);
+                        return foundHistory || { ts: time.getTime(), val: 0 };
+                    });
+                }
             }
-        }
+            this.setState(newState);
+        });
     }
 
     getSubscribeState = (id, cb) => this.props.socket.getState(id)

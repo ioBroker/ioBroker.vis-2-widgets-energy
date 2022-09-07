@@ -1,19 +1,30 @@
-# Vis React Widget Template
+![Logo](admin/vis-2-widgets-energy.png)
+# Vis 2 Energy widgets
 
-## Development
-After all entries with vis-widgets-react-template are replaced to your adapter name in package.json, io-package.json 
-and file admin/ vis-widgets-react-template.png renamed too, you can start with renaming of widgets.
+![Number of Installations](http://iobroker.live/badges/vis-2-widgets-energy-installed.svg) ![Number of Installations](http://iobroker.live/badges/vis-2-widgets-energy-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.vis-2-widgets-energy.svg)](https://www.npmjs.com/package/iobroker.vis-2-widgets-energy)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.vis-2-widgets-energy.svg)](https://www.npmjs.com/package/iobroker.vis-2-widgets-energy)
 
-Some important places:
-1. `io-package.json` => `common.visWidgets`
-2. `src-widgets/modulefederation.config.js` from Line 15
-3. File `DemoWidget.jsx`
+[![NPM](https://nodei.co/npm/iobroker.vis-2-widgets-energy.png?downloads=true)](https://nodei.co/npm/iobroker.vis-2-widgets-energy/)
 
-Files in directory `src-widgets` (`App.jsx`, `bootstrap.jsx`, `index.jsx`) are only for development mode and will not be used in production. 
+This widget set consists of the following widgets:
+- Energy distribution
+![Energy distribution](img/distribution.png)
 
-By development, you can start script from `src-widgets` folder `npm run start` and then on port 4173 you will see the demo widget.
+- Energy consumption comparison
+![Energy comparison](img/comparison.png)
 
+- Time selector for energy consumption
+  ![Time selector](img/timeSelector.png)
+
+- Energy consumption per day/week/month
+  ![Energy consumption](img/consumption.png)
+
+<!--
+    ### **WORK IN PROGRESS**
+-->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Initial commit
 
 ## License
 The MIT License (MIT)
