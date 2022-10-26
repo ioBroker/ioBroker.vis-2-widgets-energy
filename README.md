@@ -14,10 +14,10 @@ This widget set consists of the following widgets:
 ![Energy comparison](img/comparison.png)
 
 - Time selector for energy consumption
-  ![Time selector](img/timeSelector.png)
+![Time selector](img/timeSelector.png)
 
 - Energy consumption per day/week/month
-  ![Energy consumption](img/consumption.png)
+![Energy consumption](img/consumption.png)
 
 <!--
     ### **WORK IN PROGRESS**

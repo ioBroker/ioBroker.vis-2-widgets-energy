@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
 import moment from 'moment';
 
-import { I18n } from '@iobroker/adapter-react-v5';
 import { Button, ButtonGroup, IconButton } from '@mui/material';
 import { NavigateBefore as NavigateBeforeIcon, NavigateNext as NavigateNextIcon } from '@mui/icons-material';
 import Generic from './Generic';
@@ -34,24 +33,24 @@ class IntervalSelector extends Generic {
         return {
             id: 'tplEnergy2IntervalSelector',
             visSet: 'vis-2-widgets-energy',
-            visWidgetLabel: 'vis_2_widgets_energy_interval_selector',  // Label of widget
+            visWidgetLabel: 'interval_selector',  // Label of widget
             visName: 'Interval selector',
             visAttrs: [{
                 name: 'common',
                 fields: [
                     {
                         name: 'name',
-                        label: 'vis_2_widgets_energy_name',
+                        label: 'name',
                     },
                     {
                         name: 'timeStart-oid',
                         type: 'id',
-                        label: 'vis_2_widgets_energy_time_start_oid',
+                        label: 'time_start_oid',
                     },
                     {
                         name: 'timeInterval-oid',
                         type: 'id',
-                        label: 'vis_2_widgets_energy_time_interval_oid',
+                        label: 'time_interval_oid',
                     },
                 ],
             }],
@@ -184,7 +183,7 @@ class IntervalSelector extends Generic {
                     onClick={() => this.setTimeStart(0)}
                     className={this.props.classes.nowButton}
                 >
-                    {I18n.t('vis_2_widgets_energy_now')}
+                    {Generic.t('now')}
                 </Button>
                 <ButtonGroup>
                     {['day', 'week', 'month', 'year'].map(period =>
@@ -200,7 +199,7 @@ class IntervalSelector extends Generic {
                                 this.setTimeStart(0);
                             }}
                         >
-                            {I18n.t(`vis_2_widgets_energy_${period}`)}
+                            {Generic.t(`${period}`)}
                         </Button>)}
                 </ButtonGroup>
             </div>

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
 
 import ReactEchartsCore from 'echarts-for-react';
-import { I18n } from '@iobroker/adapter-react-v5';
 import Generic from './Generic';
 
 const styles = () => ({
@@ -33,7 +32,7 @@ class ConsumptionComparison extends Generic {
         return {
             id: 'tplEnergy2ConsumptionComparison',
             visSet: 'vis-2-widgets-energy',
-            visWidgetLabel: 'vis_2_widgets_energy_consumption_comparison',  // Label of widget
+            visWidgetLabel: 'consumption_comparison',  // Label of widget
             visName: 'Consumption comparison',
             visAttrs: [
                 {
@@ -41,47 +40,47 @@ class ConsumptionComparison extends Generic {
                     fields: [
                         {
                             name: 'name',
-                            label: 'vis_2_widgets_energy_name',
+                            label: 'name',
                         },
                         {
                             name: 'devicesCount',
                             type: 'number',
-                            label: 'vis_2_widgets_energy_devices_count',
+                            label: 'devices_count',
                             default: 2,
                         },
                     ],
                 },
                 {
                     name: 'devices',
-                    label: 'vis_2_widgets_energy_level',
+                    label: 'level',
                     indexFrom: 1,
                     indexTo: 'devicesCount',
                     fields: [
                         {
                             name: 'oid',
                             type: 'id',
-                            label: 'vis_2_widgets_energy_oid',
+                            label: 'oid',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name]);
                                 if (object && object.common) {
                                     data[`color${field.index}`] = object.common.color !== undefined ? object.common.color : null;
-                                    data[`name${field.index}`] = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
+                                    data[`name${field.index}`] = Generic.getText(object.common.name);
                                     changeData(data);
                                 }
                             },
                         },
                         {
                             name: 'name',
-                            label: 'vis_2_widgets_energy_name',
+                            label: 'name',
                         },
                         {
                             name: 'color',
                             type: 'color',
-                            label: 'vis_2_widgets_energy_color',
+                            label: 'color',
                         },
                         {
                             name: 'unit',
-                            label: 'vis_2_widgets_energy_unit',
+                            label: 'unit',
                         },
                     ],
                 },
@@ -167,7 +166,7 @@ class ConsumptionComparison extends Generic {
                 right: 50,
                 bottom: 10,
             },
-            xAxis: { name: I18n.t(this.state.unit) || I18n.t('vis_2_widgets_energy_kwh') },
+            xAxis: { name: Generic.t(this.state.unit) || Generic.t('kwh') },
             yAxis: { type: 'category', data: data.map(item => item.name) },
             series: [
                 {

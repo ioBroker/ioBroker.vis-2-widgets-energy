@@ -31,50 +31,50 @@ class Consumption extends Generic {
         return {
             id: 'tplEnergy2Consumption',
             visSet: 'vis-2-widgets-energy',
-            visWidgetLabel: 'vis_2_widgets_energy_consumption',  // Label of widget
+            visWidgetLabel: 'consumption',  // Label of widget
             visName: 'Consumption',
             visAttrs: [{
                 name: 'common',
                 fields: [
                     {
                         name: 'name',
-                        label: 'vis_2_widgets_energy_name',
+                        label: 'name',
                     },
                     {
                         name: 'devicesCount',
                         type: 'number',
-                        label: 'vis_2_widgets_energy_devices_count',
+                        label: 'devices_count',
                         default: 1,
                     },
                     {
                         name: 'timeWidget',
                         type: 'widget',
-                        label: 'vis_2_widgets_energy_time_widget',
+                        label: 'time_widget',
                         tpl: 'tplEnergy2IntervalSelector',
                     },
                     {
                         name: 'start-oid',
                         type: 'id',
                         hidden: data => !!data.timeWidget,
-                        label: 'vis_2_widgets_energy_start_oid',
-                        tooltip: 'vis_2_widgets_energy_start_oid_tooltip',
+                        label: 'start_oid',
+                        tooltip: 'start_oid_tooltip',
                     },
                     {
                         name: 'interval-oid',
                         type: 'id',
                         hidden: data => !data['start-oid'] || !!data.timeWidget,
-                        label: 'vis_2_widgets_energy_interval_oid',
-                        tooltip: 'vis_2_widgets_energy_start_oid_tooltip',
+                        label: 'interval_oid',
+                        tooltip: 'start_oid_tooltip',
                     },
                 ],
             },
             {
                 name: 'aggregation',
-                label: 'vis_2_widgets_energy_aggregation',
+                label: 'aggregation',
                 fields: [
                     {
                         name: 'aggregate',
-                        label: 'vis_2_widgets_energy_aggregate',
+                        label: 'aggregate',
                         type: 'select',
                         options: ['minmax', 'max', 'min', 'average', 'total', 'count', 'percentile', 'quantile', 'integral', 'none'],
                         default: 'total',
@@ -83,21 +83,21 @@ class Consumption extends Generic {
                         name: 'percentile',
                         default: 50,
                         type: 'number',
-                        label: 'vis_2_widgets_energy_percentile',
+                        label: 'percentile',
                         hidden: data => data.aggregate !== 'percentile',
                     },
                     {
                         name: 'quantile',
                         default: 0.5,
                         type: 'number',
-                        label: 'vis_2_widgets_energy_quantile',
+                        label: 'quantile',
                         hidden: data => data.aggregate !== 'quantile',
                     },
                     {
                         name: 'integralUnit',
                         default: 60,
                         type: 'number',
-                        label: 'vis_2_widgets_energy_integral_unit',
+                        label: 'integral_unit',
                         hidden: data => data.aggregate !== 'integral',
                     },
                     {
@@ -105,21 +105,21 @@ class Consumption extends Generic {
                         default: 'none',
                         type: 'select',
                         options: ['linear', 'none'],
-                        label: 'vis_2_widgets_energy_integral_interpolation',
+                        label: 'integral_interpolation',
                         hidden: data => data.aggregate !== 'integral',
                     },
                 ],
             },
             {
                 name: 'devices',
-                label: 'vis_2_widgets_energy_level',
+                label: 'level',
                 indexFrom: 1,
                 indexTo: 'devicesCount',
                 fields: [
                     {
                         name: 'oid',
                         type: 'hid',
-                        label: 'vis_2_widgets_energy_oid',
+                        label: 'oid',
                         onChange: async (field, data, changeData, socket) => {
                             const object = await socket.getObject(data[field.name]);
                             if (object && object.common) {
@@ -131,16 +131,16 @@ class Consumption extends Generic {
                     },
                     {
                         name: 'name',
-                        label: 'vis_2_widgets_energy_name',
+                        label: 'name',
                     },
                     {
                         name: 'color',
                         type: 'color',
-                        label: 'vis_2_widgets_energy_color',
+                        label: 'color',
                     },
                     {
                         name: 'unit',
-                        label: 'vis_2_widgets_energy_unit',
+                        label: 'unit',
                     },
                 ],
             }],

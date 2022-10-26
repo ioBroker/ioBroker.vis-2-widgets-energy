@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
 
-import { I18n } from '@iobroker/adapter-react-v5';
 import {
     Home as HomeIcon,
     ElectricCar as ElectricCarIcon,
@@ -50,88 +49,88 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
 }
 
 const STANDARD_ICONS = [
-    { value: '', label: 'vis_2_widgets_energy_icons_none' },
+    { value: '', label: 'icons_none' },
     {
         value: 'home',
-        label: 'vis_2_widgets_energy_icons_home',
+        label: 'icons_home',
         icon: <HomeIcon width={24} />,
         component: HomeIcon,
     },
     {
         value: 'powerLIne',
-        label: 'vis_2_widgets_energy_icons_powerline',
+        label: 'icons_powerline',
         icon: <PowerLine width={24} />,
         component: PowerLine,
     },
     {
         value: 'solar',
-        label: 'vis_2_widgets_energy_icons_solar',
+        label: 'icons_solar',
         icon: <SolarIcon width={24} />,
         component: SolarIcon,
     },
     {
         value: 'leaf',
-        label: 'vis_2_widgets_energy_icons_leaf',
+        label: 'icons_leaf',
         icon: <LeafIcon width={24} />,
         component: LeafIcon,
     },
     {
         value: 'auto',
-        label: 'vis_2_widgets_energy_icons_auto',
+        label: 'icons_auto',
         icon: <ElectricCarIcon width={24} />,
         component: ElectricCarIcon,
     },
     {
         value: 'hvac',
-        label: 'vis_2_widgets_energy_icons_hvac',
+        label: 'icons_hvac',
         icon: <HvacIcon width={24} />,
         component: HvacIcon,
     },
     {
         value: 'heat',
-        label: 'vis_2_widgets_energy_icons_heating',
+        label: 'icons_heating',
         icon: <FireIcon width={24} />,
         component: FireIcon,
     },
     {
         value: 'pool',
-        label: 'vis_2_widgets_energy_icons_pool',
+        label: 'icons_pool',
         icon: <PoolIcon width={24} />,
         component: PoolIcon,
     },
     {
         value: 'heatPump',
-        label: 'vis_2_widgets_energy_icons_heat_pump',
+        label: 'icons_heat_pump',
         icon: <HeatPumpIcon width={24} />,
         component: HeatPumpIcon,
     },
     {
         value: 'microwave',
-        label: 'vis_2_widgets_energy_icons_microwave',
+        label: 'icons_microwave',
         icon: <MicrowaveIcon width={24} />,
         component: MicrowaveIcon,
     },
     {
         value: 'wind',
-        label: 'vis_2_widgets_energy_icons_wind',
+        label: 'icons_wind',
         icon: <WindPowerIcon width={24} />,
         component: WindPowerIcon,
     },
     {
         value: 'solarPower',
-        label: 'vis_2_widgets_energy_icons_solar_power',
+        label: 'icons_solar_power',
         icon: <SolarPowerIcon width={24} />,
         component: SolarPowerIcon,
     },
     {
         value: 'battery',
-        label: 'vis_2_widgets_energy_icons_battery',
+        label: 'icons_battery',
         icon: <BatteryIcon width={24} />,
         component: BatteryIcon,
     },
     {
         value: 'evStation',
-        label: 'vis_2_widgets_energy_icons_solar_ev_station',
+        label: 'icons_solar_ev_station',
         icon: <EvStationIcon width={24} />,
         component: EvStationIcon,
     },
@@ -150,8 +149,8 @@ class Distribution extends Generic {
         return {
             id: 'tplEnergy2Distribution',
             visSet: 'vis-2-widgets-energy',
-            visSetLabel: 'vis_2_widgets_energy_set_label', // Label of widget set
-            visWidgetLabel: 'vis_2_widgets_energy_distribution',  // Label of widget
+            visSetLabel: 'set_label', // Label of widget set
+            visWidgetLabel: 'distribution',  // Label of widget
             visName: 'Distribution',
             visAttrs: [
                 {
@@ -159,32 +158,32 @@ class Distribution extends Generic {
                     fields: [
                         {
                             name: 'name',
-                            label: 'vis_2_widgets_energy_name',
+                            label: 'name',
                         },
                         {
                             name: 'defaultColor',
                             type: 'color',
-                            label: 'vis_2_widgets_energy_default_color',
+                            label: 'default_color',
                         },
                         {
                             name: 'defaultCircleSize',
                             type: 'number',
-                            label: 'vis_2_widgets_energy_default_circle_size',
-                            tooltip: 'vis_2_widgets_energy_default_circle_size_tooltip',
+                            label: 'default_circle_size',
+                            tooltip: 'default_circle_size_tooltip',
                             default: 10,
                         },
                         {
                             name: 'defaultDistanceSize',
                             type: 'number',
-                            label: 'vis_2_widgets_energy_default_distance_size',
-                            tooltip: 'vis_2_widgets_energy_default_distance_size_tooltip',
+                            label: 'default_distance_size',
+                            tooltip: 'default_distance_size_tooltip',
                             default: 18,
                         },
                         {
                             name: 'defaultFontSize',
                             type: 'number',
-                            label: 'vis_2_widgets_energy_default_font_size',
-                            tooltip: 'vis_2_widgets_energy_default_font_size_tooltip',
+                            label: 'default_font_size',
+                            tooltip: 'default_font_size_tooltip',
                             default: 12,
                         },
                         {
@@ -192,40 +191,41 @@ class Distribution extends Generic {
                             type: 'number',
                             min: 0,
                             max: 10,
-                            label: 'vis_2_widgets_energy_nodes_count',
+                            label: 'nodes_count',
                         },
                     ],
                 },
                 {
                     name: 'home',
-                    label: 'vis_2_widgets_energy_group_home',
+                    label: 'group_home',
                     fields: [
                         {
                             name: 'home-oid',
                             type: 'id',
-                            label: 'vis_2_widgets_energy_home_oid',
+                            label: 'home_oid',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name]);
                                 if (object && object.common) {
-                                    data.homeColor  = object.common.color !== undefined ? object.common.color : null;
-                                    data.homeName  = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
+                                    data.homeColor = object.common.color !== undefined ? object.common.color : null;
+                                    data.homeName = Generic.getText(object.common.name);
                                     changeData(data);
                                 }
                             },
+                            noInit: true,
                         },
                         {
                             name: 'homeName',
-                            label: 'vis_2_widgets_energy_home_name',
+                            label: 'home_name',
                         },
                         {
                             name: 'homeColor',
                             type: 'color',
-                            label: 'vis_2_widgets_energy_home_color',
+                            label: 'home_color',
                         },
                         {
                             name: 'homeStandardIcon',
                             type: 'select',
-                            label: 'vis_2_widgets_energy_standard_icon',
+                            label: 'standard_icon',
                             options: STANDARD_ICONS.map(item => ({
                                 value: item.value,
                                 label: item.label,
@@ -238,82 +238,83 @@ class Distribution extends Generic {
                             name: 'homeIcon',
                             type: 'image',
                             hidden: data => !!data.homeStandardIcon,
-                            label: 'vis_2_widgets_energy_custom_icon',
+                            label: 'custom_icon',
                         },
                         {
                             name: 'homeCircleSize',
                             type: 'slider',
                             min: 0,
                             max: 50,
-                            label: 'vis_2_widgets_energy_home_circle_size',
-                            tooltip: 'vis_2_widgets_energy_home_circle_size_tooltip',
+                            label: 'home_circle_size',
+                            tooltip: 'home_circle_size_tooltip',
                         },
                         {
                             name: 'homeDistanceSize',
                             type: 'slider',
                             min: 0,
                             max: 50,
-                            label: 'vis_2_widgets_energy_home_distance_size',
-                            tooltip: 'vis_2_widgets_energy_home_distance_size_tooltip',
+                            label: 'home_distance_size',
+                            tooltip: 'home_distance_size_tooltip',
                         },
                         {
                             name: 'homeFontSize',
                             type: 'number',
-                            label: 'vis_2_widgets_energy_home_font_size',
-                            tooltip: 'vis_2_widgets_energy_home_font_size_tooltip',
+                            label: 'home_font_size',
+                            tooltip: 'home_font_size_tooltip',
                         },
                     ],
                 },
                 {
                     name: 'powerLine',
-                    label: 'vis_2_widgets_energy_group_powerLine',
+                    label: 'group_powerLine',
                     fields: [
                         {
                             name: 'powerLine-oid',
                             type: 'id',
-                            label: 'vis_2_widgets_energy_power_line_oid',
+                            label: 'power_line_oid',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name]);
                                 if (object && object.common) {
                                     data.powerLineColor = object.common.color !== undefined ? object.common.color : null;
-                                    data.powerLineName = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
+                                    data.powerLineName = Generic.getText(object.common.name);
                                     changeData(data);
                                 }
                             },
+                            noInit: true,
                         },
                         {
                             name: 'powerLineReturn-oid',
                             type: 'id',
-                            label: 'vis_2_widgets_energy_power_line_return_oid',
+                            label: 'power_line_return_oid',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name]);
                                 if (object && object.common) {
                                     data.powerLineColor = object.common.color !== undefined ? object.common.color : null;
-                                    data.powerLineName = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
+                                    data.powerLineName = Generic.getText(object.common.name);
                                     changeData(data);
                                 }
                             },
                         },
                         {
                             name: 'powerLineName',
-                            label: 'vis_2_widgets_energy_power_line_name',
+                            label: 'power_line_name',
                         },
                         {
                             name: 'powerLineColor',
                             type: 'color',
-                            label: 'vis_2_widgets_energy_power_line_color',
+                            label: 'power_line_color',
                         },
                         {
                             name: 'powerLineReturnColor',
                             hidden: data => !data['powerLineReturn-oid'],
                             type: 'color',
-                            label: 'vis_2_widgets_energy_power_line_return_color',
+                            label: 'power_line_return_color',
                             default: '#208020',
                         },
                         {
                             name: 'powerLineStandardIcon',
                             type: 'select',
-                            label: 'vis_2_widgets_energy_standard_icon',
+                            label: 'standard_icon',
                             options: STANDARD_ICONS.map(item => ({
                                 value: item.value,
                                 label: item.label,
@@ -326,64 +327,65 @@ class Distribution extends Generic {
                             name: 'powerLineIcon',
                             hidden: data => !!data.powerLineStandardIcon,
                             type: 'image',
-                            label: 'vis_2_widgets_energy_custom_icon',
+                            label: 'custom_icon',
                         },
                         {
                             name: 'powerLineCircleSize',
                             type: 'slider',
                             min: 0,
                             max: 50,
-                            label: 'vis_2_widgets_energy_power_line_circle_size',
-                            tooltip: 'vis_2_widgets_energy_power_line_circle_size_tooltip',
+                            label: 'power_line_circle_size',
+                            tooltip: 'power_line_circle_size_tooltip',
                         },
                         {
                             name: 'powerLineDistanceSize',
                             type: 'slider',
                             min: 0,
                             max: 50,
-                            label: 'vis_2_widgets_energy_power_line_distance_size',
-                            tooltip: 'vis_2_widgets_energy_power_line_distance_size_tooltip',
+                            label: 'power_line_distance_size',
+                            tooltip: 'power_line_distance_size_tooltip',
                         },
                         {
                             name: 'powerLineFontSize',
                             type: 'number',
-                            label: 'vis_2_widgets_energy_power_line_font_size',
-                            tooltip: 'vis_2_widgets_energy_power_line_font_size_tooltip',
+                            label: 'power_line_font_size',
+                            tooltip: 'power_line_font_size_tooltip',
                         },
                     ],
                 },
                 {
                     name: 'node',
-                    label: 'vis_2_widgets_energy_group_node',
+                    label: 'group_node',
                     indexFrom: 1,
                     indexTo: 'nodesCount',
                     fields: [
                         {
                             name: 'oid',
                             type: 'id',
-                            label: 'vis_2_widgets_energy_oid',
+                            label: 'oid',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name]);
                                 if (object && object.common) {
                                     data[`color${field.index}`] = object.common.color !== undefined ? object.common.color : null;
-                                    data[`name${field.index}`] = object.common.name && typeof object.common.name === 'object' ? object.common.name[I18n.getLanguage()] : object.common.name;
+                                    data[`name${field.index}`] = Generic.getText(object.common.name);
                                     changeData(data);
                                 }
                             },
+                            noInit: true,
                         },
                         {
                             name: 'name',
-                            label: 'vis_2_widgets_energy_name',
+                            label: 'name',
                         },
                         {
                             name: 'color',
                             type: 'color',
-                            label: 'vis_2_widgets_energy_color',
+                            label: 'color',
                         },
                         {
                             name: 'standardIcon',
                             type: 'select',
-                            label: 'vis_2_widgets_energy_standard_icon',
+                            label: 'standard_icon',
                             options: STANDARD_ICONS.map(item => ({
                                 value: item.value,
                                 label: item.label,
@@ -396,29 +398,29 @@ class Distribution extends Generic {
                             name: 'icon',
                             type: 'image',
                             hidden: (data, index) => !!data[`standardIcon${index}`],
-                            label: 'vis_2_widgets_energy_custom_icon',
+                            label: 'custom_icon',
                         },
                         {
                             name: 'circleSize',
                             type: 'slider',
                             min: 0,
                             max: 50,
-                            label: 'vis_2_widgets_energy_circle_size',
-                            tooltip: 'vis_2_widgets_energy_circle_size_tooltip',
+                            label: 'circle_size',
+                            tooltip: 'circle_size_tooltip',
                         },
                         {
                             name: 'distanceSize',
                             type: 'slider',
                             min: 0,
                             max: 50,
-                            label: 'vis_2_widgets_energy_distance_size',
-                            tooltip: 'vis_2_widgets_energy_distance_size_tooltip',
+                            label: 'distance_size',
+                            tooltip: 'distance_size_tooltip',
                         },
                         {
                             name: 'fontSize',
                             type: 'number',
-                            label: 'vis_2_widgets_energy_font_size',
-                            tooltip: 'vis_2_widgets_energy_font_size_tooltip',
+                            label: 'font_size',
+                            tooltip: 'font_size_tooltip',
                         },
                     ],
                 },
@@ -556,7 +558,7 @@ class Distribution extends Generic {
             distance: (size * (this.state.rxData.powerLineDistanceSize || defaultDistanceSize)) / 100,
             fontSize: defaultFontSize || this.state.rxData.powerLineFontSize,
             oid: this.state.rxData['powerLine-oid'],
-            unit: valueAndUnit.unit || I18n.t('vis_2_widgets_energy_kwh'),
+            unit: valueAndUnit.unit || Generic.t('kwh'),
             value: valueAndUnit.value,
             icon: this.state.rxData.powerLineStandardIcon || this.state.rxData.powerLineIcon || this.state.objects.powerLine?.common?.icon,
             arrow: '→', // '↦',
@@ -579,7 +581,7 @@ class Distribution extends Generic {
                 distance: (size * (this.state.rxData[`distanceSize${i}`] || defaultDistanceSize)) / 100,
                 fontSize: defaultFontSize || this.state.rxData[`fontSize${i}`],
                 oid: this.state.rxData[`oid${i}`],
-                unit: _valueAndUnit.unit || I18n.t('vis_2_widgets_energy_kwh'),
+                unit: _valueAndUnit.unit || Generic.t('kwh'),
                 value: _valueAndUnit.value,
                 icon: this.state.rxData[`standardIcon${i}`] || this.state.rxData[`icon${i}`] || this.state.objects[`object${i}`]?.common?.icon,
                 arrow: '',
@@ -659,7 +661,7 @@ class Distribution extends Generic {
                                 :
                                 (CustomIcon ? <CustomIcon style={{ width: Math.round(circle.radius * 0.666), height: Math.round(circle.radius * 0.666) }} /> : null)}
                             {circle.secondaryValue?.value !== undefined ? <div style={{ color: this.state.rxData.powerLineReturnColor }}>
-                                {`${circle.secondaryArrow}${circle.secondaryValue.value} ${circle.secondaryValue.unit || I18n.t('vis_2_widgets_energy_kwh')}`}
+                                {`${circle.secondaryArrow}${circle.secondaryValue.value} ${circle.secondaryValue.unit || Generic.t('kwh')}`}
                             </div> : null}
                             {circle.value !== undefined ? <div>
                                 {`${circle.arrow}${circle.value} ${circle.unit}`}
@@ -696,7 +698,7 @@ class Distribution extends Generic {
                             :
                             null)}
                     {homeValueAndUnit.value !== undefined ? <div>
-                        {`${homeValueAndUnit.value} ${homeValueAndUnit.unit || I18n.t('vis_2_widgets_energy_kwh')}`}
+                        {`${homeValueAndUnit.value} ${homeValueAndUnit.unit || Generic.t('kwh')}`}
                     </div> : null}
                 </div>
                 <div
@@ -708,7 +710,7 @@ class Distribution extends Generic {
                         fontSize: homeFontSize,
                     }}
                 >
-                    <div>{this.state.rxData.homeName || this.state.rxData['home-oid'] || I18n.t('vis_2_widgets_energy_home')}</div>
+                    <div>{this.state.rxData.homeName || this.state.rxData['home-oid'] || Generic.t('home')}</div>
                 </div>
                 <svg style={{ width: size, height: size, overflow: 'visible' }}>
                     <circle

@@ -8,6 +8,20 @@ import {
 import { VisRxWidget } from '@iobroker/vis-2-widgets-react-dev';
 
 class Generic extends (window.visRxWidget || VisRxWidget) {
+    getPropertyValue = state => this.state.values[`${this.state.rxData[state]}.val`];
+
+    // eslint-disable-next-line class-methods-use-this
+    static getI18nPrefix() {
+        return 'vis_2_widgets_energy_';
+    }
+
+    static getText(text) {
+        if (typeof text === 'object') {
+            return text[(window.visRxWidget || VisRxWidget).getLanguage()] || text.en;
+        }
+        return text;
+    }
+
     // eslint-disable-next-line class-methods-use-this
     formatValue(value, round) {
         if (typeof value === 'number') {
