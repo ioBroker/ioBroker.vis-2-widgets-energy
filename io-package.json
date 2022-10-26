@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "news": {
+      "0.1.1": {
+        "en": "Initial commit",
+        "de": "Ursprüngliche Verpflichtung",
+        "ru": "Первоначальный коммит",
+        "pt": "Compromisso inicial",
+        "nl": "Initiatief",
+        "fr": "Engagement initial",
+        "it": "Impegno iniziale",
+        "es": "Composición inicial",
+        "pl": "Śledczy",
+        "uk": "Початкова комісія",
+        "zh-cn": "初始承诺"
+      },
       "0.1.0": {
         "en": "initial commit",
         "de": "anfängliches Commit",
@@ -61,9 +74,7 @@
       "vis"
     ]
   },
-  "native": {
-
-  },
+  "native": {},
   "objects": [],
   "instanceObjects": []
 }
