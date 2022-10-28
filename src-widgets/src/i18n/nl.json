@@ -85,5 +85,7 @@
   "icons_wind": "Windkracht",
   "icons_solar_power": "Zonne-energie",
   "icons_battery": "Accu",
-  "icons_solar_ev_station": "EV-station op zonne-energie"
+  "icons_solar_ev_station": "EV-station op zonne-energie",
+  "icon_size_tooltip": "In procent tot cirkelgrootte",
+  "icon_size": "Pictogramgrootte"
 }

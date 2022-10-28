@@ -85,5 +85,7 @@
   "icons_wind": "Windkraft",
   "icons_solar_power": "Solarenergie",
   "icons_battery": "Batterie",
-  "icons_solar_ev_station": "Solar-EV-Station"
+  "icons_solar_ev_station": "Solar-EV-Station",
+  "icon_size_tooltip": "In Prozent zur Kreisgröße",
+  "icon_size": "Symbolgröße"
 }

@@ -85,5 +85,7 @@
   "icons_wind": "Énergie éolienne",
   "icons_solar_power": "Énergie solaire",
   "icons_battery": "La batterie",
-  "icons_solar_ev_station": "Station solaire EV"
+  "icons_solar_ev_station": "Station solaire EV",
+  "icon_size_tooltip": "En pourcentage de la taille du cercle",
+  "icon_size": "Taille de l'icône"
 }

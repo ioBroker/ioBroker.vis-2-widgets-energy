@@ -85,5 +85,7 @@
   "icons_wind": "Сила ветра",
   "icons_solar_power": "Солнечная энергия",
   "icons_battery": "Батарея",
-  "icons_solar_ev_station": "Солнечная электростанция"
+  "icons_solar_ev_station": "Солнечная электростанция",
+  "icon_size_tooltip": "В процентах к размеру круга",
+  "icon_size": "Размер значка"
 }

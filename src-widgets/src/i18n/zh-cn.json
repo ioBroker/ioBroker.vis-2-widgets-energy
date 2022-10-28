@@ -85,5 +85,7 @@
   "icons_wind": "风力",
   "icons_solar_power": "太阳能",
   "icons_battery": "电池",
-  "icons_solar_ev_station": "太阳能电动车站"
+  "icons_solar_ev_station": "太阳能电动车站",
+  "icon_size_tooltip": "以圆圈大小的百分比",
+  "icon_size": "图标大小"
 }

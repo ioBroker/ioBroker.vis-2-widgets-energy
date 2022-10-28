@@ -2,24 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
 
-import {
-    Home as HomeIcon,
-    ElectricCar as ElectricCarIcon,
-    Hvac as HvacIcon,
-    LocalFireDepartment as FireIcon,
-    Waves as PoolIcon,
-    HeatPump as HeatPumpIcon,
-    Microwave as MicrowaveIcon,
-    WindPower as WindPowerIcon,
-    SolarPower as SolarPowerIcon,
-    BatteryChargingFull as BatteryIcon,
-    EvStation as EvStationIcon,
-} from '@mui/icons-material';
+import { Icon } from '@iobroker/adapter-react-v5';
 
 import Generic from './Generic';
-import PowerLine from './icons/PowerLine';
-import SolarIcon from './icons/Solar';
-import LeafIcon from './icons/Leaf';
 
 const styles = () => ({
     cardContent: {
@@ -47,94 +32,6 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     returnValue.y = Math.round((centerY + radius * Math.sin(angleInRadians)) * 100) / 100;
     return returnValue;
 }
-
-const STANDARD_ICONS = [
-    { value: '', label: 'icons_none' },
-    {
-        value: 'home',
-        label: 'icons_home',
-        icon: <HomeIcon width={24} />,
-        component: HomeIcon,
-    },
-    {
-        value: 'powerLIne',
-        label: 'icons_powerline',
-        icon: <PowerLine width={24} />,
-        component: PowerLine,
-    },
-    {
-        value: 'solar',
-        label: 'icons_solar',
-        icon: <SolarIcon width={24} />,
-        component: SolarIcon,
-    },
-    {
-        value: 'leaf',
-        label: 'icons_leaf',
-        icon: <LeafIcon width={24} />,
-        component: LeafIcon,
-    },
-    {
-        value: 'auto',
-        label: 'icons_auto',
-        icon: <ElectricCarIcon width={24} />,
-        component: ElectricCarIcon,
-    },
-    {
-        value: 'hvac',
-        label: 'icons_hvac',
-        icon: <HvacIcon width={24} />,
-        component: HvacIcon,
-    },
-    {
-        value: 'heat',
-        label: 'icons_heating',
-        icon: <FireIcon width={24} />,
-        component: FireIcon,
-    },
-    {
-        value: 'pool',
-        label: 'icons_pool',
-        icon: <PoolIcon width={24} />,
-        component: PoolIcon,
-    },
-    {
-        value: 'heatPump',
-        label: 'icons_heat_pump',
-        icon: <HeatPumpIcon width={24} />,
-        component: HeatPumpIcon,
-    },
-    {
-        value: 'microwave',
-        label: 'icons_microwave',
-        icon: <MicrowaveIcon width={24} />,
-        component: MicrowaveIcon,
-    },
-    {
-        value: 'wind',
-        label: 'icons_wind',
-        icon: <WindPowerIcon width={24} />,
-        component: WindPowerIcon,
-    },
-    {
-        value: 'solarPower',
-        label: 'icons_solar_power',
-        icon: <SolarPowerIcon width={24} />,
-        component: SolarPowerIcon,
-    },
-    {
-        value: 'battery',
-        label: 'icons_battery',
-        icon: <BatteryIcon width={24} />,
-        component: BatteryIcon,
-    },
-    {
-        value: 'evStation',
-        label: 'icons_solar_ev_station',
-        icon: <EvStationIcon width={24} />,
-        component: EvStationIcon,
-    },
-];
 
 class Distribution extends Generic {
     constructor(props) {
@@ -224,15 +121,10 @@ class Distribution extends Generic {
                         },
                         {
                             name: 'homeStandardIcon',
-                            type: 'select',
+                            type: 'icon64',
                             label: 'standard_icon',
-                            options: STANDARD_ICONS.map(item => ({
-                                value: item.value,
-                                label: item.label,
-                                icon: item.icon,
-                                color: item.color,
-                            })),
-                            default: '',
+                            hidden: data => !!data.homeIcon,
+                            default: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0xOSA5LjNWNGgtM3YyLjZMMTIgM0wyIDEyaDN2OGg1di02aDR2Nmg1di04aDNsLTMtMi43em0tOSAuN2MwLTEuMS45LTIgMi0yczIgLjkgMiAyaC00eiIvPjwvc3ZnPg==',
                         },
                         {
                             name: 'homeIcon',
@@ -261,6 +153,15 @@ class Distribution extends Generic {
                             type: 'number',
                             label: 'home_font_size',
                             tooltip: 'home_font_size_tooltip',
+                        },
+                        {
+                            name: 'homeIconSize',
+                            type: 'slider',
+                            label: 'icon_size',
+                            tooltip: 'icon_size_tooltip',
+                            min: 0,
+                            max: 230,
+                            hidden: data => !data.homeIcon && !data.homeStandardIcon,
                         },
                     ],
                 },
@@ -313,15 +214,10 @@ class Distribution extends Generic {
                         },
                         {
                             name: 'powerLineStandardIcon',
-                            type: 'select',
+                            type: 'icon64',
                             label: 'standard_icon',
-                            options: STANDARD_ICONS.map(item => ({
-                                value: item.value,
-                                label: item.label,
-                                icon: item.icon,
-                                color: item.color,
-                            })),
-                            default: 'powerLIne',
+                            default: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NzAgNDcwIiB3aWR0aD0iNDcwIiBoZWlnaHQ9IjQ3MCI+DQogICAgPHBhdGgNCiAgICAgICAgZmlsbD0iY3VycmVudENvbG9yIg0KICAgICAgICBkPSJNNDIwLjYzNCwxNjkuNDIyYy0wLjAwMi0wLjAyNS0wLjAwMy0wLjA1LTAuMDA2LTAuMDc0Yy0wLjA3Ni0wLjcyNS0wLjI1NS0xLjQxNi0wLjUyMy0yLjA2NQ0KYy0wLjAxNS0wLjAzNy0wLjAyOS0wLjA3My0wLjA0NS0wLjEwOWMtMC4yNjktMC42MjMtMC42MTctMS4xOTgtMS4wMzctMS43MmMtMC4wNDctMC4wNTktMC4wOTUtMC4xMTctMC4xNDQtMC4xNzQNCmMtMC4yNTItMC4yOTUtMC41MjUtMC41Ny0wLjgyLTAuODIzYy0wLjA0NC0wLjAzOC0wLjA4NC0wLjA3OS0wLjEyOS0wLjExNmMtMC4xNDItMC4xMTYtMC4yOS0wLjIyMy0wLjQ0LTAuMzI5DQpjLTAuMTE2LTAuMDgyLTAuMjM0LTAuMTU4LTAuMzU1LTAuMjMzYy0wLjE4MS0wLjExMy0wLjM2NC0wLjIxOS0wLjU1NS0wLjMxNmMtMC4xOTgtMC4xMDItMC40LTAuMTk2LTAuNjA3LTAuMjc5DQpjLTAuMDYxLTAuMDI0LTAuMTE3LTAuMDU5LTAuMTc4LTAuMDgybC0xMjEuMTU0LTUyLjExNVY2OS4yMTFoMTExLjAyOHYzMS40OWMwLDQuMTQyLDMuMzU4LDcuNSw3LjUsNy41czcuNS0zLjM1OCw3LjUtNy41VjYyLjEwOA0KYzAuMDA3LTAuMTMyLDAuMDItMC4yNjMsMC4wMi0wLjM5N2MwLTAuMjQzLTAuMDMzLTAuNDc2LTAuMDU2LTAuNzEzYy0wLjAwMi0wLjAyNS0wLjAwMy0wLjA1LTAuMDA2LTAuMDc0DQpjLTAuMDc2LTAuNzI1LTAuMjU1LTEuNDE2LTAuNTIzLTIuMDY1Yy0wLjAxNS0wLjAzNy0wLjAyOS0wLjA3My0wLjA0NS0wLjEwOWMtMC4yNjktMC42MjMtMC42MTctMS4xOTgtMS4wMzctMS43Mg0KYy0wLjA0Ny0wLjA1OS0wLjA5NS0wLjExNy0wLjE0NC0wLjE3NGMtMC4yNTItMC4yOTUtMC41MjUtMC41Ny0wLjgyLTAuODIzYy0wLjA0NC0wLjAzOC0wLjA4NC0wLjA3OS0wLjEyOS0wLjExNg0KYy0wLjE0Mi0wLjExNi0wLjI5LTAuMjIzLTAuNDQtMC4zMjljLTAuMTE2LTAuMDgyLTAuMjM0LTAuMTU4LTAuMzU1LTAuMjMzYy0wLjE4MS0wLjExMy0wLjM2NC0wLjIxOS0wLjU1NS0wLjMxNg0KYy0wLjE5OC0wLjEwMi0wLjQtMC4xOTYtMC42MDctMC4yNzljLTAuMDYxLTAuMDI0LTAuMTE3LTAuMDU5LTAuMTc4LTAuMDgyTDI5MC4xMDcsMC42MUMyODkuMTk1LDAuMjE5LDI4OC4xOTUsMCwyODcuMTQzLDBIMTgyLjgzNw0KYy0xLjA1MiwwLTIuMDUyLDAuMjE5LTIuOTYxLDAuNjA5QzE3OS44NzMsMC42MSw1My45Miw1NC43OSw1My45Miw1NC43OWMtMC4wMjMsMC4wMS0wLjA0NiwwLjAyLTAuMDY5LDAuMDMNCmMtMC4wODMsMC4wMzYtMC4xNTYsMC4wNzYtMC4yMzIsMC4xMTJjLTAuMTk4LDAuMDk0LTAuMzkxLDAuMTk0LTAuNTgsMC4zMDRjLTAuMTMxLDAuMDc2LTAuMjYyLDAuMTUyLTAuMzg3LDAuMjM1DQpjLTAuMDY1LDAuMDQzLTAuMTI1LDAuMDkxLTAuMTg5LDAuMTM2Yy0wLjEyNywwLjA5LTAuMjUyLDAuMTgxLTAuMzcyLDAuMjc4Yy0wLjA2LDAuMDQ5LTAuMTE4LDAuMTAxLTAuMTc3LDAuMTUyDQpjLTAuMTE2LDAuMS0wLjIyOSwwLjIwMS0wLjMzOCwwLjMwOGMtMC4wNTksMC4wNTctMC4xMTUsMC4xMTYtMC4xNzEsMC4xNzVjLTAuMTAxLDAuMTA1LTAuMTk5LDAuMjEyLTAuMjkzLDAuMzIzDQpjLTAuMDU4LDAuMDY3LTAuMTE0LDAuMTM2LTAuMTY5LDAuMjA1Yy0wLjA4NSwwLjEwNy0wLjE2NiwwLjIxNi0wLjI0NSwwLjMyN2MtMC4wNTYsMC4wNzgtMC4xMTEsMC4xNTYtMC4xNjQsMC4yMzYNCmMtMC4wNywwLjEwOC0wLjEzNSwwLjIxOS0wLjIsMC4zMjljLTAuMDUxLDAuMDg4LTAuMTA0LDAuMTc0LTAuMTUyLDAuMjY0Yy0wLjA2MSwwLjExNi0wLjExNSwwLjIzNS0wLjE3MSwwLjM1NA0KYy0wLjA2MSwwLjEzMi0wLjEyLDAuMjY1LTAuMTc0LDAuNGMtMC4wNjIsMC4xNTYtMC4xMjIsMC4zMTItMC4xNzMsMC40NzJjLTAuMDI5LDAuMDkxLTAuMDUyLDAuMTg1LTAuMDc3LDAuMjc4DQpjLTAuMDM3LDAuMTMyLTAuMDczLDAuMjY1LTAuMTAzLDAuMzk5Yy0wLjAyLDAuMDkxLTAuMDM1LDAuMTgzLTAuMDUyLDAuMjc1Yy0wLjAyNiwwLjE0NS0wLjA0OSwwLjI5LTAuMDY3LDAuNDM3DQpjLTAuMDEsMC4wODUtMC4wMTksMC4xNy0wLjAyNiwwLjI1NmMtMC4wMTQsMC4xNjItMC4wMjEsMC4zMjQtMC4wMjUsMC40ODdjLTAuMDAxLDAuMDUxLTAuMDA4LDAuMS0wLjAwOCwwLjE1djM4Ljk5DQpjMCw0LjE0MiwzLjM1OCw3LjUsNy41LDcuNXM3LjUtMy4zNTgsNy41LTcuNXYtMzEuNDloMTExLjAyOHY0MS43NzNMNTMuOTIsMTYzLjIxMmMtMC4wMjMsMC4wMS0wLjA0NiwwLjAyLTAuMDY5LDAuMDMNCmMtMC4wODMsMC4wMzYtMC4xNTYsMC4wNzYtMC4yMzIsMC4xMTJjLTAuMTk4LDAuMDk0LTAuMzkxLDAuMTk0LTAuNTgsMC4zMDRjLTAuMTMxLDAuMDc2LTAuMjYyLDAuMTUyLTAuMzg3LDAuMjM1DQpjLTAuMDY1LDAuMDQzLTAuMTI1LDAuMDkxLTAuMTg5LDAuMTM2Yy0wLjEyNywwLjA5LTAuMjUyLDAuMTgxLTAuMzcyLDAuMjc4Yy0wLjA2LDAuMDQ5LTAuMTE4LDAuMTAxLTAuMTc3LDAuMTUyDQpjLTAuMTE2LDAuMS0wLjIyOSwwLjIwMS0wLjMzOCwwLjMwOGMtMC4wNTksMC4wNTctMC4xMTUsMC4xMTYtMC4xNzEsMC4xNzVjLTAuMTAxLDAuMTA1LTAuMTk5LDAuMjEyLTAuMjkzLDAuMzIzDQpjLTAuMDU4LDAuMDY3LTAuMTE0LDAuMTM2LTAuMTY5LDAuMjA1Yy0wLjA4NSwwLjEwNy0wLjE2NiwwLjIxNi0wLjI0NSwwLjMyN2MtMC4wNTYsMC4wNzgtMC4xMTEsMC4xNTYtMC4xNjQsMC4yMzYNCmMtMC4wNywwLjEwOC0wLjEzNSwwLjIxOS0wLjIsMC4zMjljLTAuMDUxLDAuMDg4LTAuMTA0LDAuMTc0LTAuMTUyLDAuMjY0Yy0wLjA2MSwwLjExNi0wLjExNSwwLjIzNS0wLjE3MSwwLjM1NA0KYy0wLjA2MSwwLjEzMi0wLjEyLDAuMjY1LTAuMTc0LDAuNGMtMC4wNjIsMC4xNTYtMC4xMjIsMC4zMTItMC4xNzMsMC40NzJjLTAuMDI5LDAuMDkxLTAuMDUyLDAuMTg1LTAuMDc3LDAuMjc4DQpjLTAuMDM3LDAuMTMyLTAuMDczLDAuMjY1LTAuMTAzLDAuMzk5Yy0wLjAyLDAuMDkxLTAuMDM1LDAuMTgzLTAuMDUyLDAuMjc1Yy0wLjAyNiwwLjE0NS0wLjA0OSwwLjI5LTAuMDY3LDAuNDM3DQpjLTAuMDEsMC4wODUtMC4wMTksMC4xNy0wLjAyNiwwLjI1NmMtMC4wMTQsMC4xNjItMC4wMjEsMC4zMjQtMC4wMjUsMC40ODdjLTAuMDAxLDAuMDUxLTAuMDA4LDAuMS0wLjAwOCwwLjE1djM4Ljk5DQpjMCw0LjE0MiwzLjM1OCw3LjUsNy41LDcuNXM3LjUtMy4zNTgsNy41LTcuNXYtMzEuNDloMTA4LjMxN0w4NC4wMjMsNDYwLjI1NmMtMC4wMDgsMC4wMjYtMC4wMSwwLjA1My0wLjAxOCwwLjA3OQ0KYy0wLjEwNywwLjM1Ny0wLjE5LDAuNzIxLTAuMjQzLDEuMDg4Yy0wLjAwNCwwLjAyOC0wLjAxMSwwLjA1NS0wLjAxNSwwLjA4M2MtMC4wNDgsMC4zNTktMC4wNjIsMC43MjEtMC4wNTgsMS4wODMNCmMwLjAwMSwwLjA3MiwwLDAuMTQzLDAuMDAzLDAuMjE1YzAuMDE0LDAuMzUxLDAuMDUzLDAuNywwLjExNiwxLjA0N2MwLjAxMSwwLjA2LDAuMDI1LDAuMTE4LDAuMDM3LDAuMTc4DQpjMC4xNDgsMC43MTUsMC40MDMsMS40MTIsMC43NjMsMi4wN2MwLjAyOCwwLjA1MSwwLjA1NCwwLjEwMSwwLjA4MywwLjE1MWMwLjE3OCwwLjMwNywwLjM3OCwwLjYwNCwwLjYwMywwLjg5DQpjMC4wNDIsMC4wNTMsMC4wODgsMC4xMDMsMC4xMzEsMC4xNTVjMC4wOTIsMC4xMTEsMC4xOCwwLjIyNCwwLjI3OSwwLjMzYzAuMTI2LDAuMTM1LDAuMjYyLDAuMjU3LDAuMzk2LDAuMzgNCmMwLjA0MSwwLjAzOCwwLjA3OCwwLjA3OCwwLjEyLDAuMTE1YzAuMjg1LDAuMjUyLDAuNTg3LDAuNDc1LDAuODk5LDAuNjc2YzAuMDI1LDAuMDE2LDAuMDQ1LDAuMDM3LDAuMDcsMC4wNTMNCmMwLjAzNCwwLjAyMSwwLjA3LDAuMDM1LDAuMTA0LDAuMDU1YzAuMjQ4LDAuMTUsMC41MDEsMC4yODcsMC43NjEsMC40MDZjMC4wMzgsMC4wMTgsMC4wNzUsMC4wMzksMC4xMTQsMC4wNTYNCmMwLjI5NCwwLjEyOCwwLjU5MywwLjIzNiwwLjg5OCwwLjMyNmMwLjA2OSwwLjAyLDAuMTM5LDAuMDM1LDAuMjA5LDAuMDUzYzAuMjM3LDAuMDYyLDAuNDc3LDAuMTEzLDAuNzE4LDAuMTUxDQpjMC4wODgsMC4wMTQsMC4xNzYsMC4wMjksMC4yNjQsMC4wNGMwLjMwMiwwLjAzNywwLjYwNiwwLjA2MywwLjkxMSwwLjA2M2MxLjYyMSwwLDMuMjMzLTAuNTE0LDQuNTgxLTEuNTUyDQpjMC4xOTEtMC4xNDcsMC4zNzYtMC4zMDQsMC41NTUtMC40NzFsMjEzLjY2My0xOTkuOTYzbDUzLjE1MSwxNjkuNTM5bC0xMDEuMDU2LTk0LjU3NmMtMy4wMjUtMi44My03Ljc3MS0yLjY3My0xMC42MDEsMC4zNTENCnMtMi42NzMsNy43NzEsMC4zNTEsMTAuNjAxbDEyMS44NjIsMTE0LjA0N2MxLjQyOCwxLjMzNiwzLjI3MSwyLjAyNCw1LjEyNywyLjAyNGMxLjM3NywwLDIuNzYxLTAuMzc4LDMuOTg5LTEuMTUNCmMyLjg4NC0xLjgxMyw0LjE4NS01LjM0MiwzLjE2Ni04LjU5M2wtODguNjAyLTI4Mi42MjJoMTA4LjMxN3YzMS40OWMwLDQuMTQyLDMuMzU4LDcuNSw3LjUsNy41czcuNS0zLjM1OCw3LjUtNy41di0zOC41OTQNCmMwLjAwNy0wLjEzMiwwLjAyLTAuMjYzLDAuMDItMC4zOTdDNDIwLjY5MSwxNjkuODkyLDQyMC42NTgsMTY5LjY1OCw0MjAuNjM1LDE2OS40MjF6IE0xOTAuMzM3LDE2Mi42MzR2LTM5LjIxMWg4OS4zMDd2MzkuMjExDQpIMTkwLjMzN3ogTTI5NC42NDMsNTQuMjExVjE4Ljg5MWw4Mi4xMTIsMzUuMzIxSDI5NC42NDN6IE0xOTAuMzM3LDE1aDg5LjMwN3YzOS4yMTFoLTg5LjMwN1YxNXogTTkzLjIyNSw1NC4yMTFsODIuMTEyLTM1LjMyMQ0KdjM1LjMyMUg5My4yMjV6IE0yNzkuNjQzLDY5LjIxMXYzOS4yMTFoLTg5LjMwN1Y2OS4yMTFIMjc5LjY0M3ogTTE3NS4zMzcsMTI3LjMxM3YzNS4zMjFIOTMuMjI1TDE3NS4zMzcsMTI3LjMxM3ogTTE2MC4wMTIsMjY4LjAxMw0KbDY0LjAwMiw1OS44OThsLTExNy4xNTIsMTA5LjY0TDE2MC4wMTIsMjY4LjAxM3ogTTMwNC45ODksMjUyLjEyOWwtNjkuOTk5LDY1LjUxbC02OS45OTgtNjUuNTFsMjMuMzU0LTc0LjQ5NWg5My4yODkNCkwzMDQuOTg5LDI1Mi4xMjl6IE0yOTQuNjQzLDE2Mi42MzR2LTM1LjMyMWw4Mi4xMTIsMzUuMzIySDI5NC42NDR6Ig0KICAgIC8+DQo8L3N2Zz4=',
+                            hidden: data => !!data.powerLineIcon,
                         },
                         {
                             name: 'powerLineIcon',
@@ -350,6 +246,15 @@ class Distribution extends Generic {
                             type: 'number',
                             label: 'power_line_font_size',
                             tooltip: 'power_line_font_size_tooltip',
+                        },
+                        {
+                            name: 'powerIconSize',
+                            type: 'slider',
+                            label: 'icon_size',
+                            tooltip: 'icon_size_tooltip',
+                            hidden: data => !data.powerLineIcon && !data.powerLineStandardIcon,
+                            min: 0,
+                            max: 230,
                         },
                     ],
                 },
@@ -384,14 +289,9 @@ class Distribution extends Generic {
                         },
                         {
                             name: 'standardIcon',
-                            type: 'select',
+                            type: 'icon64',
                             label: 'standard_icon',
-                            options: STANDARD_ICONS.map(item => ({
-                                value: item.value,
-                                label: item.label,
-                                icon: item.icon,
-                                color: item.color,
-                            })),
+                            hidden: (data, index) => !!data[`icon${index}`],
                             default: '',
                         },
                         {
@@ -421,6 +321,15 @@ class Distribution extends Generic {
                             type: 'number',
                             label: 'font_size',
                             tooltip: 'font_size_tooltip',
+                        },
+                        {
+                            name: 'iconSize',
+                            type: 'slider',
+                            label: 'icon_size',
+                            tooltip: 'icon_size_tooltip',
+                            min: 0,
+                            max: 230,
+                            hidden: (data, index) => !data[`standardIcon${index}`] && !data[`icon${index}`],
                         },
                     ],
                 },
@@ -564,6 +473,7 @@ class Distribution extends Generic {
             arrow: '→', // '↦',
             secondaryValue: this.getValue(this.state.rxData['powerLineReturn-oid']),
             secondaryArrow: '←',
+            iconSize: parseFloat(this.state.rxData.powerIconSize) || 33.3,
         }];
 
         if (circles[0].radius > maxRadius) {
@@ -585,6 +495,7 @@ class Distribution extends Generic {
                 value: _valueAndUnit.value,
                 icon: this.state.rxData[`standardIcon${i}`] || this.state.rxData[`icon${i}`] || this.state.objects[`object${i}`]?.common?.icon,
                 arrow: '',
+                iconSize: parseFloat(this.state.rxData[`iconSize${i}`]) || 33.3,
             };
             circles.push(circle);
 
@@ -628,9 +539,7 @@ class Distribution extends Generic {
         // if (Math.abs(size - max - min) > 5) {
         xOffset = (size - max - min) / 2;
         // }
-
-        const standardHomeIcon = STANDARD_ICONS.find(item => item.value === homeIcon);
-        const CustomHomeIcon = standardHomeIcon ? standardHomeIcon.component : null;
+        const homeIconSize = parseFloat(this.state.rxData.homeIconSize) || 66.6;
 
         const content = <div
             ref={this.refCardContent}
@@ -643,8 +552,6 @@ class Distribution extends Generic {
                         :
                         circle.icon;
 
-                    const standardIcon = STANDARD_ICONS.find(item => item.value === icon);
-                    const CustomIcon = standardIcon ? standardIcon.component : null;
                     return <div key={i}>
                         <div
                             className={this.props.classes.circleContent}
@@ -656,10 +563,9 @@ class Distribution extends Generic {
                                 fontSize: circle.fontSize,
                             }}
                         >
-                            {icon && !CustomIcon ?
-                                <img src={icon} alt="" style={{ width: Math.round(circle.radius * 0.666), height: Math.round(circle.radius * 0.666) }} />
-                                :
-                                (CustomIcon ? <CustomIcon style={{ width: Math.round(circle.radius * 0.666), height: Math.round(circle.radius * 0.666) }} /> : null)}
+                            {icon ?
+                                <Icon src={icon} style={{ width: Math.round(circle.radius * (circle.iconSize / 100) * 2), height: Math.round(circle.radius * (circle.iconSize / 100) * 2) }} />
+                                : null}
                             {circle.secondaryValue?.value !== undefined ? <div style={{ color: this.state.rxData.powerLineReturnColor }}>
                                 {`${circle.secondaryArrow}${circle.secondaryValue.value} ${circle.secondaryValue.unit || Generic.t('kwh')}`}
                             </div> : null}
@@ -690,13 +596,9 @@ class Distribution extends Generic {
                         fontSize: homeFontSize,
                     }}
                 >
-                    {homeIcon && !CustomHomeIcon ?
-                        <img src={homeIcon} alt="" style={{ width: Math.round(homeRadius * 0.666), height: Math.round(homeRadius * 0.666) }} />
-                        :
-                        (CustomHomeIcon ?
-                            <CustomHomeIcon style={{ width: Math.round(homeRadius * 0.666), height: Math.round(homeRadius * 0.666) }} />
-                            :
-                            null)}
+                    {homeIcon ?
+                        <Icon src={homeIcon} style={{ width: Math.round(homeRadius * (homeIconSize / 100) * 2), height: Math.round(homeRadius * (homeIconSize / 100) * 2) }} />
+                        : null}
                     {homeValueAndUnit.value !== undefined ? <div>
                         {`${homeValueAndUnit.value} ${homeValueAndUnit.unit || Generic.t('kwh')}`}
                     </div> : null}

@@ -85,5 +85,7 @@
   "icons_wind": "Wind power",
   "icons_solar_power": "Solar power",
   "icons_battery": "Battery",
-  "icons_solar_ev_station": "Solar EV Station"
+  "icons_solar_ev_station": "Solar EV Station",
+  "icon_size_tooltip": "In percent to circle size",
+  "icon_size": "Icon size"
 }

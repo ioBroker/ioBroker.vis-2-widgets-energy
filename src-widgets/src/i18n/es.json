@@ -85,5 +85,7 @@
   "icons_wind": "Energía eólica",
   "icons_solar_power": "Energía solar",
   "icons_battery": "Batería",
-  "icons_solar_ev_station": "Estación de vehículos eléctricos solares"
+  "icons_solar_ev_station": "Estación de vehículos eléctricos solares",
+  "icon_size_tooltip": "En porcentaje al tamaño del círculo",
+  "icon_size": "Tamaño de ícono"
 }
