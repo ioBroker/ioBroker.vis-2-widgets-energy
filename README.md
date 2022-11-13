@@ -23,7 +23,7 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### 0.1.2 (2022-10-28)
+### **WORK IN PROGRESS**
 * (bluefox) Initial commit
 
 ## License

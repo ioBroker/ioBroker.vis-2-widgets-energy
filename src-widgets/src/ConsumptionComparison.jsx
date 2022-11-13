@@ -156,7 +156,7 @@ class ConsumptionComparison extends Generic {
         return {
             tooltip: {
                 // formatter: '{b}: {c} kWh',
-                formatter: (params, ticket, callback) => `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
+                formatter: (params /* , ticket, callback */) => `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
             },
             backgroundColor: 'transparent',
             grid: {

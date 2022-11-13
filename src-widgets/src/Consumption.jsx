@@ -175,9 +175,9 @@ class Consumption extends Generic {
                         }
                     });
             });
-        } else {
-            return this.props.socket.getHistory(id, options);
         }
+
+        return this.props.socket.getHistory(id, options);
     }
 
     propertiesUpdate() {
@@ -204,7 +204,7 @@ class Consumption extends Generic {
 
         const times = new Array(types[this.getTimeInterval()].count).fill(0).map((_, i) => new Date(
             interval.from.getTime() +
-            (interval.to.getTime() - interval.from.getTime()) / types[this.getTimeInterval()].count * i
+            ((interval.to.getTime() - interval.from.getTime()) / types[this.getTimeInterval()].count) * i
             + 1,
         ));
 
@@ -222,7 +222,7 @@ class Consumption extends Generic {
             quantile: this.state.rxData.quantile,
             integralUnit: this.state.rxData.integralUnit,
             integralInterpolation: this.state.rxData.integralInterpolation,
-            timeout: 10000
+            timeout: 10000,
         };
 
         this.setState({ loading: true }, async () => {
@@ -250,7 +250,7 @@ class Consumption extends Generic {
     getSubscribeState = (id, cb) => this.props.socket.getState(id)
         .then(result => {
             cb(id, result);
-            return this.props.socket.subscribeState(id, (resultId, result) => cb(id, result));
+            return this.props.socket.subscribeState(id, (resultId, _result) => cb(id, _result));
         });
 
     componentDidUpdate(prevProps, prevState, snapshot) {
