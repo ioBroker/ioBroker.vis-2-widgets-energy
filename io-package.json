@@ -37,7 +37,7 @@
     "enabled": true,
     "readme": "https://github.com/ioBroker/ioBroker.vis-2-widgets-energy/blob/master/README.md",
     "loglevel": "info",
-    "mode": "schedule",
+    "mode": "once",
     "adminUI": {
       "config": "none"
     },
