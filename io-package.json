@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "news": {
+      "0.1.4": {
+        "en": "packages were updated",
+        "de": "pakete wurden aktualisiert",
+        "ru": "пакеты были обновлены",
+        "pt": "pacotes foram atualizados",
+        "nl": "vertaling:",
+        "fr": "paquets were updated",
+        "it": "i pacchetti sono stati aggiornati",
+        "es": "se actualizaron los paquetes",
+        "pl": "pakiety były aktualizowane",
+        "uk": "було оновлено",
+        "zh-cn": "已更新一揽子计划"
+      },
       "0.1.3": {
         "en": "Initial commit",
         "de": "Ursprüngliche Verpflichtung",
