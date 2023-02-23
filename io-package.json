@@ -45,6 +45,8 @@
     "type": "visualization-widgets",
     "connectionType": "cloud",
     "dataSource": "poll",
+    "nogit": true,
+    "singleton": true,
     "visWidgets": {
       "i18n": "component",
       "vis2energyWidgets": {

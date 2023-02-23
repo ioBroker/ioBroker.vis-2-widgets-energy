@@ -23,6 +23,9 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) packages were updated
+
 ### 0.1.3 (2022-11-13)
 * (bluefox) Initial commit
 
