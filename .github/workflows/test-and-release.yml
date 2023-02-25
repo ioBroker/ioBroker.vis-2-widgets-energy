@@ -73,7 +73,8 @@ jobs:
         run: |
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
           npm whoami
-          npm publish
+          echo "CI does not work. widgets folder is empty???"
+#          npm publish
 
       - name: Create Github Release
         uses: actions/create-release@v1
