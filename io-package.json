@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "news": {
-      "0.1.4": {
+      "0.1.5": {
         "en": "packages were updated",
         "de": "pakete wurden aktualisiert",
         "ru": "пакеты были обновлены",
