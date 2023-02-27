@@ -24,7 +24,9 @@ concurrency:
 jobs:
   build:
     if: contains(github.event.head_commit.message, '[skip ci]') == false
+
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -67,8 +69,11 @@ jobs:
           BODY="${BODY//$'\r'/'%0D'}"
           echo "::set-output name=BODY::$BODY"
 
-      - run: npm i
-      - run: npm run build
+      - name: Install dependencies
+        run: npm i
+
+      - name: Build
+        run: npm run build
 
       - name: Publish package to npm
         run: |
