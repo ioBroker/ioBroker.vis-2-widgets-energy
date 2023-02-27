@@ -32,8 +32,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: npm i
-      - run: npm run build
+
+      - name: Install Dependencies
+        run: npm i
+      - name: Build widgets
+        run: npm run build
 
   # Deploys the final package to NPM
   deploy:
@@ -50,7 +53,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 16
         uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -69,7 +72,7 @@ jobs:
           BODY="${BODY//$'\r'/'%0D'}"
           echo "::set-output name=BODY::$BODY"
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm i
 
       - name: Build

@@ -87,12 +87,12 @@ function buildWidgets() {
         const options = {
             stdio: 'pipe',
             cwd: src,
-            env: {
+   /*         env: {
                 CI: 'true',
-            },
+            },*/
         };
 
-        console.log(options.cwd);
+        console.log(`Start in ${options.cwd}`);
 
         let script = `${src}node_modules/@craco/craco/dist/bin/craco.js`;
         if (!fs.existsSync(script)) {
@@ -102,11 +102,12 @@ function buildWidgets() {
             console.error(`Cannot find execution file: ${script}`);
             reject(`Cannot find execution file: ${script}`);
         } else {
+            console.log(`Start ${script} with "build" and options ${JSON.stringify(options)}`);
             const child = cp.fork(script, ['build'], options);
             child.stdout.on('data', data => console.log(data.toString()));
             child.stderr.on('data', data => console.log(data.toString()));
             child.on('close', code => {
-                console.log(`child process exited with code ${code}`);
+                console.log(`compile process exited with code ${code}`);
                 code ? reject(`Exit code: ${code}`) : resolve();
             });
         }
