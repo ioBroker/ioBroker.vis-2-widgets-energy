@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.1.10",
+    "version": "0.1.11",
     "news": {
+      "0.1.11": {
+        "en": "translation was corrected",
+        "de": "übersetzung wurde korrigiert",
+        "ru": "перевод был исправлен",
+        "pt": "tradução foi corrigida",
+        "nl": "vertaling is gecorrigeerd",
+        "fr": "traduction corrigée",
+        "it": "traduzione corretta",
+        "es": "traducción corregida",
+        "pl": "tłumaczenie było poprawne",
+        "uk": "переклад було виправлено",
+        "zh-cn": "更正"
+      },
       "0.1.10": {
         "en": "update packages",
         "de": "update-pakete",
@@ -80,19 +93,6 @@
         "pl": "pakiety były aktualizowane",
         "uk": "було оновлено",
         "zh-cn": "已更新一揽子计划"
-      },
-      "0.1.3": {
-        "en": "Initial commit",
-        "de": "Ursprüngliche Verpflichtung",
-        "ru": "Первоначальный коммит",
-        "pt": "Compromisso inicial",
-        "nl": "Initiatief",
-        "fr": "Engagement initial",
-        "it": "Impegno iniziale",
-        "es": "Composición inicial",
-        "pl": "Śledczy",
-        "uk": "Початкова комісія",
-        "zh-cn": "初始承诺"
       }
     },
     "title": "Vis 2 Widgets Energy",
