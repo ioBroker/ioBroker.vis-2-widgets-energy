@@ -314,10 +314,10 @@ class Consumption extends Generic {
         const data = [];
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             data.push({
-                name: this.state.rxData[`name${i}`],
-                value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`],
-                values: this.state[`history${i}`],
-                color: this.state.rxData[`color${i}`],
+                name: this.state.rxData[`name${i}`] || '',
+                value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || '',
+                values: this.state[`history${i}`] || [],
+                color: this.state.rxData[`color${i}`] || '',
             });
         }
 
