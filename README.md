@@ -23,6 +23,9 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Corrected the consumption widget
+
 ### 0.1.11 (2023-03-31)
 * (bluefox) translation was corrected
 

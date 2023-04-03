@@ -116,9 +116,11 @@ class App extends WidgetDemoApp {
                 data={{
                     name: 'Consumption',
                     devicesCount: 2,
+
                     oid1: 'javascript.0.temperatureActual',
                     name1: 'temperatureActual',
                     color1: 'rgba(28,71,38,1)',
+
                     oid2: 'javascript.0.temperatureActual',
                     // oid2: 'info.0.sysinfo.memory.info.active',
                     name2: 'memory',

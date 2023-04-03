@@ -26,7 +26,8 @@ const styles = () => ({
 class IntervalSelector extends Generic {
     constructor(props) {
         super(props);
-        this.refCardContent = React.createRef();
+        this.refTimeSelector = React.createRef();
+        this.eventHandlers = [];
     }
 
     static getWidgetInfo() {
@@ -68,11 +69,34 @@ class IntervalSelector extends Generic {
             const obj = await this.props.socket.getObject(this.state.rxData.oid);
             this.setState({ object: obj });
         }
+        if (this.refTimeSelector.current && !this.refTimeSelector.current._addEventHandler) {
+            this.refTimeSelector.current._addEventHandler = cb => {
+                if (!this.eventHandlers.includes(cb)) {
+                    this.eventHandlers.push(cb);
+                    setTimeout(() => cb('update', { start: this.getTimeStart(), interval: this.getTimeInterval() }), 0);
+                }
+            };
+            this.refTimeSelector.current._removeEventHandler = cb => {
+                const pos = this.eventHandlers.indexOf(cb);
+                if (pos !== -1) {
+                    this.eventHandlers.splice(pos, 1);
+                }
+            };
+        }
     }
 
     componentDidMount() {
         super.componentDidMount();
         this.propertiesUpdate();
+    }
+
+    componentWillUnmount() {
+        this.eventHandlers.forEach(cb => cb('unmount'));
+        if (this.refTimeSelector.current) {
+            this.refTimeSelector.current._addEventHandler = null;
+            this.refTimeSelector.current._removeEventHandler = null;
+        }
+        super.componentWillUnmount();
     }
 
     onRxDataChanged() {
@@ -96,6 +120,14 @@ class IntervalSelector extends Generic {
         } else {
             this.props.setTimeStart(timeStart);
         }
+
+        this.eventHandlers.forEach(cb => {
+            try {
+                cb('update', { start: timeStart, interval: this.getTimeInterval() });
+            } catch (e) {
+                console.warn(e);
+            }
+        });
     };
 
     getTimeInterval() {
@@ -110,6 +142,14 @@ class IntervalSelector extends Generic {
         } else {
             this.props.setTimeInterval(timeInterval);
         }
+
+        this.eventHandlers.forEach(cb => {
+            try {
+                cb('update', { interval: timeInterval, start: this.getTimeStart() });
+            } catch (e) {
+                console.warn(e);
+            }
+        });
     };
 
     renderWidgetBody(props) {
@@ -134,7 +174,8 @@ class IntervalSelector extends Generic {
         } else if (this.getTimeInterval() === 'year') {
             periodName = moment(new Date(interval.from)).format('YYYY');
         }
-        const content = <div className={this.props.classes.contentContainer}>
+
+        const content = <div className={`${this.props.classes.contentContainer} time-selector`} ref={this.refTimeSelector}>
             <div className={this.props.classes.content}>
                 <span className={this.props.classes.periodName}>{periodName}</span>
                 <IconButton onClick={() => {

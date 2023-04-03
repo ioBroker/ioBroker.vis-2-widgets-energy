@@ -25,6 +25,8 @@ class Consumption extends Generic {
     constructor(props) {
         super(props);
         this.refCardContent = React.createRef();
+        this.timeSelectorRegistered = false;
+        this.timeSelectorRegisterInterval = null;
     }
 
     static getWidgetInfo() {
@@ -153,6 +155,16 @@ class Consumption extends Generic {
         };
     }
 
+    getTimeWidget(wid) {
+        const el = window.document.getElementById(wid || this.state.rxData.timeWidget);
+        const div = el && el.querySelector('.time-selector');
+        if (div && div._addEventHandler) {
+            return div;
+        }
+
+        return null;
+    }
+
     getHistory(id, options) {
         if (options.timeout) {
             return new Promise(resolve => {
@@ -226,28 +238,50 @@ class Consumption extends Generic {
         };
 
         this.setState({ loading: true }, async () => {
-            const newState = { loading: false };
-            const format = types[this.getTimeInterval()].format;
+            if (interval.from !== interval.to) {
+                const newState = { loading: false };
+                const format = types[this.getTimeInterval()].format;
 
-            for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
-                if (this.state.rxData[`oid${i}`] && this.state.rxData[`oid${i}`] !== 'nothing_selected') {
-                    const values = await this.getHistory(this.state.rxData[`oid${i}`], options);
-                    const history = values
-                        .sort((a, b) => (a.ts > b.ts ? 1 : -1))
-                        .forEach(item => item.tsF = moment(item.ts).format(format))
-                        .filter(item => item && item.val !== undefined && item.val !== null);
+                for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
+                    if (this.state.rxData[`oid${i}`] && this.state.rxData[`oid${i}`] !== 'nothing_selected') {
+                        const values = await this.getHistory(this.state.rxData[`oid${i}`], options);
+                        const history = values
+                            .sort((a, b) => (a.ts > b.ts ? 1 : -1))
+                            .filter(item => item && item.val !== undefined && item.val !== null);
 
-                    history.forEach(item => item.tsF = moment(item.ts).format(format));
+                        history.forEach(item => item.tsF = moment(item.ts).format(format));
 
-                    newState[`history${i}`] = times.map(time => {
-                        const timeStr = moment(time).format(format);
-                        const foundHistory = history.find(item => item.tsF === timeStr);
-                        return foundHistory || { ts: time.getTime(), val: 0 };
-                    });
+                        newState[`history${i}`] = times.map(time => {
+                            const timeStr = moment(time).format(format);
+                            const foundHistory = history.find(item => item.tsF === timeStr);
+                            return foundHistory || { ts: time.getTime(), val: 0 };
+                        });
+                    }
                 }
+                this.setState(newState);
             }
-            this.setState(newState);
         });
+    }
+
+    registerTimeSelector() {
+        if (!this.timeSelectorRegistered && this.state.rxData.timeWidget && this.props.views[this.props.view].widgets[this.state.rxData.timeWidget]) {
+            this.timeSelectorRegisterInterval = this.timeSelectorRegisterInterval || setInterval(() => {
+                if (!this.timeSelectorRegistered && this.state.rxData.timeWidget) {
+                    const el = this.getTimeWidget();
+
+                    if (el) {
+                        el._addEventHandler(this.onTimeFromWidgetChanged);
+                        this.timeSelectorRegistered = this.state.rxData.timeWidget;
+                    }
+                }
+
+                // stop interval
+                if ((!this.state.rxData.timeWidget || this.timeSelectorRegistered) && this.timeSelectorRegisterInterval) {
+                    clearInterval(this.timeSelectorRegisterInterval);
+                    this.timeSelectorRegisterInterval = null;
+                }
+            }, 300);
+        }
     }
 
     getSubscribeState = (id, cb) => this.props.socket.getState(id)
@@ -260,6 +294,17 @@ class Consumption extends Generic {
         if (super.componentDidUpdate) {
             super.componentDidUpdate(prevProps, prevState, snapshot);
         }
+
+        if (this.state.rxData.timeWidget && this.props.views[this.props.view].widgets[this.state.rxData.timeWidget]) {
+            if (this.timeSelectorRegistered && this.state.rxData.timeWidget !== this.timeSelectorRegistered) {
+                this.getTimeWidget(this.timeSelectorRegistered)?._removeEventHandler(this.onTimeFromWidgetChanged);
+                this.timeSelectorRegistered = null;
+                this.timeSelectorRegisterInterval && clearInterval(this.timeSelectorRegisterInterval);
+                this.timeSelectorRegisterInterval = null;
+            }
+            this.registerTimeSelector();
+        }
+
         if (this.props.timeStart !== prevProps.timeStart) {
             this.propertiesUpdate();
         }
@@ -273,32 +318,48 @@ class Consumption extends Generic {
             clearInterval(this.updateInterval);
             this.updateInterval = null;
         }
-
-        if (this.state.rxData.timeWidget && this.props.views[this.props.view].widgets[this.state.rxData.timeWidget]) {
-            const timeStartOID = this.props.views[this.props.view].widgets[this.state.rxData.timeWidget].data['timeStart-oid'];
-            const timeIntervalOID = this.props.views[this.props.view].widgets[this.state.rxData.timeWidget].data['timeInterval-oid'];
-
-            if (this.subscribedTimeStart !== timeStartOID) {
-                this.subscribedTimeStart && this.props.socket.unsubscribeState(this.subscribedTimeStart);
-                this.subscribedTimeStart = timeStartOID;
-                timeStartOID && this.getSubscribeState(this.subscribedTimeStart, this.onTimeChange);
-            }
-            if (this.subscribedTimeInterval !== timeIntervalOID) {
-                this.subscribedTimeInterval && this.props.socket.unsubscribeState(this.subscribedTimeInterval);
-                this.subscribedTimeInterval = timeIntervalOID;
-                timeIntervalOID && this.getSubscribeState(this.subscribedTimeInterval, this.onTimeChange);
-            }
-        }
     }
 
     componentWillUnmount() {
+        this.timeSelectorRegisterInterval && clearInterval(this.timeSelectorRegisterInterval);
+        this.timeSelectorRegisterInterval = null;
+
+        this.updateInterval && clearInterval(this.updateInterval);
+        this.updateInterval = null;
+
+        // unregister from time selector
+        if (this.timeSelectorRegistered) {
+            this.getTimeWidget(this.timeSelectorRegistered)?._removeEventHandler(this.onTimeFromWidgetChanged);
+            this.timeSelectorRegistered = false;
+        }
+
         if (super.componentWillUnmount) {
             super.componentWillUnmount();
         }
-        this.subscribedTimeStart && this.props.socket.unsubscribeState(this.subscribedTimeStart);
-        this.subscribedTimeInterval && this.props.socket.unsubscribeState(this.subscribedTimeInterval);
-        this.updateInterval && clearInterval(this.updateInterval);
     }
+
+    onTimeFromWidgetChanged = (event, value) => {
+        if (event === 'unmount') {
+            if (this.timeSelectorRegistered) {
+                const el = window.document.getElementById(this.state.rxData.timeWidget);
+
+                if (el) {
+                    const div = el.querySelector('.time-selector');
+                    if (div) {
+                        div._removeEventHandler(this.onTimeChange);
+                        this.timeSelectorRegistered = false;
+                    }
+                }
+            }
+            this.registerTimeSelector();
+        } else if (event === 'update') {
+            if (this.timeStart !== value.start || this.timeInterval !== value.interval) {
+                this.timeStart = value.start;
+                this.timeInterval = value.interval;
+                setTimeout(() => this.propertiesUpdate(), 0);
+            }
+        }
+    };
 
     onStateUpdated() {
         this.propertiesUpdate();
@@ -400,15 +461,6 @@ class Consumption extends Generic {
         }
         return result;
     }
-
-    onTimeChange = (id, state) => {
-        if (id === this.subscribedTimeStart) {
-            this.timeStart = state.val;
-        } else if (id === this.subscribedTimeInterval) {
-            this.timeInterval = state.val;
-        }
-        this.propertiesUpdate();
-    };
 
     renderWidgetBody(props) {
         super.renderWidgetBody(props);
