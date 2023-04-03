@@ -231,10 +231,13 @@ class Consumption extends Generic {
 
             for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
                 if (this.state.rxData[`oid${i}`] && this.state.rxData[`oid${i}`] !== 'nothing_selected') {
-                    const history = (await this.getHistory(this.state.rxData[`oid${i}`], options))
+                    const values = await this.getHistory(this.state.rxData[`oid${i}`], options);
+                    const history = values
                         .sort((a, b) => (a.ts > b.ts ? 1 : -1))
-                        .map(item => item.tsF = moment(item.ts).format(format))
+                        .forEach(item => item.tsF = moment(item.ts).format(format))
                         .filter(item => item && item.val !== undefined && item.val !== null);
+
+                    history.forEach(item => item.tsF = moment(item.ts).format(format));
 
                     newState[`history${i}`] = times.map(time => {
                         const timeStr = moment(time).format(format);
