@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.1.11",
+    "version": "0.1.12",
     "news": {
+      "0.1.12": {
+        "en": "Corrected the consumption widget",
+        "de": "Das Verbrauchs-Widget korrigiert",
+        "ru": "Исправлен виджет потребления",
+        "pt": "Corrigido o widget de consumo",
+        "nl": "Vertaling:",
+        "fr": "Correction du widget de consommation",
+        "it": "Corretto il widget di consumo",
+        "es": "Corregido el widget de consumo",
+        "pl": "Naprawdę skorygowano widget",
+        "uk": "Виправлено віджет споживання",
+        "zh-cn": "纠正消费被动植物"
+      },
       "0.1.11": {
         "en": "translation was corrected",
         "de": "übersetzung wurde korrigiert",
@@ -69,19 +82,6 @@
         "zh-cn": "已更新一揽子计划"
       },
       "0.1.6": {
-        "en": "packages were updated",
-        "de": "pakete wurden aktualisiert",
-        "ru": "пакеты были обновлены",
-        "pt": "pacotes foram atualizados",
-        "nl": "vertaling:",
-        "fr": "paquets were updated",
-        "it": "i pacchetti sono stati aggiornati",
-        "es": "se actualizaron los paquetes",
-        "pl": "pakiety były aktualizowane",
-        "uk": "було оновлено",
-        "zh-cn": "已更新一揽子计划"
-      },
-      "0.1.5": {
         "en": "packages were updated",
         "de": "pakete wurden aktualisiert",
         "ru": "пакеты были обновлены",
