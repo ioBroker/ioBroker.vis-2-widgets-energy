@@ -78,6 +78,7 @@ class Consumption extends Generic {
                         name: 'aggregate',
                         label: 'aggregate',
                         type: 'select',
+                        noTranslate: true,
                         options: ['minmax', 'max', 'min', 'average', 'total', 'count', 'percentile', 'quantile', 'integral', 'none'],
                         default: 'total',
                     },
