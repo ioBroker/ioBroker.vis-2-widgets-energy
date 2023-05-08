@@ -1,7 +1,7 @@
 {
   "custom_icon": "Benutzerdefiniertes Symbol",
   "aggregate": "Aggregat",
-  "aggregation": "Anhäufung",
+  "aggregation": "Aggregation",
   "circle_size": "Kreisgröße",
   "circle_size_tooltip": "In Prozent der Widget-Breite",
   "color": "Farbe",
@@ -46,7 +46,7 @@
   "interval_oid": "Intervall-OID",
   "interval_selector": "Intervallwähler",
   "kwh": "kWh",
-  "level": "Eben",
+  "level": "Ebene",
   "month": "Monat",
   "name": "Name",
   "nodes_count": "Knoten zählen",

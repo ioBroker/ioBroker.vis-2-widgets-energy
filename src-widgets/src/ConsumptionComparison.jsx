@@ -151,6 +151,7 @@ class ConsumptionComparison extends Generic {
                 color: this.state.rxData[`color${i}`] || undefined,
             });
         }
+
         data.reverse();
 
         return {
@@ -166,7 +167,7 @@ class ConsumptionComparison extends Generic {
                 right: 50,
                 bottom: 10,
             },
-            xAxis: { name: Generic.t(this.state.unit) || Generic.t('kwh') },
+            xAxis: { name: this.state.unit ? Generic.t(this.state.unit) : Generic.t('kwh') },
             yAxis: { type: 'category', data: data.map(item => item.name) },
             series: [
                 {

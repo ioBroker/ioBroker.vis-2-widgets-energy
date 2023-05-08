@@ -23,13 +23,25 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
+### 0.1.12 (2023-04-03)
+* (bluefox) Corrected the consumption widget
+
+### 0.1.11 (2023-03-31)
+* (bluefox) translation was corrected
+
+### 0.1.10 (2023-03-09)
+* (bluefox) update packages
+
+### 0.1.8 (2023-02-27)
+* (bluefox) packages were updated
+
 ### 0.1.3 (2022-11-13)
 * (bluefox) Initial commit
 
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2022 bluefox <dogafox@gmail.com>
+Copyright (c) 2022-2023 bluefox <dogafox@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
