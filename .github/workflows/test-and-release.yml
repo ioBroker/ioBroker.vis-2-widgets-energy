@@ -48,8 +48,8 @@ jobs:
       - name: Archive screenshots
         uses: actions/upload-artifact@v3
         with:
-          path: |
-            tmp/screenshots/**/*.png
+          path: tmp/screenshots/**/*.png
+          retention-days: 3
 
   # Deploys the final package to NPM
   deploy:
