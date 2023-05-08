@@ -8,7 +8,7 @@ name: Test and Release
 on:
   push:
     branches:
-      - master
+      - '*'
     tags:
       # normal versions
       - "v?[0-9]+.[0-9]+.[0-9]+"
@@ -17,46 +17,62 @@ on:
   pull_request: {}
 
 # Cancel previous PR/branch runs when a new commit is pushed
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
+#concurrency:
+#  group: ${{ github.ref }}
+#  cancel-in-progress: true
 
 jobs:
-  build:
+  # Performs quick checks before the expensive test runs
+  check-and-lint:
     if: contains(github.event.head_commit.message, '[skip ci]') == false
 
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
 
-      - name: Install Dependencies
-        run: npm i
-      - name: Build widgets
-        run: npm run build
-
-  adapter-tests:
-    if: contains(github.event.head_commit.message, '[skip ci]') == false
-
-    needs: [build]
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
       - name: Use Node.js 16.x
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
 
       - name: Install Dependencies
-        run: npm install
+        run: npm i
 
-      - name: build
+      - name: Build
         run: npm run build
+
+      #      - name: Perform a type check
+      #        run: npm run check:ts
+      #        env:
+      #          CI: true
+      # - name: Lint TypeScript code
+      #   run: npm run lint
+  #      - name: Test package files
+  #        run: npm run test:package
+
+  # Runs adapter tests on all supported node versions and OSes
+  adapter-tests:
+    if: contains(github.event.head_commit.message, '[skip ci]') == false
+
+    needs: [check-and-lint]
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [16.x]
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Dependencies
+        run: npm i
 
       - name: Run local tests
         run: npm test
@@ -84,10 +100,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Use Node.js 16
+      - name: Use Node.js 16.x
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 16.x
+
+      - name: Install Dependencies
+        run: npm i
 
       - name: Extract the version and commit body from the tag
         id: extract_release
@@ -103,9 +122,8 @@ jobs:
           BODY="${BODY//$'\r'/'%0D'}"
           echo "::set-output name=BODY::$BODY"
 
-      - name: Install Dependencies
-        run: npm i
-
+      #      - name: Create a clean build
+      #        run: npm run build
       - name: Publish package to npm
         run: |
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
