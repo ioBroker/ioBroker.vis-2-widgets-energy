@@ -22,8 +22,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Performs quick checks before the expensive test runs
-  check-and-lint:
+  # Runs adapter tests on all supported node versions and OSes
+  adapter-tests:
     if: contains(github.event.head_commit.message, '[skip ci]') == false
 
     runs-on: ubuntu-latest
@@ -41,34 +41,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      #      - name: Perform a type check
-      #        run: npm run check:ts
-      #        env:
-      #          CI: true
-      # - name: Lint TypeScript code
-      #   run: npm run lint
-  #      - name: Test package files
-  #        run: npm run test:package
-
-  # Runs adapter tests on all supported node versions and OSes
-  adapter-tests:
-    if: contains(github.event.head_commit.message, '[skip ci]') == false
-
-    needs: [check-and-lint]
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-
-      - name: Install Dependencies
-        run: npm i
 
       - name: Run local tests
         run: npm test
