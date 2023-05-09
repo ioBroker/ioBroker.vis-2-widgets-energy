@@ -1,12 +1,12 @@
 const helper = require('@iobroker/vis-2-widgets-testing');
 const adapterName = require('../package.json').name.split('.').pop();
 
-describe('vis-2-widgets-material', () => {
+describe('vis-2-widgets-energy', () => {
     before(async function (){
         this.timeout(180000);
         // install js-controller, web and vis-2-beta
         await helper.startIoBroker();
-        await helper.startBrowser(process.env.CI === 'true');
+        await helper.startBrowser(process.env.CI === 'true' ? 'new' : false);
         await helper.createProject();
 
         // open widgets
