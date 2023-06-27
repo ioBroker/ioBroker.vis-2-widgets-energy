@@ -98,7 +98,7 @@ class ConsumptionComparison extends Generic {
         const units = [];
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             try {
-                const object = await this.props.socket.getObject(this.state.rxData[`oid${i}`]);
+                const object = await this.props.context.socket.getObject(this.state.rxData[`oid${i}`]);
                 if (object && object.common && object.common.unit) {
                     units[i] = object.common.unit;
                     if (units[i] === 'kW') {

@@ -66,7 +66,7 @@ class IntervalSelector extends Generic {
 
     async propertiesUpdate() {
         if (this.state.rxData.oid && this.state.rxData.oid !== 'nothing_selected') {
-            const obj = await this.props.socket.getObject(this.state.rxData.oid);
+            const obj = await this.props.context.socket.getObject(this.state.rxData.oid);
             this.setState({ object: obj });
         }
         if (this.refTimeSelector.current && !this.refTimeSelector.current._addEventHandler) {
@@ -116,7 +116,7 @@ class IntervalSelector extends Generic {
 
     setTimeStart = timeStart => {
         if (this.state.rxData['timeStart-oid']) {
-            this.props.socket.setState(this.state.rxData['timeStart-oid'], timeStart);
+            this.props.context.socket.setState(this.state.rxData['timeStart-oid'], timeStart);
         } else {
             this.props.setTimeStart(timeStart);
         }
@@ -138,7 +138,7 @@ class IntervalSelector extends Generic {
 
     setTimeInterval = timeInterval => {
         if (this.state.rxData['timeInterval-oid']) {
-            this.props.socket.setState(this.state.rxData['timeInterval-oid'], timeInterval);
+            this.props.context.socket.setState(this.state.rxData['timeInterval-oid'], timeInterval);
         } else {
             this.props.setTimeInterval(timeInterval);
         }

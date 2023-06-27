@@ -87,5 +87,11 @@
   "icons_battery": "Accu",
   "icons_solar_ev_station": "EV-station op zonne-energie",
   "icon_size_tooltip": "In procent tot cirkelgrootte",
-  "icon_size": "Pictogramgrootte"
+  "icon_size": "Pictogramgrootte",
+  "invert_direction": "Richting omkeren",
+  "hide_if_less": "Verbergen indien kleiner dan",
+  "round": "Ronde",
+  "factor": "Vermenigvuldiger",
+  "factor_tooltip": "Als je wilt delen, gebruik dan 0,1 of 0,01",
+  "units": "Eenheden"
 }

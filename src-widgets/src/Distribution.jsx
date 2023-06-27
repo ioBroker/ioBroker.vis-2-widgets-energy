@@ -163,6 +163,25 @@ class Distribution extends Generic {
                             max: 230,
                             hidden: data => !data.homeIcon && !data.homeStandardIcon,
                         },
+                        {
+                            name: 'homeUnit',
+                            label: 'units',
+                        },
+                        {
+                            name: 'homeFactor',
+                            type: 'number',
+                            label: 'factor',
+                            default: 1,
+                            tooltip: 'factor_tooltip',
+                        },
+                        {
+                            name: 'homeRound',
+                            type: 'slider',
+                            min: 0,
+                            max: 6,
+                            label: 'round',
+                            default: 2,
+                        },
                     ],
                 },
                 {
@@ -256,6 +275,35 @@ class Distribution extends Generic {
                             min: 0,
                             max: 230,
                         },
+                        {
+                            name: 'powerUnit',
+                            label: 'units',
+                        },
+                        {
+                            name: 'powerFactor',
+                            type: 'number',
+                            label: 'factor',
+                            default: 1,
+                            tooltip: 'factor_tooltip',
+                        },
+                        {
+                            name: 'powerRound',
+                            type: 'slider',
+                            min: 0,
+                            max: 6,
+                            label: 'round',
+                            default: 2,
+                        },
+                        {
+                            name: 'powerHideIfLess',
+                            type: 'number',
+                            label: 'hide_if_less',
+                        },
+                        {
+                            name: 'powerInvert',
+                            type: 'checkbox',
+                            label: 'invert_direction',
+                        },
                     ],
                 },
                 {
@@ -331,6 +379,36 @@ class Distribution extends Generic {
                             max: 230,
                             hidden: (data, index) => !data[`standardIcon${index}`] && !data[`icon${index}`],
                         },
+                        {
+                            name: 'unit',
+                            type: 'string',
+                            label: 'units',
+                        },
+                        {
+                            name: 'factor',
+                            type: 'number',
+                            label: 'factor',
+                            default: 1,
+                            tooltip: 'factor_tooltip',
+                        },
+                        {
+                            name: 'round',
+                            type: 'slider',
+                            min: 0,
+                            max: 6,
+                            label: 'round',
+                            default: 2,
+                        },
+                        {
+                            name: 'hideIfLess',
+                            type: 'number',
+                            label: 'hide_if_less',
+                        },
+                        {
+                            name: 'invert',
+                            type: 'checkbox',
+                            label: 'invert_direction',
+                        },
                     ],
                 },
             ],
@@ -346,7 +424,7 @@ class Distribution extends Generic {
     async loadObject(oid, iconExists) {
         if (oid) {
             // read object itself
-            const object = await this.props.socket.getObject(oid);
+            const object = await this.props.context.socket.getObject(oid);
             if (!object) {
                 return { common: {} };
             }
@@ -355,9 +433,9 @@ class Distribution extends Generic {
                 const idArray = oid.split('.');
 
                 // read channel
-                const parentObject = await this.props.socket.getObject(idArray.slice(0, -1).join('.'));
+                const parentObject = await this.props.context.socket.getObject(idArray.slice(0, -1).join('.'));
                 if (!parentObject?.common?.icon && (object.type === 'state' || object.type === 'channel')) {
-                    const grandParentObject = await this.props.socket.getObject(idArray.slice(0, -2).join('.'));
+                    const grandParentObject = await this.props.context.socket.getObject(idArray.slice(0, -2).join('.'));
                     if (grandParentObject?.common?.icon) {
                         object.common.icon = grandParentObject.common.icon;
                     }
@@ -383,11 +461,51 @@ class Distribution extends Generic {
 
         // try to find icons for all OIDs
         for (let i = 1; i <= this.state.rxData.nodesCount; i++) {
-            objects[`object${i}`] = await this.loadObject(this.state.rxData[`oid${i}`], this.state.rxData[`icon${i}`]);
-            units[this.state.rxData[`oid${i}`]] = objects[`object${i}`].common.unit;
+            const idx = `object${i}`;
+            objects[idx] = await this.loadObject(this.state.rxData[`oid${i}`], this.state.rxData[`icon${i}`]);
+            if (this.state.rxData[`unit${i}`]) {
+                objects[idx].common.unit = this.state.rxData[`unit${i}`];
+            }
+            objects[idx].factor = parseFloat(this.state.rxData[`factor${i}`]) || 1;
+
+            let n = this.state.rxData[`round${i}`];
+            objects[idx].round = n === undefined || n === null || n === '' ? 2 : (parseFloat(n) || 0);
+
+            n = this.state.rxData[`hideIfLess${i}`];
+            objects[idx].hideIfLess = n === undefined || n === null || n === '' ? null : (parseFloat(n) || 0);
+
+            n = this.state.rxData[`invert${i}`];
+            objects[idx].invert = n === true || n === 'true';
+
+            units[this.state.rxData[`oid${i}`]] = objects[idx].common.unit;
         }
+        // home
         objects.home = await this.loadObject(this.state.rxData['home-oid'], this.state.rxData.homeIcon);
+        if (this.state.rxData.homeUnit) {
+            objects.home.common.unit = this.state.rxData.homeUnit;
+        }
+        objects.home.factor = parseFloat(this.state.rxData.homeFactor) || 1;
+        let n = this.state.rxData.homeRound;
+        objects.home.round = n === undefined || n === null || n === '' ? 2 : (parseFloat(n) || 0);
+
+        objects.home.hideIfLess = null;
+
+        // power line
         objects.powerLine = await this.loadObject(this.state.rxData['powerLine-oid'], this.state.rxData.powerLineIcon);
+        if (this.state.rxData.powerUnit) {
+            objects.powerLine.common.unit = this.state.rxData.powerUnit;
+        }
+        objects.powerLine.factor = parseFloat(this.state.rxData.powerFactor) || 1;
+
+        n = this.state.rxData.powerInvert;
+        objects.powerLine.invert = n === true || n === 'true';
+
+        n = this.state.rxData.powerRound;
+        objects.powerLine.round = n === undefined || n === null || n === '' ? 2 : (parseFloat(n) || 0);
+
+        n = this.state.rxData.powerHideIfLess;
+        objects.powerLine.hideIfLess = n === undefined || n === null || n === '' ? null : (parseFloat(n) || 0);
+
         units[this.state.rxData['home-oid']] = objects.home.common.unit;
         units[this.state.rxData['powerLine-oid']] = objects.powerLine.common.unit;
 
@@ -417,14 +535,20 @@ class Distribution extends Generic {
         this.propertiesUpdate();
     }
 
-    getValue(oid) {
+    getValue(oid, obj) {
         let value;
         if (oid) {
             value = this.state.values[`${oid}.val`];
             if (value === null || value === undefined) {
                 value = '--';
-            } else if (this.state.units[oid] === 'Wh') {
-                value = Math.round(value / 10) / 100;
+            } else {
+                if (this.state.units[oid] === 'Wh') {
+                    value = Math.round(value / 10) / 100;
+                }
+                if (obj && obj.factor !== 1) {
+                    value *= obj.factor;
+                }
+                value = this.formatValue(value, obj?.round || 2);
             }
         }
         return { unit: this.state.units[oid], value };
@@ -458,9 +582,9 @@ class Distribution extends Generic {
         let maxRadius = 0;
         let valuesSum = 0;
         // prepare power line as first circle
-        const valueAndUnit = this.getValue(this.state.rxData['powerLine-oid']);
+        const valueAndUnit = this.getValue(this.state.rxData['powerLine-oid'], this.state.objects.powerLine);
 
-        const circles = [{
+        let circles = [{
             name: this.state.rxData.powerLineName,
             color: this.state.rxData.powerLineColor,
             radius: (size * (this.state.rxData.powerLineCircleSize || defaultRadiusSize)) / 100,
@@ -471,9 +595,13 @@ class Distribution extends Generic {
             value: valueAndUnit.value,
             icon: this.state.rxData.powerLineStandardIcon || this.state.rxData.powerLineIcon || this.state.objects.powerLine?.common?.icon,
             arrow: '→', // '↦',
-            secondaryValue: this.getValue(this.state.rxData['powerLineReturn-oid']),
+            secondaryValue: this.getValue(this.state.rxData['powerLineReturn-oid'], this.state.objects.powerLine),
             secondaryArrow: '←',
             iconSize: parseFloat(this.state.rxData.powerIconSize) || 33.3,
+            hide: this.state.objects.powerLine &&
+                this.state.objects.powerLine.hideIfLess !== null &&
+                valueAndUnit.value < this.state.objects.powerLine.hideIfLess,
+            invert: this.state.powerLine && this.state.powerLine.invert,
         }];
 
         if (circles[0].radius > maxRadius) {
@@ -483,7 +611,8 @@ class Distribution extends Generic {
 
         // add all other nodes, like solar and so on
         for (let i = 1; i <= this.state.rxData.nodesCount; i++) {
-            const _valueAndUnit = this.getValue(this.state.rxData[`oid${i}`]);
+            const idx = `object${i}`;
+            const _valueAndUnit = this.getValue(this.state.rxData[`oid${i}`], this.state.objects[idx]);
             const circle = {
                 name: this.state.rxData[`name${i}`],
                 color: this.state.rxData[`color${i}`],
@@ -496,6 +625,10 @@ class Distribution extends Generic {
                 icon: this.state.rxData[`standardIcon${i}`] || this.state.rxData[`icon${i}`] || this.state.objects[`object${i}`]?.common?.icon,
                 arrow: '',
                 iconSize: parseFloat(this.state.rxData[`iconSize${i}`]) || 33.3,
+                hide: this.state.objects[idx] &&
+                    this.state.objects[idx].hideIfLess !== null &&
+                    valueAndUnit.value < this.state.objects[idx].hideIfLess,
+                invert: this.state.objects[idx] && this.state.objects[idx].invert,
             };
             circles.push(circle);
 
@@ -506,12 +639,14 @@ class Distribution extends Generic {
         }
 
         let currentPart = 0;
-        const homeValueAndUnit = this.getValue(this.state.rxData['home-oid']);
+        const homeValueAndUnit = this.getValue(this.state.rxData['home-oid'], this.state.objects.home);
         let xOffset = 0;
-        // calculate max and min position of circles to place it in center
+        // calculate max and min position of circles to place it in the center
         let max = size / 2;
         let min = size / 2;
         const allCoordinates = [];
+        circles = circles.filter(circle => !circle.hide);
+
         for (let i = 0; i < circles.length; i++) {
             const angle = 180 + (i * 360) / circles.length;
             const _coordinates = polarToCartesian(0, 0, circles[i].distance + circles[i].radius + homeRadius, angle);
@@ -656,7 +791,11 @@ class Distribution extends Generic {
                             step = 2;
                         }
                         let offset = (this.state.offset * step + i * 10) % circle.distance;
-                        if (circle.value > 0) {
+                        if (circle.invert) {
+                            if (circle.value < 0) {
+                                offset = circle.distance - offset;
+                            }
+                        } else if (circle.value > 0) {
                             offset = circle.distance - offset;
                         }
 

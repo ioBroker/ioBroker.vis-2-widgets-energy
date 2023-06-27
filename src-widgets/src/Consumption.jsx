@@ -177,7 +177,7 @@ class Consumption extends Generic {
                     }
                 }, options.timeout);
 
-                this.props.socket.getHistory(id, options)
+                this.props.context.socket.getHistory(id, options)
                     .then(result => {
                         if (timeout) {
                             clearTimeout(timeout);
@@ -190,7 +190,7 @@ class Consumption extends Generic {
             });
         }
 
-        return this.props.socket.getHistory(id, options);
+        return this.props.context.socket.getHistory(id, options);
     }
 
     propertiesUpdate() {
@@ -285,10 +285,10 @@ class Consumption extends Generic {
         }
     }
 
-    getSubscribeState = (id, cb) => this.props.socket.getState(id)
+    getSubscribeState = (id, cb) => this.props.context.socket.getState(id)
         .then(result => {
             cb(id, result);
-            return this.props.socket.subscribeState(id, (resultId, _result) => cb(id, _result));
+            return this.props.context.socket.subscribeState(id, (resultId, _result) => cb(id, _result));
         });
 
     componentDidUpdate(prevProps, prevState, snapshot) {

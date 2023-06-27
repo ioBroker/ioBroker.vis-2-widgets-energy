@@ -87,5 +87,11 @@
   "icons_battery": "Bateria",
   "icons_solar_ev_station": "Estação Solar EV",
   "icon_size_tooltip": "Em porcentagem para o tamanho do círculo",
-  "icon_size": "Tamanho do ícone"
+  "icon_size": "Tamanho do ícone",
+  "invert_direction": "Inverter direção",
+  "hide_if_less": "Ocultar se for menor que",
+  "round": "Redondo",
+  "factor": "Multiplicador",
+  "factor_tooltip": "Se você quiser dividir, use 0,1 ou 0,01",
+  "units": "Unidades"
 }

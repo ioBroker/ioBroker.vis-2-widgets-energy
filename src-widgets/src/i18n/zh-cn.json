@@ -87,5 +87,11 @@
   "icons_battery": "电池",
   "icons_solar_ev_station": "太阳能电动车站",
   "icon_size_tooltip": "以圆圈大小的百分比",
-  "icon_size": "图标大小"
+  "icon_size": "图标大小",
+  "invert_direction": "反转方向",
+  "hide_if_less": "如果小于则隐藏",
+  "round": "圆形的",
+  "factor": "乘数",
+  "factor_tooltip": "如果要除以0.1或0.01",
+  "units": "单位"
 }
