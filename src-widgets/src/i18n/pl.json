@@ -93,5 +93,6 @@
   "round": "Okrągły",
   "factor": "Mnożnik",
   "factor_tooltip": "Jeśli chcesz podzielić, użyj 0,1 lub 0,01",
-  "units": "Jednostki"
+  "units": "Jednostki",
+  "motion_speed": "Szybkość ruchu"
 }

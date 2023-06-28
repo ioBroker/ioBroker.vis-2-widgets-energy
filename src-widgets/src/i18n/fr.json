@@ -93,5 +93,6 @@
   "round": "Rond",
   "factor": "Multiplicateur",
   "factor_tooltip": "Si vous voulez diviser, utilisez 0,1 ou 0,01",
-  "units": "Unités"
+  "units": "Unités",
+  "motion_speed": "Vitesse de mouvement"
 }

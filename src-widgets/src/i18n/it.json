@@ -93,5 +93,6 @@
   "round": "Girare",
   "factor": "Moltiplicatore",
   "factor_tooltip": "Se vuoi dividere, usa 0.1 o 0.01",
-  "units": "Unità"
+  "units": "Unità",
+  "motion_speed": "Velocità di movimento"
 }

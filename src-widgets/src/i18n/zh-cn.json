@@ -93,5 +93,6 @@
   "round": "圆形的",
   "factor": "乘数",
   "factor_tooltip": "如果要除以0.1或0.01",
-  "units": "单位"
+  "units": "单位",
+  "motion_speed": "运动速度"
 }

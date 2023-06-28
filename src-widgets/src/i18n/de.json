@@ -49,7 +49,7 @@
   "level": "Ebene",
   "month": "Monat",
   "name": "Name",
-  "nodes_count": "Knoten zählen",
+  "nodes_count": "Zusatzkreise",
   "now": "Jetzt",
   "oid": "OID",
   "percentile": "Perzentil",
@@ -93,5 +93,6 @@
   "round": "Runden",
   "factor": "Multiplikator",
   "factor_tooltip": "Wenn Sie dividieren möchten, verwenden Sie 0,1 oder 0,01",
-  "units": "Einheiten"
+  "units": "Einheiten",
+  "motion_speed": "Bewegungsgeschwindigkeit"
 }

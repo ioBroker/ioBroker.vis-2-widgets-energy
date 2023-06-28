@@ -169,7 +169,17 @@ class Distribution extends Generic {
                         },
                         {
                             name: 'homeFactor',
-                            type: 'number',
+                            type: 'select',
+                            noTranslation: true,
+                            options: [
+                                { value: 1, label: '1' },
+                                { value: 10, label: '10' },
+                                { value: 100, label: '100' },
+                                { value: 1000, label: '1000' },
+                                { value: 0.1, label: '0.1' },
+                                { value: 0.01, label: '0.01' },
+                                { value: 0.001, label: '0.001' },
+                            ],
                             label: 'factor',
                             default: 1,
                             tooltip: 'factor_tooltip',
@@ -281,7 +291,17 @@ class Distribution extends Generic {
                         },
                         {
                             name: 'powerFactor',
-                            type: 'number',
+                            type: 'select',
+                            noTranslation: true,
+                            options: [
+                                { value: 1, label: '1' },
+                                { value: 10, label: '10' },
+                                { value: 100, label: '100' },
+                                { value: 1000, label: '1000' },
+                                { value: 0.1, label: '0.1' },
+                                { value: 0.01, label: '0.01' },
+                                { value: 0.001, label: '0.001' },
+                            ],
                             label: 'factor',
                             default: 1,
                             tooltip: 'factor_tooltip',
@@ -303,6 +323,14 @@ class Distribution extends Generic {
                             name: 'powerInvert',
                             type: 'checkbox',
                             label: 'invert_direction',
+                        },
+                        {
+                            name: 'powerSpeed',
+                            type: 'slider',
+                            min: 2,
+                            max: 50,
+                            default: 50,
+                            label: 'motion_speed',
                         },
                     ],
                 },
@@ -381,12 +409,21 @@ class Distribution extends Generic {
                         },
                         {
                             name: 'unit',
-                            type: 'string',
                             label: 'units',
                         },
                         {
                             name: 'factor',
-                            type: 'number',
+                            type: 'select',
+                            noTranslation: true,
+                            options: [
+                                { value: 1, label: '1' },
+                                { value: 10, label: '10' },
+                                { value: 100, label: '100' },
+                                { value: 1000, label: '1000' },
+                                { value: 0.1, label: '0.1' },
+                                { value: 0.01, label: '0.01' },
+                                { value: 0.001, label: '0.001' },
+                            ],
                             label: 'factor',
                             default: 1,
                             tooltip: 'factor_tooltip',
@@ -408,6 +445,14 @@ class Distribution extends Generic {
                             name: 'invert',
                             type: 'checkbox',
                             label: 'invert_direction',
+                        },
+                        {
+                            name: 'speed',
+                            type: 'slider',
+                            min: 2,
+                            max: 50,
+                            default: 50,
+                            label: 'motion_speed',
                         },
                     ],
                 },
@@ -471,6 +516,9 @@ class Distribution extends Generic {
             let n = this.state.rxData[`round${i}`];
             objects[idx].round = n === undefined || n === null || n === '' ? 2 : (parseFloat(n) || 0);
 
+            n = this.state.rxData[`speed${i}`];
+            objects[idx].speed = n === undefined || n === null || n === '' ? 50 : (parseFloat(n) || 50);
+
             n = this.state.rxData[`hideIfLess${i}`];
             objects[idx].hideIfLess = n === undefined || n === null || n === '' ? null : (parseFloat(n) || 0);
 
@@ -502,6 +550,9 @@ class Distribution extends Generic {
 
         n = this.state.rxData.powerRound;
         objects.powerLine.round = n === undefined || n === null || n === '' ? 2 : (parseFloat(n) || 0);
+
+        n = this.state.rxData.powerSpeed;
+        objects.powerLine.speed = n === undefined || n === null || n === '' ? 50 : (parseFloat(n) || 50);
 
         n = this.state.rxData.powerHideIfLess;
         objects.powerLine.hideIfLess = n === undefined || n === null || n === '' ? null : (parseFloat(n) || 0);
@@ -542,16 +593,27 @@ class Distribution extends Generic {
             if (value === null || value === undefined) {
                 value = '--';
             } else {
+                // string => float
+                value = parseFloat(value.toString().replace(',', '.')) || 0;
                 if (this.state.units[oid] === 'Wh') {
                     value = Math.round(value / 10) / 100;
                 }
                 if (obj && obj.factor !== 1) {
                     value *= obj.factor;
                 }
-                value = this.formatValue(value, obj?.round || 2);
+                value = this.formatValue(value, obj?.round === undefined ? 2 : obj.round);
             }
+            return {
+                unit: this.state.units[oid],
+                value,
+                iValue: parseFloat(value.toString().replace(',', '.')) || 0,
+            };
         }
-        return { unit: this.state.units[oid], value };
+        return {
+            unit: this.state.units[oid],
+            value: undefined,
+            iValue: 0,
+        };
     }
 
     renderWidgetBody(props) {
@@ -593,6 +655,7 @@ class Distribution extends Generic {
             oid: this.state.rxData['powerLine-oid'],
             unit: valueAndUnit.unit || Generic.t('kwh'),
             value: valueAndUnit.value,
+            iValue: valueAndUnit.iValue,
             icon: this.state.rxData.powerLineStandardIcon || this.state.rxData.powerLineIcon || this.state.objects.powerLine?.common?.icon,
             arrow: '→', // '↦',
             secondaryValue: this.getValue(this.state.rxData['powerLineReturn-oid'], this.state.objects.powerLine),
@@ -600,13 +663,14 @@ class Distribution extends Generic {
             iconSize: parseFloat(this.state.rxData.powerIconSize) || 33.3,
             hide: this.state.objects.powerLine &&
                 this.state.objects.powerLine.hideIfLess !== null &&
-                valueAndUnit.value < this.state.objects.powerLine.hideIfLess,
-            invert: this.state.powerLine && this.state.powerLine.invert,
+                valueAndUnit.iValue < this.state.objects.powerLine.hideIfLess,
+            invert: this.state.objects.powerLine?.invert || false,
+            speed: parseFloat(this.state.objects.powerLine?.speed) || 50,
         }];
 
         if (circles[0].radius > maxRadius) {
             maxRadius = circles[0].radius;
-            valuesSum += Number.isFinite(circles[0].value) ? Math.abs(circles[0].value) : 0;
+            valuesSum += Number.isFinite(valueAndUnit.iValue) ? Math.abs(valueAndUnit.iValue) : 0;
         }
 
         // add all other nodes, like solar and so on
@@ -622,20 +686,22 @@ class Distribution extends Generic {
                 oid: this.state.rxData[`oid${i}`],
                 unit: _valueAndUnit.unit || Generic.t('kwh'),
                 value: _valueAndUnit.value,
+                iValue: _valueAndUnit.iValue,
                 icon: this.state.rxData[`standardIcon${i}`] || this.state.rxData[`icon${i}`] || this.state.objects[`object${i}`]?.common?.icon,
                 arrow: '',
                 iconSize: parseFloat(this.state.rxData[`iconSize${i}`]) || 33.3,
                 hide: this.state.objects[idx] &&
                     this.state.objects[idx].hideIfLess !== null &&
-                    valueAndUnit.value < this.state.objects[idx].hideIfLess,
-                invert: this.state.objects[idx] && this.state.objects[idx].invert,
+                    _valueAndUnit.iValue < this.state.objects[idx].hideIfLess,
+                invert: (this.state.objects[idx] && this.state.objects[idx].invert) || false,
+                speed: parseFloat(this.state.objects[idx] && this.state.objects[idx].speed) || 50,
             };
             circles.push(circle);
 
             if (circle.radius > maxRadius) {
                 maxRadius = circle.radius;
             }
-            valuesSum += Number.isFinite(_valueAndUnit.value) ? Math.abs(_valueAndUnit.value) : 0;
+            valuesSum += Number.isFinite(_valueAndUnit.iValue) ? Math.abs(_valueAndUnit.iValue) : 0;
         }
 
         let currentPart = 0;
@@ -645,7 +711,9 @@ class Distribution extends Generic {
         let max = size / 2;
         let min = size / 2;
         const allCoordinates = [];
-        circles = circles.filter(circle => !circle.hide);
+        if (!this.props.editMode) {
+            circles = circles.filter(circle => !circle.hide);
+        }
 
         for (let i = 0; i < circles.length; i++) {
             const angle = 180 + (i * 360) / circles.length;
@@ -681,6 +749,7 @@ class Distribution extends Generic {
             className={this.props.classes.cardContent}
         >
             {size && <div style={{ position: 'relative' }}>
+                {/* show power line and others */}
                 {circles.map((circle, i) => {
                     const icon = circle.icon && circle.icon.startsWith('_PRJ_NAME/') ?
                         `${this.props.adapterName}.${this.props.instance}/${this.props.projectName}${circle.icon.substring(9)}`
@@ -696,6 +765,7 @@ class Distribution extends Generic {
                                 width:    circle.radius * 2,
                                 height:   circle.radius * 2,
                                 fontSize: circle.fontSize,
+                                opacity:  circle.hide ? 0.3 : 1,
                             }}
                         >
                             {icon ?
@@ -715,12 +785,14 @@ class Distribution extends Generic {
                                 left: xOffset + allCoordinates[i].leftLabel,
                                 width: circle.radius * 2,
                                 fontSize: circle.fontSize,
+                                opacity:  circle.hide ? 0.3 : 1,
                             }}
                         >
                             <div>{circle.name || circle.oid}</div>
                         </div>
                     </div>;
                 })}
+                {/* show home icon and value in the middle of the circle */}
                 <div
                     className={this.props.classes.circleContent}
                     style={{
@@ -738,6 +810,7 @@ class Distribution extends Generic {
                         {`${homeValueAndUnit.value} ${homeValueAndUnit.unit || Generic.t('kwh')}`}
                     </div> : null}
                 </div>
+                {/* show home name at the bottom of the circle */}
                 <div
                     className={this.props.classes.circleContent}
                     style={{
@@ -750,18 +823,9 @@ class Distribution extends Generic {
                     <div>{this.state.rxData.homeName || this.state.rxData['home-oid'] || Generic.t('home')}</div>
                 </div>
                 <svg style={{ width: size, height: size, overflow: 'visible' }}>
-                    <circle
-                        cx="50%"
-                        cy="50%"
-                        r={homeRadius}
-                        transform={`translate(${xOffset}, 0)`}
-                        fill="none"
-                        stroke={this.state.rxData.homeColor || this.props.theme.palette.text.primary}
-                        strokeWidth="3"
-                    />
                     {valuesSum ? circles.map((circle, i) => {
                         // Show parts of home circle
-                        const partRadiusStroke = ((valuesSum - (Number.isFinite(circle.value) ? Math.abs(circle.value) : 0)) / valuesSum) * (Math.PI * (homeRadius * 2));
+                        const partRadiusStroke = ((valuesSum - (Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) : 0)) / valuesSum) * (Math.PI * (homeRadius * 2));
                         const result = <circle
                             key={i}
                             cx="50%"
@@ -777,7 +841,7 @@ class Distribution extends Generic {
                             transform={`translate(${xOffset}, 0), rotate(${Math.round((currentPart / valuesSum) * 360 + 135)},${size / 2},${size / 2})`}
                             strokeWidth="3"
                         />;
-                        currentPart += Number.isFinite(circle.value) ? Math.abs(circle.value) : 0;
+                        currentPart += Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) : 0;
                         return result;
                     }) : null}
                     {circles.map((circle, i) => {
@@ -786,16 +850,16 @@ class Distribution extends Generic {
                         const coordinates     = polarToCartesian(0, 0, circle.distance + circle.radius + homeRadius, angle);
                         const coordinatesFrom = polarToCartesian(0, 0, homeRadius, angle);
                         const coordinatesTo   = polarToCartesian(0, 0, homeRadius + circle.distance, angle);
-                        let step = Number.isFinite(circle.value) ? Math.abs(circle.value) / 50 : 0;
+                        let step = Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) / circle.speed : 0;
                         if (step > 2) {
                             step = 2;
                         }
                         let offset = (this.state.offset * step + i * 10) % circle.distance;
                         if (circle.invert) {
-                            if (circle.value < 0) {
+                            if (circle.iValue < 0) {
                                 offset = circle.distance - offset;
                             }
-                        } else if (circle.value > 0) {
+                        } else if (circle.iValue > 0) {
                             offset = circle.distance - offset;
                         }
 
@@ -808,6 +872,7 @@ class Distribution extends Generic {
                                 cy="50%"
                                 r={circle.radius}
                                 fill="none"
+                                opacity={circle.hide ? 0.3 : 1}
                                 stroke={color}
                                 strokeWidth="3"
                                 transform={`translate(${xOffset + coordinates.x}, ${coordinates.y})`}
@@ -818,18 +883,30 @@ class Distribution extends Generic {
                                 x2={xOffset + size / 2 + coordinatesTo.x}
                                 y2={size / 2 + coordinatesTo.y}
                                 stroke={color}
+                                opacity={circle.hide ? 0.3 : 1}
                             />
-                            {circle.value ? <circle
+                            {circle.iValue ? <circle
                                 cx="50%"
                                 cy="50%"
                                 r={step < 0.5 ? 1.5 : step * 3}
                                 fill={color}
                                 stroke={color}
                                 strokeWidth="3"
+                                opacity={circle.hide ? 0.3 : 1}
                                 transform={`translate(${xOffset + coordinatesOffset.x}, ${coordinatesOffset.y})`}
                             /> : null}
                         </React.Fragment>;
                     })}
+                    {/* show home circle as last to overdraw all lines */}
+                    <circle
+                        cx="50%"
+                        cy="50%"
+                        r={homeRadius}
+                        transform={`translate(${xOffset}, 0)`}
+                        fill="none"
+                        stroke={this.state.rxData.homeColor || this.props.theme.palette.text.primary}
+                        strokeWidth="3"
+                    />
                 </svg>
             </div>}
         </div>;

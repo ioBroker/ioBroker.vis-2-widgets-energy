@@ -93,5 +93,6 @@
   "round": "Round",
   "factor": "Multiplier",
   "factor_tooltip": "If you want to divide, use 0.1 or 0.01",
-  "units": "Units"
+  "units": "Units",
+  "motion_speed": "Motion speed"
 }
