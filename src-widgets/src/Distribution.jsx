@@ -638,7 +638,7 @@ class Distribution extends Generic {
         let homeIcon = this.state.rxData.homeStandardIcon || this.state.rxData.homeIcon || this.state.objects.home?.common?.icon;
 
         if (homeIcon && homeIcon.startsWith('_PRJ_NAME/')) {
-            homeIcon = homeIcon.replace('_PRJ_NAME/', `${this.props.adapterName}.${this.props.instance}/${this.props.projectName}${homeIcon.substring(9)}`);
+            homeIcon = homeIcon.replace('_PRJ_NAME/', `${this.props.context.adapterName}.${this.props.context.instance}/${this.props.context.projectName}${homeIcon.substring(9)}`);
         }
 
         let maxRadius = 0;
@@ -752,7 +752,7 @@ class Distribution extends Generic {
                 {/* show power line and others */}
                 {circles.map((circle, i) => {
                     const icon = circle.icon && circle.icon.startsWith('_PRJ_NAME/') ?
-                        `${this.props.adapterName}.${this.props.instance}/${this.props.projectName}${circle.icon.substring(9)}`
+                        `${this.props.context.adapterName}.${this.props.context.instance}/${this.props.context.projectName}${circle.icon.substring(9)}`
                         :
                         circle.icon;
 

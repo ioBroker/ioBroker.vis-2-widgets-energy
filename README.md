@@ -23,7 +23,7 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### 0.2.0 (2023-06-28)
+### **WORK IN PROGRESS**
 * (bluefox) Added settings for units, rounding, invert direction, multiplier
 
 ### 0.1.12 (2023-04-03)
