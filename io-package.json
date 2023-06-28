@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.1.12",
+    "version": "0.2.0",
     "news": {
+      "0.2.0": {
+        "en": "Added settings for units, rounding, invert direction, multiplier",
+        "de": "Hinzugefügt Einstellungen für Einheiten, Rundung, Invert-Richtung, Multiplikator",
+        "ru": "Добавлены настройки для блоков, округления, направления инверта, мультипликатора",
+        "pt": "Configurações adicionadas para unidades, arredondamento, direção invert, multiplicador",
+        "nl": "Vermelding voor eenheden, ronde, omgekeerde richting, multiplier",
+        "fr": "Paramètres ajoutés pour les unités, arrondissement, direction inverse, multiplicateur",
+        "it": "Impostazioni aggiuntive per unità, arrotondamento, direzione invert, moltiplicatore",
+        "es": "Ajustes adicionales para unidades, redondeo, dirección invertida, multiplicador",
+        "pl": "Dodrukowane ustawienia dla jednostek, krążących, odwracających się kierunków",
+        "uk": "Додано налаштування для юнітів, округлення, зворотний напрямок, мультиплікатор",
+        "zh-cn": "增加各单位的环境,圆桌会议,以避免方向,乘数"
+      },
       "0.1.12": {
         "en": "Corrected the consumption widget",
         "de": "Das Verbrauchs-Widget korrigiert",
@@ -69,19 +82,6 @@
         "zh-cn": "已更新一揽子计划"
       },
       "0.1.7": {
-        "en": "packages were updated",
-        "de": "pakete wurden aktualisiert",
-        "ru": "пакеты были обновлены",
-        "pt": "pacotes foram atualizados",
-        "nl": "vertaling:",
-        "fr": "paquets were updated",
-        "it": "i pacchetti sono stati aggiornati",
-        "es": "se actualizaron los paquetes",
-        "pl": "pakiety były aktualizowane",
-        "uk": "було оновлено",
-        "zh-cn": "已更新一揽子计划"
-      },
-      "0.1.6": {
         "en": "packages were updated",
         "de": "pakete wurden aktualisiert",
         "ru": "пакеты были обновлены",
