@@ -126,8 +126,8 @@
     "nogit": true,
     "singleton": true,
     "visWidgets": {
-      "i18n": "component",
       "vis2energyWidgets": {
+        "i18n": "component",
         "name": "vis2energyWidgets",
         "url": "vis-2-widgets-energy/customWidgets.js",
         "components": [
