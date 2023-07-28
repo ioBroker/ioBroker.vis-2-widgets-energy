@@ -23,7 +23,7 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 0.2.2 (2023-07-28)
 * (bluefox) Corrected layout of date selector
 
 ### 0.2.1 (2023-06-28)

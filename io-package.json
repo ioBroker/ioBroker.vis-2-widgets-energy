@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "news": {
+      "0.2.2": {
+        "en": "Corrected layout of date selector",
+        "de": "Korrigiertes Layout der Datumsauswahl",
+        "ru": "Исправлена планировка выбора даты",
+        "pt": "Layout corrigido do seletor de data",
+        "nl": "Vertaling:",
+        "fr": "Mise en page corrigée du sélecteur de date",
+        "it": "Layout corretto del selettore della data",
+        "es": "Diseño corregido del selector de fecha",
+        "pl": "Poprawny układ dany",
+        "uk": "Виправлена схема вибору дати",
+        "zh-cn": "修改日期的选择"
+      },
       "0.2.1": {
         "en": "Added settings for units, rounding, invert direction, multiplier",
         "de": "Hinzugefügt Einstellungen für Einheiten, Rundung, Invert-Richtung, Multiplikator",
@@ -69,19 +82,6 @@
         "zh-cn": "更新包"
       },
       "0.1.8": {
-        "en": "packages were updated",
-        "de": "pakete wurden aktualisiert",
-        "ru": "пакеты были обновлены",
-        "pt": "pacotes foram atualizados",
-        "nl": "vertaling:",
-        "fr": "paquets were updated",
-        "it": "i pacchetti sono stati aggiornati",
-        "es": "se actualizaron los paquetes",
-        "pl": "pakiety były aktualizowane",
-        "uk": "було оновлено",
-        "zh-cn": "已更新一揽子计划"
-      },
-      "0.1.7": {
         "en": "packages were updated",
         "de": "pakete wurden aktualisiert",
         "ru": "пакеты были обновлены",
