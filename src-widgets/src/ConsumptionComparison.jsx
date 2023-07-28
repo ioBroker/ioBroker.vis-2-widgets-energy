@@ -109,8 +109,7 @@ class ConsumptionComparison extends Generic {
                     units[i] = object.common.unit;
                     if (units[i] === 'kW') {
                         units[i] = 'kWh';
-                    } else
-                    if (units[i] === 'W') {
+                    } else if (units[i] === 'W') {
                         units[i] = 'Wh';
                     }
                 }
