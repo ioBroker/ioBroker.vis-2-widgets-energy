@@ -23,6 +23,9 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Corrected layout of date selector
+
 ### 0.2.1 (2023-06-28)
 * (bluefox) Added settings for units, rounding, invert direction, multiplier
 

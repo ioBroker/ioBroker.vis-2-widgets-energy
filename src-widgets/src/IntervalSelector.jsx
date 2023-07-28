@@ -40,8 +40,14 @@ class IntervalSelector extends Generic {
                 name: 'common',
                 fields: [
                     {
-                        name: 'name',
+                        name: 'noCard',
+                        label: 'without_card',
+                        type: 'checkbox',
+                    },
+                    {
+                        name: 'widgetTitle',
                         label: 'name',
+                        hidden: '!!data.noCard',
                     },
                     {
                         name: 'timeStart-oid',
@@ -246,7 +252,11 @@ class IntervalSelector extends Generic {
             </div>
         </div>;
 
-        return this.wrapContent(content, null, { textAlign: 'center', padding: 0 });
+        if (this.state.rxData.noCard || props.widget.usedInWidget) {
+            return content;
+        }
+
+        return this.wrapContent(content, null, { textAlign: 'center', padding: 0, height: '100%' });
     }
 }
 

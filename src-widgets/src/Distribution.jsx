@@ -54,8 +54,14 @@ class Distribution extends Generic {
                     name: 'common',
                     fields: [
                         {
-                            name: 'name',
+                            name: 'noCard',
+                            label: 'without_card',
+                            type: 'checkbox',
+                        },
+                        {
+                            name: 'widgetTitle',
                             label: 'name',
+                            hidden: '!!data.noCard',
                         },
                         {
                             name: 'defaultColor',
@@ -911,7 +917,11 @@ class Distribution extends Generic {
             </div>}
         </div>;
 
-        return this.wrapContent(content, null, { textAlign: 'center', height: 'calc(100% - 32px)' });
+        if (this.state.rxData.noCard || props.widget.usedInWidget) {
+            return content;
+        }
+
+        return this.wrapContent(content, null, { textAlign: 'center' });
     }
 
     // eslint-disable-next-line class-methods-use-this

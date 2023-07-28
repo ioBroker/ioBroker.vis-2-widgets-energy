@@ -39,8 +39,14 @@ class Consumption extends Generic {
                 name: 'common',
                 fields: [
                     {
-                        name: 'name',
+                        name: 'noCard',
+                        label: 'without_card',
+                        type: 'checkbox',
+                    },
+                    {
+                        name: 'widgetTitle',
                         label: 'name',
+                        hidden: '!!data.noCard',
                     },
                     {
                         name: 'devicesCount',
@@ -484,7 +490,12 @@ class Consumption extends Generic {
                 opts={{ renderer: 'svg' }}
             /> }
         </div>;
-        return this.wrapContent(content, null, { textAlign: 'center', height: 'calc(100% - 32px)' });
+
+        if (this.state.rxData.noCard || props.widget.usedInWidget) {
+            return content;
+        }
+
+        return this.wrapContent(content, null, { textAlign: 'center' });
     }
 }
 

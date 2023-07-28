@@ -94,5 +94,6 @@
   "factor": "乘数",
   "factor_tooltip": "如果要除以0.1或0.01",
   "units": "单位",
-  "motion_speed": "运动速度"
+  "motion_speed": "运动速度",
+  "without_card": "无框"
 }

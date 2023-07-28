@@ -94,5 +94,6 @@
   "factor": "Multiplicador",
   "factor_tooltip": "Si quieres dividir, usa 0.1 o 0.01",
   "units": "Unidades",
-  "motion_speed": "Velocidad de movimiento"
+  "motion_speed": "Velocidad de movimiento",
+  "without_card": "sin marco"
 }
