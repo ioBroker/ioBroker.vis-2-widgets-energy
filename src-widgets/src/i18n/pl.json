@@ -95,5 +95,16 @@
   "factor_tooltip": "Jeśli chcesz podzielić, użyj 0,1 lub 0,01",
   "units": "Jednostki",
   "motion_speed": "Szybkość ruchu",
-  "without_card": "Bez ramy"
+  "without_card": "Bez ramy",
+  "type": "Typ",
+  "inner_title": "Wewnętrzny tytuł",
+  "inner_radius": "Promień wewnętrzny",
+  "inner_oid": "Wewnętrzny identyfikator obiektu",
+  "inner_unit": "Wewnętrzna jednostka wartości",
+  "legend": "Pokaż legendę",
+  "hide_Labels": "Ukryj etykiety",
+  "legend_height": "Wysokość legendy",
+  "precision": "Precyzja etykiety",
+  "bar": "Wykres słupkowy",
+  "pie": "Wykres kołowy"
 }

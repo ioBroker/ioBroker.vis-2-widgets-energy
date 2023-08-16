@@ -95,5 +95,16 @@
   "factor_tooltip": "如果要除以0.1或0.01",
   "units": "单位",
   "motion_speed": "运动速度",
-  "without_card": "无框"
+  "without_card": "无框",
+  "type": "类型",
+  "inner_title": "内标题",
+  "inner_radius": "内半径",
+  "inner_oid": "内部对象ID",
+  "inner_unit": "内值单位",
+  "legend": "显示图例",
+  "hide_Labels": "隐藏标签",
+  "legend_height": "图例高度",
+  "precision": "标签精度",
+  "bar": "条形图",
+  "pie": "饼形图"
 }

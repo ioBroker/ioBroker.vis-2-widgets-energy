@@ -95,5 +95,16 @@
   "factor_tooltip": "Wenn Sie dividieren möchten, verwenden Sie 0,1 oder 0,01",
   "units": "Einheiten",
   "motion_speed": "Bewegungsgeschwindigkeit",
-  "without_card": "Ohne Rahmen"
+  "without_card": "Ohne Rahmen",
+  "type": "Typ",
+  "inner_title": "Innerer Titel",
+  "inner_radius": "Innenradius",
+  "inner_oid": "Innere Objekt-ID",
+  "inner_unit": "Innere Werteinheit",
+  "legend": "Legende anzeigen",
+  "hide_Labels": "Versteckte Etiketten",
+  "legend_height": "Höhe der Legende",
+  "precision": "Etikettenpräzision",
+  "bar": "Balkendiagramm",
+  "pie": "Kuchendiagramm"
 }

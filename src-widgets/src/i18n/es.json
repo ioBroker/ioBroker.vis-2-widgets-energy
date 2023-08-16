@@ -95,5 +95,16 @@
   "factor_tooltip": "Si quieres dividir, usa 0.1 o 0.01",
   "units": "Unidades",
   "motion_speed": "Velocidad de movimiento",
-  "without_card": "sin marco"
+  "without_card": "sin marco",
+  "type": "Tipo",
+  "inner_title": "título interior",
+  "inner_radius": "Radio interno",
+  "inner_oid": "ID de objeto interno",
+  "inner_unit": "Unidad de valor interno",
+  "legend": "Mostrar leyenda",
+  "hide_Labels": "etiquetas ocultas",
+  "legend_height": "Altura de la leyenda",
+  "precision": "Precisión de etiquetas",
+  "bar": "Gráfico de barras",
+  "pie": "Gráfico circular"
 }

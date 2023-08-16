@@ -95,5 +95,16 @@
   "factor_tooltip": "If you want to divide, use 0.1 or 0.01",
   "units": "Units",
   "motion_speed": "Motion speed",
-  "without_card": "Without frame"
+  "without_card": "Without frame",
+  "type": "Type",
+  "inner_title": "Inner title",
+  "inner_radius": "Inner radius",
+  "inner_oid": "Inner Object ID",
+  "inner_unit": "Inner value unit",
+  "legend": "Show legend",
+  "hide_Labels": "Hid labels",
+  "legend_height": "Legend height",
+  "precision": "Label precision",
+  "bar": "Bar chart",
+  "pie": "Pie chart"
 }

@@ -95,5 +95,16 @@
   "factor_tooltip": "Als je wilt delen, gebruik dan 0,1 of 0,01",
   "units": "Eenheden",
   "motion_speed": "Bewegingssnelheid",
-  "without_card": "Zonder lijst"
+  "without_card": "Zonder lijst",
+  "type": "Type",
+  "inner_title": "Innerlijke titel",
+  "inner_radius": "Binnen straal",
+  "inner_oid": "Innerlijke object-ID",
+  "inner_unit": "Innerlijke waarde eenheid",
+  "legend": "Legenda tonen",
+  "hide_Labels": "Labels verborgen",
+  "legend_height": "Legenda hoogte",
+  "precision": "Labelprecisie",
+  "bar": "Staafdiagram",
+  "pie": "Cirkeldiagram"
 }

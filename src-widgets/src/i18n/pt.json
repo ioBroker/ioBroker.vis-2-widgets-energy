@@ -95,5 +95,16 @@
   "factor_tooltip": "Se você quiser dividir, use 0,1 ou 0,01",
   "units": "Unidades",
   "motion_speed": "Velocidade de movimento",
-  "without_card": "sem moldura"
+  "without_card": "sem moldura",
+  "type": "Tipo",
+  "inner_title": "Título interno",
+  "inner_radius": "Raio interno",
+  "inner_oid": "ID do objeto interno",
+  "inner_unit": "Unidade de valor interno",
+  "legend": "Mostrar legenda",
+  "hide_Labels": "Marcadores ocultos",
+  "legend_height": "Altura da legenda",
+  "precision": "Precisão da etiqueta",
+  "bar": "Gráfico de barras",
+  "pie": "gráfico de pizza"
 }
