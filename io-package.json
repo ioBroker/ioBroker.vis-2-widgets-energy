@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.2.3",
+    "version": "0.3.0",
     "news": {
+      "0.3.0": {
+        "en": "Added pie chart for comparison",
+        "de": "Piratendiagramm zum Vergleich hinzugefügt",
+        "ru": "Добавлен pie график для сравнения",
+        "pt": "Gráfico de torta adicionado para comparação",
+        "nl": "Vergelijkingskaart",
+        "fr": "Ajout d'un diagramme de tartes pour comparaison",
+        "it": "Grafico torta aggiunto per confronto",
+        "es": "Gráfico de tarta añadido para comparación",
+        "pl": "Pieśń o porównanie",
+        "uk": "Додано діаграму пирога для порівняння",
+        "zh-cn": "比较图表"
+      },
       "0.2.3": {
         "en": "Corrected layout of date selector",
         "de": "Korrigiertes Layout der Datumsauswahl",
@@ -80,19 +93,6 @@
         "pl": "pakiet aktualizacji",
         "uk": "оновлення пакетів",
         "zh-cn": "更新包"
-      },
-      "0.1.8": {
-        "en": "packages were updated",
-        "de": "pakete wurden aktualisiert",
-        "ru": "пакеты были обновлены",
-        "pt": "pacotes foram atualizados",
-        "nl": "vertaling:",
-        "fr": "paquets were updated",
-        "it": "i pacchetti sono stati aggiornati",
-        "es": "se actualizaron los paquetes",
-        "pl": "pakiety były aktualizowane",
-        "uk": "було оновлено",
-        "zh-cn": "已更新一揽子计划"
       }
     },
     "title": "Vis 2 Widgets Energy",

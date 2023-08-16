@@ -25,7 +25,7 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 0.3.0 (2023-08-16)
 * (bluefox) Added pie chart for comparison
 
 ### 0.2.3 (2023-07-28)
