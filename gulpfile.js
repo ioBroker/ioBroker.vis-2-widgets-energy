@@ -33,6 +33,7 @@ gulp.task('widget-3-copy', () => Promise.all([
     gulp.src([
         ...gulpHelper.copyFiles(SRC),
         `${src}build/static/js/*node_modules_echarts-for-react_esm_index_js.*.*`,
+        `${src}build/static/js/*echarts-for-react_esm_index_js-node_modules_babel_runtime_helpers_esm.*.*`,
     ]).pipe(gulp.dest(`widgets/${adapterName}/static/js`)),
     gulp.src([`${SRC}src/i18n/*.json`]).pipe(gulp.dest(`widgets/${adapterName}/i18n`)),
     new Promise(resolve =>
