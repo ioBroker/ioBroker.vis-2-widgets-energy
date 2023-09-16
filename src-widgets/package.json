@@ -8,10 +8,10 @@
         "@emotion/styled": "^11.11.0",
         "@iobroker/adapter-react-v5": "^4.5.3",
         "@iobroker/vis-2-widgets-react-dev": "^0.4.6",
-        "@mui/icons-material": "^5.14.8",
-        "@mui/material": "^5.14.8",
-        "@mui/styles": "^5.14.7",
-        "caniuse-lite": "^1.0.30001532",
+        "@mui/icons-material": "^5.14.9",
+        "@mui/material": "^5.14.9",
+        "@mui/styles": "^5.14.9",
+        "caniuse-lite": "^1.0.30001534",
         "craco-esbuild": "^0.5.2",
         "craco-module-federation": "^1.1.0",
         "date-fns": "^2.30.0",
@@ -31,7 +31,7 @@
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-scripts": "^5.0.1",
-        "sass": "^1.66.1"
+        "sass": "^1.67.0"
     },
     "scripts": {
         "start": "set PORT=4173 && craco start",

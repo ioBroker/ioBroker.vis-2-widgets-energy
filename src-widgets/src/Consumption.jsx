@@ -84,7 +84,7 @@ class Consumption extends Generic {
                         name: 'aggregate',
                         label: 'aggregate',
                         type: 'select',
-                        noTranslate: true,
+                        noTranslation: true,
                         options: ['minmax', 'max', 'min', 'average', 'total', 'count', 'percentile', 'quantile', 'integral', 'none'],
                         default: 'total',
                     },
@@ -271,7 +271,7 @@ class Consumption extends Generic {
     }
 
     registerTimeSelector() {
-        if (!this.timeSelectorRegistered && this.state.rxData.timeWidget && this.props.views[this.props.view].widgets[this.state.rxData.timeWidget]) {
+        if (!this.timeSelectorRegistered && this.state.rxData.timeWidget && this.props.context.views[this.props.view].widgets[this.state.rxData.timeWidget]) {
             this.timeSelectorRegisterInterval = this.timeSelectorRegisterInterval || setInterval(() => {
                 if (!this.timeSelectorRegistered && this.state.rxData.timeWidget) {
                     const el = this.getTimeWidget();
@@ -302,7 +302,7 @@ class Consumption extends Generic {
             super.componentDidUpdate(prevProps, prevState, snapshot);
         }
 
-        if (this.state.rxData.timeWidget && this.props.views[this.props.view].widgets[this.state.rxData.timeWidget]) {
+        if (this.state.rxData.timeWidget && this.props.context.views[this.props.view].widgets[this.state.rxData.timeWidget]) {
             if (this.timeSelectorRegistered && this.state.rxData.timeWidget !== this.timeSelectorRegistered) {
                 this.getTimeWidget(this.timeSelectorRegistered)?._removeEventHandler(this.onTimeFromWidgetChanged);
                 this.timeSelectorRegistered = null;
