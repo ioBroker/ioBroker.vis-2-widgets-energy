@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "news": {
+      "0.3.3": {
+        "en": "Corrected the default history",
+        "de": "Korrektur der Standardhistorie",
+        "ru": "Исправлена история по умолчанию",
+        "pt": "Corrigido o histórico padrão",
+        "nl": "Vertaling:",
+        "fr": "Correction de l'historique par défaut",
+        "it": "Corretto la cronologia di default",
+        "es": "Corregido la historia predeterminada",
+        "pl": "Poprawiona domyślna historia",
+        "uk": "Виправлено історію за замовчуванням",
+        "zh-cn": "纠正违约历史"
+      },
       "0.3.2": {
         "en": "Error corrected in Consumption-Widget",
         "de": "Fehler behoben in Verbrauchs-Widget",
@@ -80,19 +93,6 @@
         "pl": "Naprawdę skorygowano widget",
         "uk": "Виправлено віджет споживання",
         "zh-cn": "纠正消费被动植物"
-      },
-      "0.1.11": {
-        "en": "translation was corrected",
-        "de": "übersetzung wurde korrigiert",
-        "ru": "перевод был исправлен",
-        "pt": "tradução foi corrigida",
-        "nl": "vertaling is gecorrigeerd",
-        "fr": "traduction corrigée",
-        "it": "traduzione corretta",
-        "es": "traducción corregida",
-        "pl": "tłumaczenie było poprawne",
-        "uk": "переклад було виправлено",
-        "zh-cn": "更正"
       }
     },
     "title": "Vis 2 Widgets Energy",
