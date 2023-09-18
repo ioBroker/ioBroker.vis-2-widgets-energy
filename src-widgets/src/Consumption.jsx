@@ -228,7 +228,7 @@ class Consumption extends Generic {
         ));
 
         const options = {
-            instance: this.props.systemConfig?.common?.defaultHistory || 'history.0',
+            instance: this.props.context.systemConfig?.common?.defaultHistory || 'history.0',
             start: interval.from.getTime(),
             end: interval.to.getTime(),
             count: types[this.getTimeInterval()].count,
@@ -500,7 +500,6 @@ class Consumption extends Generic {
 }
 
 Consumption.propTypes = {
-    systemConfig: PropTypes.object,
     socket: PropTypes.object,
     themeType: PropTypes.string,
     style: PropTypes.object,

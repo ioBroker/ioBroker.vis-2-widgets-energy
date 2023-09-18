@@ -64,7 +64,6 @@ class App extends WidgetDemoApp {
                     width: 600,
                     height: 650,
                 }}
-                systemConfig={this.state.systemConfig}
                 data={{
                     name: 'Distribution',
                     'powerLine-oid': 'javascript.0.random1',
@@ -93,7 +92,6 @@ class App extends WidgetDemoApp {
                     width: 600,
                     height: 650,
                 }}
-                systemConfig={this.state.systemConfig}
                 data={{
                     name: 'ConsumptionComparison',
                     devicesCount: 2,
@@ -112,7 +110,7 @@ class App extends WidgetDemoApp {
                     width: 600,
                     height: 650,
                 }}
-                systemConfig={this.state.systemConfig}
+                context={{ systemConfig: this.state.systemConfig }}
                 data={{
                     name: 'Consumption',
                     devicesCount: 2,
@@ -138,7 +136,6 @@ class App extends WidgetDemoApp {
                     width: 600,
                     height: 650,
                 }}
-                systemConfig={this.state.systemConfig}
                 data={{
                     name: 'IntervalSelector',
                     oid: 'javascript.0.temperatureActual',

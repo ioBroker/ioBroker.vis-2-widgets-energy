@@ -441,7 +441,6 @@ class ConsumptionComparison extends Generic {
 }
 
 ConsumptionComparison.propTypes = {
-    systemConfig: PropTypes.object,
     socket: PropTypes.object,
     themeType: PropTypes.string,
     style: PropTypes.object,

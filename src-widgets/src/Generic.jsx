@@ -28,7 +28,6 @@ class Generic extends (window.visRxWidget || VisRxWidget) {
 }
 
 Generic.propTypes = {
-    systemConfig: PropTypes.object,
     socket: PropTypes.object,
     themeType: PropTypes.string,
     style: PropTypes.object,
