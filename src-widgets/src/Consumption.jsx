@@ -312,10 +312,10 @@ class Consumption extends Generic {
             this.registerTimeSelector();
         }
 
-        if (this.props.timeStart !== prevProps.timeStart) {
+        if (this.props.context.timeStart !== prevProps.context.timeStart) {
             this.propertiesUpdate();
         }
-        if (this.props.timeInterval !== prevProps.timeInterval) {
+        if (this.props.context.timeInterval !== prevProps.context.timeInterval) {
             this.propertiesUpdate();
         }
         if (!this.getTimeStart() && !this.updateInterval) {
@@ -446,7 +446,7 @@ class Consumption extends Generic {
         } else if (this.state.rxData['start-oid']) {
             result = this.state.values[`${this.state.rxData['start-oid']}.val`];
         } else {
-            result = this.props.timeStart;
+            result = this.props.context.timeStart;
         }
         if (!result) {
             result = 0;
@@ -461,7 +461,7 @@ class Consumption extends Generic {
         } else if (this.state.rxData['start-oid'] && this.state.rxData['interval-oid']) {
             result = this.state.values[`${this.state.rxData['interval-oid']}.val`];
         } else {
-            result = this.props.timeInterval;
+            result = this.props.context.timeInterval;
         }
         if (!result) {
             result = 'day';

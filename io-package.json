@@ -3,19 +3,6 @@
     "name": "vis-2-widgets-energy",
     "version": "0.3.4",
     "news": {
-      "0.3.4": {
-        "en": "Corrected the default history",
-        "de": "Korrektur der Standardhistorie",
-        "ru": "Исправлена история по умолчанию",
-        "pt": "Corrigido o histórico padrão",
-        "nl": "Vertaling:",
-        "fr": "Correction de l'historique par défaut",
-        "it": "Corretto la cronologia di default",
-        "es": "Corregido la historia predeterminada",
-        "pl": "Poprawiona domyślna historia",
-        "uk": "Виправлено історію за замовчуванням",
-        "zh-cn": "纠正违约历史"
-      },
       "0.3.2": {
         "en": "Error corrected in Consumption-Widget",
         "de": "Fehler behoben in Verbrauchs-Widget",
