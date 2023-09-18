@@ -110,7 +110,13 @@ class App extends WidgetDemoApp {
                     width: 600,
                     height: 650,
                 }}
-                context={{ systemConfig: this.state.systemConfig }}
+                context={{
+                    systemConfig: this.state.systemConfig,
+                    timeStart: this.state.timeStart,
+                    setTimeStart: this.setTimeStart,
+                    timeInterval: this.state.timeInterval,
+                    setTimeInterval: this.setTimeInterval,
+                }}
                 data={{
                     name: 'Consumption',
                     devicesCount: 2,
@@ -124,10 +130,6 @@ class App extends WidgetDemoApp {
                     name2: 'memory',
                     color2: 'rgba(201,83,80,1)',
                 }}
-                timeInterval={this.state.timeInterval}
-                setTimeInterval={this.setTimeInterval}
-                timeStart={this.state.timeStart}
-                setTimeStart={this.setTimeStart}
             />
             <IntervalSelector
                 socket={this.socket}

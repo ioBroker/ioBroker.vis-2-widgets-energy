@@ -117,14 +117,14 @@ class IntervalSelector extends Generic {
     getTimeStart() {
         return this.state.rxData['timeStart-oid'] ?
             this.state.values[`${this.state.rxData['timeStart-oid']}.val`] :
-            this.props.timeStart;
+            this.props.context.timeStart;
     }
 
     setTimeStart = timeStart => {
         if (this.state.rxData['timeStart-oid']) {
             this.props.context.socket.setState(this.state.rxData['timeStart-oid'], timeStart);
         } else {
-            this.props.setTimeStart(timeStart);
+            this.props.context.setTimeStart(timeStart);
         }
 
         this.eventHandlers.forEach(cb => {
@@ -139,14 +139,14 @@ class IntervalSelector extends Generic {
     getTimeInterval() {
         return this.state.rxData['timeInterval-oid'] ?
             this.state.values[`${this.state.rxData['timeInterval-oid']}.val`] :
-            this.props.timeInterval;
+            this.props.context.timeInterval;
     }
 
     setTimeInterval = timeInterval => {
         if (this.state.rxData['timeInterval-oid']) {
             this.props.context.socket.setState(this.state.rxData['timeInterval-oid'], timeInterval);
         } else {
-            this.props.setTimeInterval(timeInterval);
+            this.props.context.setTimeInterval(timeInterval);
         }
 
         this.eventHandlers.forEach(cb => {
