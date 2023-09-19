@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "news": {
+      "0.3.6": {
+        "en": "Added support of counters for consumption",
+        "de": "Unterstützung von Zählern für den Verbrauch",
+        "ru": "Добавлена поддержка счетчиков для потребления",
+        "pt": "Adicionado suporte de contadores para consumo",
+        "nl": "Vermeld ondersteuning voor consumptie",
+        "fr": "Appui accru aux comptoirs pour la consommation",
+        "it": "Aggiunto supporto di contatori per il consumo",
+        "es": "Apoyo adicional de contadores para consumo",
+        "pl": "Wsparcie dla przeciwników konsumpcji",
+        "uk": "Додано підтримку лічильників для споживання",
+        "zh-cn": "增加消费反补贴"
+      },
       "0.3.5": {
         "en": "Corrected the default history",
         "de": "Korrektur der Standardhistorie",
@@ -80,19 +93,6 @@
         "pl": "Dodrukowane ustawienia dla jednostek, krążących, odwracających się kierunków",
         "uk": "Додано налаштування для юнітів, округлення, зворотний напрямок, мультиплікатор",
         "zh-cn": "增加各单位的环境,圆桌会议,以避免方向,乘数"
-      },
-      "0.1.12": {
-        "en": "Corrected the consumption widget",
-        "de": "Das Verbrauchs-Widget korrigiert",
-        "ru": "Исправлен виджет потребления",
-        "pt": "Corrigido o widget de consumo",
-        "nl": "Vertaling:",
-        "fr": "Correction du widget de consommation",
-        "it": "Corretto il widget di consumo",
-        "es": "Corregido el widget de consumo",
-        "pl": "Naprawdę skorygowano widget",
-        "uk": "Виправлено віджет споживання",
-        "zh-cn": "纠正消费被动植物"
       }
     },
     "title": "Vis 2 Widgets Energy",
