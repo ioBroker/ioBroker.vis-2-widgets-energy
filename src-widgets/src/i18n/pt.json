@@ -106,5 +106,8 @@
   "legend_height": "Altura da legenda",
   "precision": "Precisão da etiqueta",
   "bar": "Gráfico de barras",
-  "pie": "gráfico de pizza"
+  "pie": "gráfico de pizza",
+  "difference": "Calcular diferença",
+  "difference_tooltip": "A diferença entre dois valores será usada. Útil para contadores.",
+  "Value": "Valor"
 }

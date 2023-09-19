@@ -106,5 +106,8 @@
   "legend_height": "Hauteur de la légende",
   "precision": "Précision de l'étiquette",
   "bar": "Diagramme à bandes",
-  "pie": "Diagramme circulaire"
+  "pie": "Diagramme circulaire",
+  "difference": "Calculer la différence",
+  "difference_tooltip": "La différence entre deux valeurs sera utilisée. Utile pour les compteurs.",
+  "Value": "Valeur"
 }

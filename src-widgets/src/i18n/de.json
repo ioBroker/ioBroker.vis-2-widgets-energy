@@ -106,5 +106,8 @@
   "legend_height": "Höhe der Legende",
   "precision": "Etikettenpräzision",
   "bar": "Balkendiagramm",
-  "pie": "Kuchendiagramm"
+  "pie": "Kuchendiagramm",
+  "difference": "Differenz berechnen",
+  "difference_tooltip": "Es wird die Differenz zwischen zwei Werten verwendet. Nützlich für Zähler.",
+  "Value": "Wert"
 }

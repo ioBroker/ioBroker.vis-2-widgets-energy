@@ -106,5 +106,8 @@
   "legend_height": "Wysokość legendy",
   "precision": "Precyzja etykiety",
   "bar": "Wykres słupkowy",
-  "pie": "Wykres kołowy"
+  "pie": "Wykres kołowy",
+  "difference": "Oblicz różnicę",
+  "difference_tooltip": "Zostanie użyta różnica między dwiema wartościami. Przydatne do liczników.",
+  "Value": "Wartość"
 }

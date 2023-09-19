@@ -106,5 +106,8 @@
   "legend_height": "Legend height",
   "precision": "Label precision",
   "bar": "Bar chart",
-  "pie": "Pie chart"
+  "pie": "Pie chart",
+  "difference": "Calculate difference",
+  "difference_tooltip": "The difference between two values will be used. Usefull for counters.",
+  "Value": "Value"
 }

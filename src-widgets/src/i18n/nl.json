@@ -106,5 +106,8 @@
   "legend_height": "Legenda hoogte",
   "precision": "Labelprecisie",
   "bar": "Staafdiagram",
-  "pie": "Cirkeldiagram"
+  "pie": "Cirkeldiagram",
+  "difference": "Bereken het verschil",
+  "difference_tooltip": "Het verschil tussen twee waarden wordt gebruikt. Handig voor tellers.",
+  "Value": "Waarde"
 }

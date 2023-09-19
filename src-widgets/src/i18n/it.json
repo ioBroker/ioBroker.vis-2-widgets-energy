@@ -106,5 +106,8 @@
   "legend_height": "Altezza legenda",
   "precision": "Precisione dell'etichetta",
   "bar": "Grafico a barre",
-  "pie": "Grafico a torta"
+  "pie": "Grafico a torta",
+  "difference": "Calcola la differenza",
+  "difference_tooltip": "Verrà utilizzata la differenza tra due valori. Utile per i contatori.",
+  "Value": "Valore"
 }

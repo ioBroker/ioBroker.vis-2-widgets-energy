@@ -86,7 +86,14 @@ class Consumption extends Generic {
                         type: 'select',
                         noTranslation: true,
                         options: ['minmax', 'max', 'min', 'average', 'total', 'count', 'percentile', 'quantile', 'integral', 'none'],
-                        default: 'total',
+                        default: 'max',
+                    },
+                    {
+                        name: 'difference',
+                        label: 'difference',
+                        type: 'checkbox',
+                        tooltip: 'difference_tooltip',
+                        hidden: data => data.aggregate !== 'max' && data.aggregate !== 'min' && data.aggregate !== 'average' && data.aggregate !== 'none' && data.aggregate !== 'integral',
                     },
                     {
                         name: 'percentile',
@@ -121,7 +128,7 @@ class Consumption extends Generic {
             },
             {
                 name: 'devices',
-                label: 'level',
+                label: 'Value',
                 indexFrom: 1,
                 indexTo: 'devicesCount',
                 fields: [
@@ -199,7 +206,7 @@ class Consumption extends Generic {
         return this.props.context.socket.getHistory(id, options);
     }
 
-    propertiesUpdate() {
+    _readCharts() {
         const interval = getFromToTime(this.getTimeStart(), this.getTimeInterval());
 
         const types = {
@@ -220,18 +227,34 @@ class Consumption extends Generic {
                 format: 'HH',
             },
         };
+        const intervalType = this.getTimeInterval();
+        const intervalCount = types[intervalType].count;
+        const times = new Array(intervalCount)
+            .fill(0)
+            .map((_, i) => new Date(
+                interval.from.getTime() +
+                ((interval.to.getTime() - interval.from.getTime()) / intervalCount) * i
+                + 1,
+            ));
 
-        const times = new Array(types[this.getTimeInterval()].count).fill(0).map((_, i) => new Date(
-            interval.from.getTime() +
-            ((interval.to.getTime() - interval.from.getTime()) / types[this.getTimeInterval()].count) * i
-            + 1,
-        ));
+        if (this.state.rxData.difference) {
+            // add one more step at the beginning
+            if (intervalType === 'year') {
+                interval.from = new Date(interval.from.getFullYear(), interval.from.getMonth() - 1, 1);
+            } else if (intervalType === 'month') {
+                interval.from = new Date(interval.from.getFullYear(), interval.from.getMonth(), interval.from.getDate() - 1);
+            } else if (intervalType === 'week') {
+                interval.from = new Date(interval.from.getFullYear(), interval.from.getMonth(), interval.from.getDate() - 1);
+            } else if (intervalType === 'day') {
+                interval.from = new Date(interval.from.getFullYear(), interval.from.getMonth(), interval.from.getDate(), interval.from.getHours() - 1);
+            }
+        }
 
         const options = {
             instance: this.props.context.systemConfig?.common?.defaultHistory || 'history.0',
             start: interval.from.getTime(),
             end: interval.to.getTime(),
-            count: types[this.getTimeInterval()].count,
+            count: this.state.rxData.difference ? intervalCount + 1 : intervalCount,
             from: false,
             ack: false,
             q: false,
@@ -256,18 +279,50 @@ class Consumption extends Generic {
                             .sort((a, b) => (a.ts > b.ts ? 1 : -1))
                             .filter(item => item && item.val !== undefined && item.val !== null);
 
-                        history.forEach(item => item.tsF = moment(item.ts).format(format));
-
-                        newState[`history${i}`] = times.map(time => {
-                            const timeStr = moment(time).format(format);
-                            const foundHistory = history.find(item => item.tsF === timeStr);
-                            return foundHistory || { ts: time.getTime(), val: 0 };
+                        history.forEach(item => {
+                            item.tsF = moment(item.ts).format(format);
+                            item.tsS = moment(item.ts).format('YYYY-MM-DD HH:mm:ss'); // debug
                         });
+
+                        if (this.state.rxData.difference) {
+                            let lastValue = history.findLast(item => item.ts < times[0].getTime()) || null;
+                            const data = [];
+                            newState[`history${i}`] = data;
+                            for (let t = 0; t < times.length - 1; t++) {
+                                const actual = times[t].getTime();
+                                const next = times[t + 1].getTime();
+                                const foundHistory = history.find(item => item.ts >= actual && item.ts < next);
+                                if (foundHistory) {
+                                    if (lastValue !== null) {
+                                        data.push({ ts: times[t].getTime(), val: foundHistory.val - lastValue.val });
+                                    } else {
+                                        data.push({ ts: times[t].getTime(), val: 0 });
+                                    }
+                                    lastValue = foundHistory;
+                                } else {
+                                    data.push({ ts: times[t].getTime(), val: 0 });
+                                }
+                            }
+                        } else {
+                            newState[`history${i}`] = times.map(time => {
+                                const timeStr = moment(time).format(format);
+                                const foundHistory = history.findLast(item => item.tsF === timeStr);
+                                return foundHistory || { ts: time.getTime(), val: 0 };
+                            });
+                        }
                     }
                 }
                 this.setState(newState);
             }
         });
+    }
+
+    readCharts() {
+        this.readTimer && clearTimeout(this.readTimer);
+        this.readTimer = setTimeout(() => {
+            this.readTimer = null;
+            this._readCharts();
+        }, 200);
     }
 
     registerTimeSelector() {
@@ -291,12 +346,6 @@ class Consumption extends Generic {
         }
     }
 
-    getSubscribeState = (id, cb) => this.props.context.socket.getState(id)
-        .then(result => {
-            cb(id, result);
-            return this.props.context.socket.subscribeState(id, (resultId, _result) => cb(id, _result));
-        });
-
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (super.componentDidUpdate) {
             super.componentDidUpdate(prevProps, prevState, snapshot);
@@ -313,13 +362,12 @@ class Consumption extends Generic {
         }
 
         if (this.props.context.timeStart !== prevProps.context.timeStart) {
-            this.propertiesUpdate();
-        }
-        if (this.props.context.timeInterval !== prevProps.context.timeInterval) {
-            this.propertiesUpdate();
+            this.readCharts();
+        } else if (this.props.context.timeInterval !== prevProps.context.timeInterval) {
+            this.readCharts();
         }
         if (!this.getTimeStart() && !this.updateInterval) {
-            this.updateInterval = setInterval(() => this.propertiesUpdate(), 1000 * 60 * 10);
+            this.updateInterval = setInterval(() => this.readCharts(), 1000 * 60 * 10);
         }
         if (this.getTimeStart() && this.updateInterval) {
             clearInterval(this.updateInterval);
@@ -330,6 +378,9 @@ class Consumption extends Generic {
     componentWillUnmount() {
         this.timeSelectorRegisterInterval && clearInterval(this.timeSelectorRegisterInterval);
         this.timeSelectorRegisterInterval = null;
+
+        this.readTimer && clearTimeout(this.readTimer);
+        this.readTimer = null;
 
         this.updateInterval && clearInterval(this.updateInterval);
         this.updateInterval = null;
@@ -363,13 +414,22 @@ class Consumption extends Generic {
             if (this.timeStart !== value.start || this.timeInterval !== value.interval) {
                 this.timeStart = value.start;
                 this.timeInterval = value.interval;
-                setTimeout(() => this.propertiesUpdate(), 0);
+                setTimeout(() => this.readCharts(), 0);
             }
         }
     };
 
     onStateUpdated() {
-        this.propertiesUpdate();
+        const interval = getFromToTime(this.getTimeStart(), this.getTimeInterval());
+        // read only if interval is not in the past
+        if (interval.to >= Date.now() && (!this.lastUpdate || Date.now() - this.lastUpdate > 60_000)) {
+            this.lastUpdate = Date.now();
+            this.readCharts();
+        }
+    }
+
+    onRxDataChanged() {
+        this.readCharts();
     }
 
     // eslint-disable-next-line class-methods-use-this
@@ -399,10 +459,19 @@ class Consumption extends Generic {
             day: 'HH:00',
         };
 
+        const textStyle = {
+            color: this.props.context.themeType === 'dark' ? '#ddd' : '#222',
+        };
+
         return {
             backgroundColor: 'transparent',
             tooltip: {},
-            legend: { data: data.map(item => item.name) },
+            legend: {
+                data: data.map(item => ({
+                    name: item.name,
+                    textStyle,
+                })),
+            },
             toolbox: {
                 feature: {
                     magicType: {
