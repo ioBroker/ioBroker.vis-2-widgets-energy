@@ -91,7 +91,7 @@ class Distribution extends Generic {
                         },
                         {
                             name: 'nodesCount',
-                            type: 'number',
+                            type: 'slider',
                             min: 0,
                             max: 10,
                             label: 'nodes_count',
@@ -639,6 +639,8 @@ class Distribution extends Generic {
         const defaultDistanceSize = this.state.rxData.defaultDistanceSize || 18;
         const defaultFontSize = this.state.rxData.defaultFontSize || 12;
 
+        size -= defaultFontSize * 2; // let place for upper and bottom labels
+
         const homeRadius = (size * (this.state.rxData.homeCircleSize || defaultRadiusSize)) / 100;
         const homeFontSize = defaultFontSize || this.state.rxData.homeFontSize;
         let homeIcon = this.state.rxData.homeStandardIcon || this.state.rxData.homeIcon || this.state.objects.home?.common?.icon;
@@ -714,8 +716,9 @@ class Distribution extends Generic {
         const homeValueAndUnit = this.getValue(this.state.rxData['home-oid'], this.state.objects.home);
         let xOffset = 0;
         // calculate max and min position of circles to place it in the center
-        let max = size / 2;
-        let min = size / 2;
+        const halfSize = size / 2;
+        let max = halfSize;
+        let min = halfSize;
         const allCoordinates = [];
         if (!this.props.editMode) {
             circles = circles.filter(circle => !circle.hide);
@@ -725,11 +728,15 @@ class Distribution extends Generic {
             const angle = 180 + (i * 360) / circles.length;
             const _coordinates = polarToCartesian(0, 0, circles[i].distance + circles[i].radius + homeRadius, angle);
             const position = {
-                top:       size / 2 + _coordinates.y - circles[i].radius,
-                left:      size / 2 + _coordinates.x - circles[i].radius,
-                topLabel:  size / 2 + _coordinates.y + circles[i].radius + 2,
-                leftLabel: size / 2 + _coordinates.x - circles[i].radius,
+                top:       halfSize + _coordinates.y - circles[i].radius,
+                left:      halfSize + _coordinates.x - circles[i].radius,
+                leftLabel: halfSize + _coordinates.x - circles[i].radius,
             };
+            if (angle - 180 > 180) {
+                position.topLabel =  halfSize + _coordinates.y + circles[i].radius + 2;
+            } else {
+                position.topLabel =  halfSize + _coordinates.y - circles[i].radius - 6 - circles[i].fontSize;
+            }
             allCoordinates.push(position);
             if (max < position.left + circles[i].radius * 2) {
                 max = position.left + circles[i].radius * 2;
@@ -739,11 +746,11 @@ class Distribution extends Generic {
             }
         }
         // compare with home
-        if (max < (size / 2 + homeRadius)) {
-            max = size / 2 + homeRadius;
+        if (max < (halfSize + homeRadius)) {
+            max = halfSize + homeRadius;
         }
-        if (min > (size / 2 - homeRadius)) {
-            min = size / 2 - homeRadius;
+        if (min > (halfSize - homeRadius)) {
+            min = halfSize - homeRadius;
         }
         // if (Math.abs(size - max - min) > 5) {
         xOffset = (size - max - min) / 2;
@@ -792,6 +799,7 @@ class Distribution extends Generic {
                                 width: circle.radius * 2,
                                 fontSize: circle.fontSize,
                                 opacity:  circle.hide ? 0.3 : 1,
+                                whiteSpace: 'nowrap',
                             }}
                         >
                             <div>{circle.name || circle.oid}</div>
@@ -802,8 +810,8 @@ class Distribution extends Generic {
                 <div
                     className={this.props.classes.circleContent}
                     style={{
-                        top: size / 2 - homeRadius,
-                        left: xOffset + size / 2 - homeRadius,
+                        top: halfSize - homeRadius,
+                        left: xOffset + halfSize - homeRadius,
                         width: homeRadius * 2,
                         height: homeRadius * 2,
                         fontSize: homeFontSize,
@@ -820,8 +828,8 @@ class Distribution extends Generic {
                 <div
                     className={this.props.classes.circleContent}
                     style={{
-                        top: size / 2 + homeRadius,
-                        left: xOffset + size / 2 - homeRadius,
+                        top: halfSize + homeRadius,
+                        left: xOffset + halfSize - homeRadius,
                         width: homeRadius * 2,
                         fontSize: homeFontSize,
                     }}
@@ -844,7 +852,7 @@ class Distribution extends Generic {
                                 strokeDasharray: Math.PI * (homeRadius * 2),
                                 transition: 'stroke-dashoffset 0.5s linear',
                             }}
-                            transform={`translate(${xOffset}, 0), rotate(${Math.round((currentPart / valuesSum) * 360 + 135)},${size / 2},${size / 2})`}
+                            transform={`translate(${xOffset}, 0), rotate(${Math.round((currentPart / valuesSum) * 360 + 135)},${halfSize},${halfSize})`}
                             strokeWidth="3"
                         />;
                         currentPart += Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) : 0;
@@ -884,10 +892,10 @@ class Distribution extends Generic {
                                 transform={`translate(${xOffset + coordinates.x}, ${coordinates.y})`}
                             />
                             <line
-                                x1={xOffset + size / 2 + coordinatesFrom.x}
-                                y1={size / 2 + coordinatesFrom.y}
-                                x2={xOffset + size / 2 + coordinatesTo.x}
-                                y2={size / 2 + coordinatesTo.y}
+                                x1={xOffset + halfSize + coordinatesFrom.x}
+                                y1={halfSize + coordinatesFrom.y}
+                                x2={xOffset + halfSize + coordinatesTo.x}
+                                y2={halfSize + coordinatesTo.y}
                                 stroke={color}
                                 opacity={circle.hide ? 0.3 : 1}
                             />
