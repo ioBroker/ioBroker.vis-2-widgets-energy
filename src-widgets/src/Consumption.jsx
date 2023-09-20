@@ -207,7 +207,8 @@ class Consumption extends Generic {
     }
 
     _readCharts() {
-        const interval = getFromToTime(this.getTimeStart(), this.getTimeInterval());
+        const intervalType = this.getTimeInterval();
+        const interval = getFromToTime(this.getTimeStart(), intervalType);
 
         const types = {
             year: {
@@ -227,7 +228,6 @@ class Consumption extends Generic {
                 format: 'HH',
             },
         };
-        const intervalType = this.getTimeInterval();
         const intervalCount = types[intervalType].count;
         const times = new Array(intervalCount)
             .fill(0)
@@ -517,9 +517,9 @@ class Consumption extends Generic {
         } else {
             result = this.props.context.timeStart;
         }
-        if (!result) {
-            result = 0;
-        }
+
+        result = result || 0;
+
         return result;
     }
 
@@ -532,9 +532,8 @@ class Consumption extends Generic {
         } else {
             result = this.props.context.timeInterval;
         }
-        if (!result) {
-            result = 'day';
-        }
+        result = result || 'day';
+
         return result;
     }
 

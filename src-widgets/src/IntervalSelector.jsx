@@ -79,7 +79,7 @@ class IntervalSelector extends Generic {
             this.refTimeSelector.current._addEventHandler = cb => {
                 if (!this.eventHandlers.includes(cb)) {
                     this.eventHandlers.push(cb);
-                    setTimeout(() => cb('update', { start: this.getTimeStart(), interval: this.getTimeInterval() }), 0);
+                    this.informSubscribers();
                 }
             };
             this.refTimeSelector.current._removeEventHandler = cb => {
@@ -125,15 +125,8 @@ class IntervalSelector extends Generic {
             this.props.context.socket.setState(this.state.rxData['timeStart-oid'], timeStart);
         } else {
             this.props.context.setTimeStart(timeStart);
+            this.informSubscribers(timeStart);
         }
-
-        this.eventHandlers.forEach(cb => {
-            try {
-                cb('update', { start: timeStart, interval: this.getTimeInterval() });
-            } catch (e) {
-                console.warn(e);
-            }
-        });
     };
 
     getTimeInterval() {
@@ -142,20 +135,44 @@ class IntervalSelector extends Generic {
             this.props.context.timeInterval;
     }
 
+    informSubscribers(start, interval) {
+        this.timerInform && clearTimeout(this.timerInform);
+        this.timerInform = setTimeout(() => {
+            const event = {
+                interval: interval === null || interval === undefined ? this.getTimeInterval() : interval,
+                start: start === null || start === undefined ? this.getTimeStart() : start,
+            };
+            const eventStr = JSON.stringify(event);
+
+            if (eventStr !== this.lastEvent) {
+                this.lastEvent = eventStr;
+
+                this.eventHandlers.forEach(cb => {
+                    try {
+                        cb('update', event);
+                    } catch (e) {
+                        console.warn(e);
+                    }
+                });
+            }
+        }, 100);
+    }
+
+    onStateUpdated(id, state) {
+        if (id === this.state.rxData['timeInterval-oid']) {
+            this.informSubscribers(null, state.val);
+        } else if (id === this.state.rxData['timeStart-oid']) {
+            this.informSubscribers(state.val);
+        }
+    }
+
     setTimeInterval = timeInterval => {
         if (this.state.rxData['timeInterval-oid']) {
             this.props.context.socket.setState(this.state.rxData['timeInterval-oid'], timeInterval);
         } else {
             this.props.context.setTimeInterval(timeInterval);
+            this.informSubscribers(null, timeInterval);
         }
-
-        this.eventHandlers.forEach(cb => {
-            try {
-                cb('update', { interval: timeInterval, start: this.getTimeStart() });
-            } catch (e) {
-                console.warn(e);
-            }
-        });
     };
 
     renderWidgetBody(props) {
