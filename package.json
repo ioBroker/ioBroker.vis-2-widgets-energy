@@ -1,6 +1,6 @@
 {
   "name": "iobroker.vis-2-widgets-energy",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "ioBroker vis2 energy widgets",
   "author": "bluefox <dogafox@gmail.com>",
   "contributors": [
