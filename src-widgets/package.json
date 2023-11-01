@@ -11,7 +11,7 @@
         "@mui/icons-material": "^5.14.11",
         "@mui/material": "^5.14.11",
         "@mui/styles": "^5.14.11",
-        "caniuse-lite": "^1.0.30001541",
+        "caniuse-lite": "^1.0.30001559",
         "craco-esbuild": "^0.5.2",
         "craco-module-federation": "^1.1.0",
         "date-fns": "^2.30.0",
