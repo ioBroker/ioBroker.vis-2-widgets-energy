@@ -1,7 +1,7 @@
 {
     "name": "iobroker.vis-2-widgets-energy",
     "private": true,
-    "version": "0.3.8",
+    "version": "0.3.9",
     "dependencies": {
         "@craco/craco": "^7.1.0",
         "@emotion/react": "^11.11.1",

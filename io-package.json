@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.3.8",
+    "version": "0.3.9",
     "news": {
+      "0.3.9": {
+        "en": "update packages",
+        "de": "update-pakete",
+        "ru": "обновление пакетов",
+        "pt": "pacotes de atualização",
+        "nl": "vertaling:",
+        "fr": "mettre à jour les paquets",
+        "it": "pacchetti di aggiornamento",
+        "es": "actualizar paquetes",
+        "pl": "pakiet aktualizacji",
+        "uk": "оновлення пакетів",
+        "zh-cn": "更新包"
+      },
       "0.3.8": {
         "en": "Added support of counters for consumption",
         "de": "Unterstützung von Zählern für den Verbrauch",
@@ -80,19 +93,6 @@
         "pl": "Poprawny układ dany",
         "uk": "Виправлена схема вибору дати",
         "zh-cn": "修改日期的选择"
-      },
-      "0.2.1": {
-        "en": "Added settings for units, rounding, invert direction, multiplier",
-        "de": "Hinzugefügt Einstellungen für Einheiten, Rundung, Invert-Richtung, Multiplikator",
-        "ru": "Добавлены настройки для блоков, округления, направления инверта, мультипликатора",
-        "pt": "Configurações adicionadas para unidades, arredondamento, direção invert, multiplicador",
-        "nl": "Vermelding voor eenheden, ronde, omgekeerde richting, multiplier",
-        "fr": "Paramètres ajoutés pour les unités, arrondissement, direction inverse, multiplicateur",
-        "it": "Impostazioni aggiuntive per unità, arrotondamento, direzione invert, moltiplicatore",
-        "es": "Ajustes adicionales para unidades, redondeo, dirección invertida, multiplicador",
-        "pl": "Dodrukowane ustawienia dla jednostek, krążących, odwracających się kierunków",
-        "uk": "Додано налаштування для юнітів, округлення, зворотний напрямок, мультиплікатор",
-        "zh-cn": "增加各单位的环境,圆桌会议,以避免方向,乘数"
       }
     },
     "title": "Vis 2 Widgets Energy",
