@@ -25,6 +25,9 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) update packages
+
 ### 0.3.8 (2023-09-20)
 * (bluefox) Added support of counters for consumption
 

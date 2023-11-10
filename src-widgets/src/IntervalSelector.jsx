@@ -122,7 +122,7 @@ class IntervalSelector extends Generic {
 
     setTimeStart = timeStart => {
         if (this.state.rxData['timeStart-oid']) {
-            this.props.context.socket.setState(this.state.rxData['timeStart-oid'], timeStart);
+            this.props.context.setValue(this.state.rxData['timeStart-oid'], timeStart);
         } else {
             this.props.context.setTimeStart(timeStart);
             this.informSubscribers(timeStart);
@@ -168,7 +168,7 @@ class IntervalSelector extends Generic {
 
     setTimeInterval = timeInterval => {
         if (this.state.rxData['timeInterval-oid']) {
-            this.props.context.socket.setState(this.state.rxData['timeInterval-oid'], timeInterval);
+            this.props.context.setValue(this.state.rxData['timeInterval-oid'], timeInterval);
         } else {
             this.props.context.setTimeInterval(timeInterval);
             this.informSubscribers(null, timeInterval);
