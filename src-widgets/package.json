@@ -9,7 +9,7 @@
         "@iobroker/adapter-react-v5": "^4.7.6",
         "@iobroker/vis-2-widgets-react-dev": "^1.0.1",
         "@mui/icons-material": "^5.14.19",
-        "@mui/material": "5.14.14",
+        "@mui/material": "5.15.2",
         "@mui/styles": "5.14.19",
         "caniuse-lite": "^1.0.30001565",
         "craco-esbuild": "^0.5.2",
