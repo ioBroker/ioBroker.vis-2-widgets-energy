@@ -115,7 +115,8 @@
     "enabled": true,
     "readme": "https://github.com/ioBroker/ioBroker.vis-2-widgets-energy/blob/master/README.md",
     "loglevel": "info",
-    "mode": "once",
+    "mode": "none",
+    "noConfig": true,
     "adminUI": {
       "config": "none"
     },
@@ -140,7 +141,8 @@
     },
     "restartAdapters": [
       "vis-2"
-    ]
+    ],
+    "tier": 3
   },
   "native": {},
   "objects": [],
