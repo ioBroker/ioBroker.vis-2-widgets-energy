@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.3.9",
+    "version": "0.3.10",
     "news": {
+      "0.3.10": {
+        "en": "show value with green color if we feed back into power line",
+        "de": "zeigenswert mit grüner farbe, wenn wir zurück in die stromleitung",
+        "ru": "показать ценность с зеленым цветом, если мы покоримся обратно в силовую линию",
+        "pt": "mostrar valor com cor verde se nós nos alimentamos de volta na linha de energia",
+        "nl": "toon waarde met groene kleur als we terugvoeren naar stroomlijn",
+        "fr": "afficher la valeur avec la couleur verte si nous retournons dans la ligne d'alimentation",
+        "it": "mostrare il valore con il colore verde se ci risaltiamo alla linea di alimentazione",
+        "es": "mostrar valor con color verde si nos alimentamos de nuevo en la línea de energía",
+        "pl": "pokaż wartość z zielonym kolorem jeśli podamy z powrotem do linii zasilania",
+        "uk": "показати значення з зеленим кольором, якщо ми подаємо в лінію живлення",
+        "zh-cn": "如果我们反馈回电线, 显示绿色值"
+      },
       "0.3.9": {
         "en": "update packages",
         "de": "update-pakete",
@@ -80,19 +93,6 @@
         "pl": "Pieśń o porównanie",
         "uk": "Додано діаграму пирога для порівняння",
         "zh-cn": "比较图表"
-      },
-      "0.2.3": {
-        "en": "Corrected layout of date selector",
-        "de": "Korrigiertes Layout der Datumsauswahl",
-        "ru": "Исправлена планировка выбора даты",
-        "pt": "Layout corrigido do seletor de data",
-        "nl": "Vertaling:",
-        "fr": "Mise en page corrigée du sélecteur de date",
-        "it": "Layout corretto del selettore della data",
-        "es": "Diseño corregido del selector de fecha",
-        "pl": "Poprawny układ dany",
-        "uk": "Виправлена схема вибору дати",
-        "zh-cn": "修改日期的选择"
       }
     },
     "title": "Vis 2 Widgets Energy",
