@@ -654,9 +654,10 @@ class Distribution extends Generic {
         // prepare power line as first circle
         const valueAndUnit = this.getValue(this.state.rxData['powerLine-oid'], this.state.objects.powerLine);
 
+        // add power line
         let circles = [{
             name: this.state.rxData.powerLineName,
-            color: this.state.rxData.powerLineColor,
+            color: valueAndUnit.iValue < 0 ? (this.props.context.themeType === 'dark' ? '#43d243' : '#266e26') : this.state.rxData.powerLineColor,
             radius: (size * (this.state.rxData.powerLineCircleSize || defaultRadiusSize)) / 100,
             distance: (size * (this.state.rxData.powerLineDistanceSize || defaultDistanceSize)) / 100,
             fontSize: defaultFontSize || this.state.rxData.powerLineFontSize,
@@ -665,7 +666,7 @@ class Distribution extends Generic {
             value: valueAndUnit.value,
             iValue: valueAndUnit.iValue,
             icon: this.state.rxData.powerLineStandardIcon || this.state.rxData.powerLineIcon || this.state.objects.powerLine?.common?.icon,
-            arrow: '→', // '↦',
+            arrow: valueAndUnit.iValue >= 0 ? '→' : '←', // '↦',
             secondaryValue: this.getValue(this.state.rxData['powerLineReturn-oid'], this.state.objects.powerLine),
             secondaryArrow: '←',
             iconSize: parseFloat(this.state.rxData.powerIconSize) || 33.3,

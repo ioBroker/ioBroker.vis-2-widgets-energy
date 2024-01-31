@@ -21,15 +21,15 @@
     "@alcalzone/release-script": "^3.7.0",
     "@alcalzone/release-script-plugin-iobroker": "^3.7.0",
     "@alcalzone/release-script-plugin-license": "^3.7.0",
-    "@iobroker/vis-2-widgets-react-dev": "^1.0.1",
+    "@iobroker/vis-2-widgets-react-dev": "^1.0.5",
     "@types/gulp": "^4.0.17",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.10.1",
-    "eslint": "^8.54.0",
+    "@types/node": "^20.11.13",
+    "eslint": "^8.56.0",
     "gulp": "^4.0.2",
     "mocha": "^10.2.0",
-    "typescript": "^5.3.2",
-    "@iobroker/vis-2-widgets-testing": "^0.3.0"
+    "typescript": "^5.3.3",
+    "@iobroker/vis-2-widgets-testing": "^1.0.0"
   },
   "files": [
     "admin/",
