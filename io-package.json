@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.3.10",
+    "version": "0.3.11",
     "news": {
+      "0.3.11": {
+        "en": "show value with green color if we feed back into power line",
+        "de": "zeigenswert mit grüner farbe, wenn wir zurück in die stromleitung",
+        "ru": "показать ценность с зеленым цветом, если мы покоримся обратно в силовую линию",
+        "pt": "mostrar valor com cor verde se nós nos alimentamos de volta na linha de energia",
+        "nl": "toon waarde met groene kleur als we terugvoeren naar stroomlijn",
+        "fr": "afficher la valeur avec la couleur verte si nous retournons dans la ligne d'alimentation",
+        "it": "mostrare il valore con il colore verde se ci risaltiamo alla linea di alimentazione",
+        "es": "mostrar valor con color verde si nos alimentamos de nuevo en la línea de energía",
+        "pl": "pokaż wartość z zielonym kolorem jeśli podamy z powrotem do linii zasilania",
+        "uk": "показати значення з зеленим кольором, якщо ми подаємо в лінію живлення",
+        "zh-cn": "如果我们反馈回电线, 显示绿色值"
+      },
       "0.3.9": {
         "en": "update packages",
         "de": "update-pakete",
