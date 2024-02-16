@@ -14,7 +14,7 @@
         "caniuse-lite": "^1.0.30001587",
         "craco-esbuild": "^0.5.2",
         "craco-module-federation": "^1.1.0",
-        "date-fns": "^2.30.0",
+        "date-fns": "^3.3.1",
         "echarts": "^5.4.3",
         "echarts-for-react": "^3.0.2",
         "eslint": "^8.56.0",
