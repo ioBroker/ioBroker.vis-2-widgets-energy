@@ -96,7 +96,8 @@
       }
     },
     "licenseInformation": {
-      "license": "free",
+      "license": "MIT",
+      "type": "free",
       "link": "https://github.com/ioBroker/ioBroker.vis-2-widgets-energy/blob/master/LICENSE"
     },
     "title": "Vis 2 Widgets Energy",
