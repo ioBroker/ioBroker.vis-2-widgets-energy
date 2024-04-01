@@ -10,7 +10,7 @@
         "@iobroker/vis-2-widgets-react-dev": "^1.0.5",
         "@mui/icons-material": "^5.15.11",
         "@mui/material": "5.14.14",
-        "@mui/styles": "5.14.14",
+        "@mui/styles": "5.15.14",
         "caniuse-lite": "^1.0.30001591",
         "craco-esbuild": "^0.5.2",
         "craco-module-federation": "^1.1.0",
