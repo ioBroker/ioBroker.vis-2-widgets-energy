@@ -28,7 +28,7 @@
     "eslint": "^8.57.0",
     "gulp": "^4.0.2",
     "mocha": "^10.3.0",
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.3",
     "@iobroker/vis-2-widgets-testing": "^1.0.0"
   },
   "files": [
