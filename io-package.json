@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.3.11",
+    "version": "0.3.12",
     "news": {
+      "0.3.12": {
+        "en": "Allowed setting the title color",
+        "de": "Erlaubte Einstellung der Titelfarbe",
+        "ru": "Позволяет установить цвет заголовка",
+        "pt": "Permite definir a cor do título",
+        "nl": "De titelkleur instellen is toegestaan",
+        "fr": "Réglage autorisé de la couleur du titre",
+        "it": "Impostare il colore del titolo",
+        "es": "Permitido fijar el color del título",
+        "pl": "Dozwolone ustawienie koloru tytułu",
+        "uk": "Дозволено налаштування кольору назв",
+        "zh-cn": "允许设置标题颜色"
+      },
       "0.3.11": {
         "en": "show value with green color if we feed back into power line",
         "de": "zeigenswert mit grüner farbe, wenn wir zurück in die stromleitung",
@@ -80,19 +93,6 @@
         "pl": "Pakiet upoważniony",
         "uk": "Оновлені пакети",
         "zh-cn": "最新一揽子计划"
-      },
-      "0.3.0": {
-        "en": "Added pie chart for comparison",
-        "de": "Piratendiagramm zum Vergleich hinzugefügt",
-        "ru": "Добавлен pie график для сравнения",
-        "pt": "Gráfico de torta adicionado para comparação",
-        "nl": "Vergelijkingskaart",
-        "fr": "Ajout d'un diagramme de tartes pour comparaison",
-        "it": "Grafico torta aggiunto per confronto",
-        "es": "Gráfico de tarta añadido para comparación",
-        "pl": "Pieśń o porównanie",
-        "uk": "Додано діаграму пирога для порівняння",
-        "zh-cn": "比较图表"
       }
     },
     "licenseInformation": {
