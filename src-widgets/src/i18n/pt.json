@@ -109,5 +109,6 @@
   "pie": "gráfico de pizza",
   "difference": "Calcular diferença",
   "difference_tooltip": "A diferença entre dois valores será usada. Útil para contadores.",
-  "Value": "Valor"
+  "Value": "Valor",
+  "text_color": "Cor do texto"
 }

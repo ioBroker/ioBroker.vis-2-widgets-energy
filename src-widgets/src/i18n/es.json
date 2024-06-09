@@ -109,5 +109,6 @@
   "pie": "Gráfico circular",
   "difference": "Calcular diferencia",
   "difference_tooltip": "Se utilizará la diferencia entre dos valores. Útil para mostradores.",
-  "Value": "Valor"
+  "Value": "Valor",
+  "text_color": "Color de texto"
 }

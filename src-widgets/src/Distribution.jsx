@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@mui/styles';
 
-import { Icon } from '@iobroker/adapter-react-v5';
+import {Icon, Utils} from '@iobroker/adapter-react-v5';
 
 import Generic from './Generic';
 
@@ -126,6 +126,11 @@ class Distribution extends Generic {
                             label: 'home_color',
                         },
                         {
+                            name: 'homeTextColor',
+                            type: 'color',
+                            label: 'text_color',
+                        },
+                        {
                             name: 'homeStandardIcon',
                             type: 'icon64',
                             label: 'standard_icon',
@@ -239,6 +244,11 @@ class Distribution extends Generic {
                             name: 'powerLineColor',
                             type: 'color',
                             label: 'power_line_color',
+                        },
+                        {
+                            name: 'powerLineTextColor',
+                            type: 'color',
+                            label: 'text_color',
                         },
                         {
                             name: 'powerLineReturnColor',
@@ -368,6 +378,11 @@ class Distribution extends Generic {
                             name: 'color',
                             type: 'color',
                             label: 'color',
+                        },
+                        {
+                            name: 'textColor',
+                            type: 'color',
+                            label: 'text_color',
                         },
                         {
                             name: 'standardIcon',
@@ -675,6 +690,7 @@ class Distribution extends Generic {
                 valueAndUnit.iValue < this.state.objects.powerLine.hideIfLess,
             invert: this.state.objects.powerLine?.invert || false,
             speed: parseFloat(this.state.objects.powerLine?.speed) || 50,
+            textColor: this.state.rxData.powerLineTextColor,
         }];
 
         if (circles[0].radius > maxRadius) {
@@ -704,6 +720,7 @@ class Distribution extends Generic {
                     _valueAndUnit.iValue < this.state.objects[idx].hideIfLess,
                 invert: (this.state.objects[idx] && this.state.objects[idx].invert) || false,
                 speed: parseFloat(this.state.objects[idx] && this.state.objects[idx].speed) || 50,
+                textColor: this.state.rxData[`textColor${i}`],
             };
             circles.push(circle);
 
@@ -772,7 +789,7 @@ class Distribution extends Generic {
 
                     return <div key={i}>
                         <div
-                            className={this.props.classes.circleContent}
+                            className={Utils.clsx(this.props.classes.circleContent, 'vis-2-distribution-circle-value')}
                             style={{
                                 top:      allCoordinates[i].top,
                                 left:     xOffset + allCoordinates[i].left,
@@ -793,7 +810,7 @@ class Distribution extends Generic {
                             </div> : null}
                         </div>
                         <div
-                            className={this.props.classes.circleContent}
+                            className={Utils.clsx(this.props.classes.circleContent, 'vis-2-distribution-circle-text', `vis-2-distribution-circle-text-${i}`)}
                             style={{
                                 top: allCoordinates[i].topLabel,
                                 left: xOffset + allCoordinates[i].leftLabel,
@@ -801,6 +818,7 @@ class Distribution extends Generic {
                                 fontSize: circle.fontSize,
                                 opacity:  circle.hide ? 0.3 : 1,
                                 whiteSpace: 'nowrap',
+                                color: circle.textColor,
                             }}
                         >
                             <div>{circle.name || circle.oid}</div>
@@ -835,7 +853,7 @@ class Distribution extends Generic {
                         fontSize: homeFontSize,
                     }}
                 >
-                    <div>{this.state.rxData.homeName || this.state.rxData['home-oid'] || Generic.t('home')}</div>
+                    <div style={{ color: this.state.rxData.homeTextColor }}>{this.state.rxData.homeName || this.state.rxData['home-oid'] || Generic.t('home')}</div>
                 </div>
                 <svg style={{ width: size, height: size, overflow: 'visible' }}>
                     {valuesSum ? circles.map((circle, i) => {

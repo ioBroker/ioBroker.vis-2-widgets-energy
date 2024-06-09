@@ -109,5 +109,6 @@
   "pie": "Grafico a torta",
   "difference": "Calcola la differenza",
   "difference_tooltip": "Verrà utilizzata la differenza tra due valori. Utile per i contatori.",
-  "Value": "Valore"
+  "Value": "Valore",
+  "text_color": "Colore del testo"
 }

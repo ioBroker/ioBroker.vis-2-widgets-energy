@@ -109,5 +109,6 @@
   "pie": "Kuchendiagramm",
   "difference": "Differenz berechnen",
   "difference_tooltip": "Es wird die Differenz zwischen zwei Werten verwendet. Nützlich für Zähler.",
-  "Value": "Wert"
+  "Value": "Wert",
+  "text_color": "Textfarbe"
 }

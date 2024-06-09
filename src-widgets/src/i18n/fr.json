@@ -109,5 +109,6 @@
   "pie": "Diagramme circulaire",
   "difference": "Calculer la différence",
   "difference_tooltip": "La différence entre deux valeurs sera utilisée. Utile pour les compteurs.",
-  "Value": "Valeur"
+  "Value": "Valeur",
+  "text_color": "Couleur du texte"
 }

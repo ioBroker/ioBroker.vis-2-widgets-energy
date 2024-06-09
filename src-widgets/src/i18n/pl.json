@@ -109,5 +109,6 @@
   "pie": "Wykres kołowy",
   "difference": "Oblicz różnicę",
   "difference_tooltip": "Zostanie użyta różnica między dwiema wartościami. Przydatne do liczników.",
-  "Value": "Wartość"
+  "Value": "Wartość",
+  "text_color": "Kolor tekstu"
 }

@@ -109,5 +109,6 @@
   "pie": "饼形图",
   "difference": "计算差异",
   "difference_tooltip": "将使用两个值之间的差值。对于计数器很有用。",
-  "Value": "价值"
+  "Value": "价值",
+  "text_color": "文本颜色"
 }
