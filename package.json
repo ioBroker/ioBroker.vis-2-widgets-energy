@@ -29,7 +29,7 @@
     "gulp": "^4.0.2",
     "mocha": "^10.4.0",
     "typescript": "^5.4.5",
-    "@iobroker/vis-2-widgets-testing": "^1.0.3"
+    "@iobroker/vis-2-widgets-testing": "^1.0.4"
   },
   "files": [
     "admin/",
