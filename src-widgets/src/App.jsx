@@ -1,6 +1,6 @@
 import React from 'react';
-import { withStyles } from '@mui/styles';
 
+import { Box } from '@mui/material';
 import WidgetDemoApp from '@iobroker/vis-2-widgets-react-dev/widgetDemoApp';
 import { I18n } from '@iobroker/adapter-react-v5';
 
@@ -11,16 +11,16 @@ import Distribution from './Distribution';
 import Consumption from './Consumption';
 import IntervalSelector from './IntervalSelector';
 
-const styles = theme => ({
-    app: {
+const styles = {
+    app: theme => ({
         backgroundColor: theme?.palette?.background.default,
         color: theme?.palette?.text.primary,
         height: '100%',
         width: '100%',
         overflow: 'auto',
         display: 'flex',
-    },
-});
+    }),
+};
 
 class App extends WidgetDemoApp {
     constructor(props) {
@@ -56,7 +56,7 @@ class App extends WidgetDemoApp {
     };
 
     renderWidget() {
-        return <div className={this.props.classes.app}>
+        return <Box sx={styles.app}>
             <Distribution
                 socket={this.socket}
                 themeType={this.state.themeType}
@@ -159,8 +159,8 @@ class App extends WidgetDemoApp {
                 timeStart={this.state.timeStart}
                 setTimeStart={this.setTimeStart}
             />
-        </div>;
+        </Box>;
     }
 }
 
-export default withStyles(styles)(App);
+export default App;

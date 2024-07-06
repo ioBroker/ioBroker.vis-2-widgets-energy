@@ -1,17 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, withTheme } from '@mui/styles';
+import { Box } from '@mui/material';
 
 import ReactEchartsCore from 'echarts-for-react';
 import Generic from './Generic';
 
-const styles = () => ({
-    chart: {
-        width: '100%',
-        '&>div': {
-            borderRadius: 5,
-        },
-    },
+const styles = {
     cardContent: {
         flex: 1,
         display: 'flex',
@@ -19,8 +13,14 @@ const styles = () => ({
         alignItems: 'center',
         width: '100%',
         overflow: 'hidden',
+        '& .vis-2-widgets-energy-chart': {
+            width: '100%',
+            '&>div': {
+                borderRadius: 5,
+            },
+        },
     },
-});
+};
 
 class ConsumptionComparison extends Generic {
     constructor(props) {
@@ -419,18 +419,18 @@ class ConsumptionComparison extends Generic {
 
         const option = this.state.rxData.type === 'pie' ? this.getPieOption() : this.getBarOption();
 
-        const content = <div
+        const content = <Box
             ref={this.refCardContent}
-            className={this.props.classes.cardContent}
+            sx={styles.cardContent}
         >
             {size && <ReactEchartsCore
                 option={option}
                 theme={this.props.themeType === 'dark' ? 'dark' : ''}
-                className={this.props.classes.chart}
+                className="vis-2-widgets-energy-chart"
                 opts={{ renderer: 'svg' }}
                 style={{ height: size }}
             />}
-        </div>;
+        </Box>;
 
         if (this.state.rxData.noCard || props.widget.usedInWidget) {
             return content;
@@ -447,4 +447,4 @@ ConsumptionComparison.propTypes = {
     data: PropTypes.object,
 };
 
-export default withStyles(styles)(withTheme(ConsumptionComparison));
+export default ConsumptionComparison;

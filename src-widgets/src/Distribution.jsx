@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, withTheme } from '@mui/styles';
 
-import {Icon, Utils} from '@iobroker/adapter-react-v5';
+import { Icon, Utils } from '@iobroker/adapter-react-v5';
 
 import Generic from './Generic';
 
-const styles = () => ({
+const styles = {
     cardContent: {
         flex: 1,
         display: 'flex',
@@ -23,7 +22,7 @@ const styles = () => ({
         justifyContent: 'center',
         zIndex: 10,
     },
-});
+};
 
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     const returnValue = {};
@@ -777,7 +776,7 @@ class Distribution extends Generic {
 
         const content = <div
             ref={this.refCardContent}
-            className={this.props.classes.cardContent}
+            style={styles.cardContent}
         >
             {size && <div style={{ position: 'relative' }}>
                 {/* show power line and others */}
@@ -789,8 +788,9 @@ class Distribution extends Generic {
 
                     return <div key={i}>
                         <div
-                            className={Utils.clsx(this.props.classes.circleContent, 'vis-2-distribution-circle-value')}
+                            className="vis-2-distribution-circle-value"
                             style={{
+                                ...styles.circleContent,
                                 top:      allCoordinates[i].top,
                                 left:     xOffset + allCoordinates[i].left,
                                 width:    circle.radius * 2,
@@ -810,8 +810,9 @@ class Distribution extends Generic {
                             </div> : null}
                         </div>
                         <div
-                            className={Utils.clsx(this.props.classes.circleContent, 'vis-2-distribution-circle-text', `vis-2-distribution-circle-text-${i}`)}
+                            className={Utils.clsx('vis-2-distribution-circle-text', `vis-2-distribution-circle-text-${i}`)}
                             style={{
+                                ...styles.circleContent,
                                 top: allCoordinates[i].topLabel,
                                 left: xOffset + allCoordinates[i].leftLabel,
                                 width: circle.radius * 2,
@@ -827,8 +828,8 @@ class Distribution extends Generic {
                 })}
                 {/* show home icon and value in the middle of the circle */}
                 <div
-                    className={this.props.classes.circleContent}
                     style={{
+                        ...styles.circleContent,
                         top: halfSize - homeRadius,
                         left: xOffset + halfSize - homeRadius,
                         width: homeRadius * 2,
@@ -845,8 +846,8 @@ class Distribution extends Generic {
                 </div>
                 {/* show home name at the bottom of the circle */}
                 <div
-                    className={this.props.classes.circleContent}
                     style={{
+                        ...styles.circleContent,
                         top: halfSize + homeRadius,
                         left: xOffset + halfSize - homeRadius,
                         width: homeRadius * 2,
@@ -964,4 +965,4 @@ Distribution.propTypes = {
     data: PropTypes.object,
 };
 
-export default withStyles(styles)(withTheme(Distribution));
+export default Distribution;

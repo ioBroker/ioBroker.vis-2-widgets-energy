@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, withTheme } from '@mui/styles';
 import moment from 'moment';
 
 import { Button, ButtonGroup, IconButton } from '@mui/material';
@@ -8,20 +7,27 @@ import { NavigateBefore as NavigateBeforeIcon, NavigateNext as NavigateNextIcon 
 import Generic from './Generic';
 import { getFromToTime } from './Utils';
 
-const styles = () => ({
+const styles = {
     nowButton: {
         marginRight: 20,
     },
     contentContainer: {
-        display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
     },
     content: {
-        display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
     },
     periodName: {
         flexShrink: 0,
     },
-});
+};
 
 class IntervalSelector extends Generic {
     constructor(props) {
@@ -198,9 +204,13 @@ class IntervalSelector extends Generic {
             periodName = moment(new Date(interval.from)).format('YYYY');
         }
 
-        const content = <div className={`${this.props.classes.contentContainer} time-selector`} ref={this.refTimeSelector}>
-            <div className={this.props.classes.content}>
-                <span className={this.props.classes.periodName}>{periodName}</span>
+        const content = <div
+            style={styles.contentContainer}
+            className="time-selector"
+            ref={this.refTimeSelector}
+        >
+            <div style={styles.content}>
+                <span style={styles.periodName}>{periodName}</span>
                 <IconButton onClick={() => {
                     const newEnd = new Date(interval.from);
                     if (this.getTimeInterval() === 'day') {
@@ -245,7 +255,7 @@ class IntervalSelector extends Generic {
                     color="grey"
                     disabled={!this.getTimeStart()}
                     onClick={() => this.setTimeStart(0)}
-                    className={this.props.classes.nowButton}
+                    style={styles.nowButton}
                 >
                     {Generic.t('now')}
                 </Button>
@@ -284,4 +294,4 @@ IntervalSelector.propTypes = {
     data: PropTypes.object,
 };
 
-export default withStyles(styles)(withTheme(IntervalSelector));
+export default IntervalSelector;

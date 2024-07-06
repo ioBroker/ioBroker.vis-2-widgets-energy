@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, withTheme } from '@mui/styles';
 
 import ReactEchartsCore from 'echarts-for-react';
 import moment from 'moment';
@@ -10,7 +9,7 @@ import { I18n } from '@iobroker/adapter-react-v5';
 import Generic from './Generic';
 import { getFromToTime } from './Utils';
 
-const styles = () => ({
+const styles = {
     cardContent: {
         flex: 1,
         display: 'flex',
@@ -19,7 +18,7 @@ const styles = () => ({
         width: '100%',
         overflow: 'hidden',
     },
-});
+};
 
 class Consumption extends Generic {
     constructor(props) {
@@ -549,7 +548,7 @@ class Consumption extends Generic {
 
         const content = <div
             ref={this.refCardContent}
-            className={this.props.classes.cardContent}
+            style={styles.cardContent}
         >
             {size && <ReactEchartsCore
                 option={this.getOption()}
@@ -574,4 +573,4 @@ Consumption.propTypes = {
     data: PropTypes.object,
 };
 
-export default withStyles(styles)(withTheme(Consumption));
+export default Consumption;
