@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "0.3.12",
+    "version": "1.0.0",
     "news": {
+      "1.0.0": {
+        "en": "Removed withStyles package",
+        "de": "MitStyles-Paket entfernt",
+        "ru": "Удаленный пакет со Стайлз",
+        "pt": "Removido com pacote Estilos",
+        "nl": "Verwijderd metStyles pakket",
+        "fr": "Enlever avec le paquetStyles",
+        "it": "Rimosso con pacchettoStyles",
+        "es": "Retire el paquete de estilos",
+        "pl": "Usunięty z pakietem Styles",
+        "uk": "Видаліть пакет \"Стиль\"",
+        "zh-cn": "用 Styles 软件包删除"
+      },
       "0.3.12": {
         "en": "Allowed setting the title color",
         "de": "Erlaubte Einstellung der Titelfarbe",
@@ -80,19 +93,6 @@
         "pl": "Error skorygował się w Consumption-Widget",
         "uk": "Помилка виправлена в споживання-віджет",
         "zh-cn": "在消费-Widget中更正的诉讼"
-      },
-      "0.3.1": {
-        "en": "Updated packages",
-        "de": "Aktualisierte Pakete",
-        "ru": "Обновленные пакеты",
-        "pt": "Pacotes atualizados",
-        "nl": "Verouderde pakketten",
-        "fr": "Forfaits mis à jour",
-        "it": "Pacchetti aggiornati",
-        "es": "Paquetes actualizados",
-        "pl": "Pakiet upoważniony",
-        "uk": "Оновлені пакети",
-        "zh-cn": "最新一揽子计划"
       }
     },
     "licenseInformation": {
