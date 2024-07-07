@@ -866,7 +866,7 @@ class Distribution extends Generic {
                             cy="50%"
                             r={homeRadius}
                             fill="none"
-                            stroke={circle.color || this.state.rxData.homeColor || this.props.theme.palette.text.primary}
+                            stroke={circle.color || this.state.rxData.homeColor || this.props.context.theme.palette.text.primary}
                             style={{
                                 strokeDashoffset: partRadiusStroke,
                                 strokeDasharray: Math.PI * (homeRadius * 2),
@@ -898,7 +898,7 @@ class Distribution extends Generic {
                         }
 
                         const coordinatesOffset = polarToCartesian(0, 0, homeRadius + offset, angle);
-                        const color = circle.color || this.state.rxData.defaultColor || this.props.theme.palette.text.primary;
+                        const color = circle.color || this.state.rxData.defaultColor || this.props.context.theme.palette.text.primary;
 
                         return <React.Fragment key={i}>
                             <circle
@@ -938,7 +938,7 @@ class Distribution extends Generic {
                         r={homeRadius}
                         transform={`translate(${xOffset}, 0)`}
                         fill="none"
-                        stroke={this.state.rxData.homeColor || this.props.theme.palette.text.primary}
+                        stroke={this.state.rxData.homeColor || this.props.context.theme.palette.text.primary}
                         strokeWidth="3"
                     />
                 </svg>
