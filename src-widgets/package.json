@@ -5,7 +5,7 @@
     "dependencies": {
         "@craco/craco": "^7.1.0",
         "@emotion/react": "^11.11.4",
-        "@emotion/styled": "^11.11.5",
+        "@emotion/styled": "^11.13.0",
         "@iobroker/adapter-react-v5": "^6.0.13",
         "@iobroker/vis-2-widgets-react-dev": "^2.0.1",
         "@mui/icons-material": "^5.16.6",
