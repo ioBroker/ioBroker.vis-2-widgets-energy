@@ -132,7 +132,6 @@
     "keywords": [
       "vis-2-widgets-energy"
     ],
-    "license": "MIT",
     "platform": "Javascript/Node.js",
     "icon": "vis-2-widgets-energy.png",
     "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.vis-2-widgets-energy/master/admin/vis-2-widgets-energy.png",
