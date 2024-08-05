@@ -100,12 +100,31 @@
       "type": "free",
       "link": "https://github.com/ioBroker/ioBroker.vis-2-widgets-energy/blob/master/LICENSE"
     },
-    "title": "Vis 2 Widgets Energy",
     "titleLang": {
-      "en": "Vis 2 Widgets Energy"
+      "en": "Vis 2 Widgets Energy",
+      "de": "Vis 2 Widgets Energie",
+      "ru": "Виджеты энергии Vis 2",
+      "pt": "Widgets de energia do Vis 2",
+      "nl": "Vis 2 Widgets Energie",
+      "fr": "Vis 2 Widgets Énergie",
+      "it": "Vis 2 Widgets Energia",
+      "es": "Vis 2 Widgets Energía",
+      "pl": "Widżety energii Vis 2",
+      "uk": "Віджети енергії Vis 2",
+      "zh-cn": "Vis 2 小部件能源"
     },
     "desc": {
-      "en": "Vis 2 Widgets Energy"
+      "en": "Vis 2 Widgets Energy",
+      "de": "Vis 2 Widgets Energie",
+      "ru": "Виджеты энергии Vis 2",
+      "pt": "Widgets de energia do Vis 2",
+      "nl": "Vis 2 Widgets Energie",
+      "fr": "Vis 2 Widgets Énergie",
+      "it": "Vis 2 Widgets Energia",
+      "es": "Vis 2 Widgets Energía",
+      "pl": "Widżety energii Vis 2",
+      "uk": "Віджети енергії Vis 2",
+      "zh-cn": "Vis 2 小部件能源"
     },
     "authors": [
       "bluefox <dogafox@gmail.com>"
@@ -113,7 +132,6 @@
     "keywords": [
       "vis-2-widgets-energy"
     ],
-    "license": "MIT",
     "platform": "Javascript/Node.js",
     "icon": "vis-2-widgets-energy.png",
     "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.vis-2-widgets-energy/master/admin/vis-2-widgets-energy.png",
