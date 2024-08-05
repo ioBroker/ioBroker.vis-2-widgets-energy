@@ -25,6 +25,9 @@ This widget set consists of the following widgets:
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) updated packages
+
 ### 1.0.0 (2024-07-07)
 * (bluefox) Removed withStyles package
 
