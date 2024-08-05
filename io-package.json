@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "news": {
+      "1.0.1": {
+        "en": "updated packages",
+        "de": "aktualisierte pakete",
+        "ru": "обновления пакетов",
+        "pt": "pacotes atualizados",
+        "nl": "bijgewerkte pakketten",
+        "fr": "paquets mis à jour",
+        "it": "pacchetti aggiornati",
+        "es": "paquetes actualizados",
+        "pl": "zaktualizowane pakiety",
+        "uk": "оновлені пакети",
+        "zh-cn": "更新软件包"
+      },
       "1.0.0": {
         "en": "Removed withStyles package",
         "de": "MitStyles-Paket entfernt",
@@ -80,19 +93,6 @@
         "pl": "Poprawiona domyślna historia",
         "uk": "Виправлено історію за замовчуванням",
         "zh-cn": "纠正违约历史"
-      },
-      "0.3.2": {
-        "en": "Error corrected in Consumption-Widget",
-        "de": "Fehler behoben in Verbrauchs-Widget",
-        "ru": "Ошибка исправлена в Consumption-Widget",
-        "pt": "Erro corrigido em Consumption-Widget",
-        "nl": "Error gecorrigeerd in Consumption-Widget",
-        "fr": "Erreur corrigée dans Consumption-Widget",
-        "it": "Errore corretto in Consum-Widget",
-        "es": "Error corregido en Consumo-Widget",
-        "pl": "Error skorygował się w Consumption-Widget",
-        "uk": "Помилка виправлена в споживання-віджет",
-        "zh-cn": "在消费-Widget中更正的诉讼"
       }
     },
     "licenseInformation": {
