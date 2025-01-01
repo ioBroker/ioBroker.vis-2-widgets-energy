@@ -27,7 +27,7 @@
     "@types/node": "^22.10.3",
     "eslint": "^8.57.0",
     "gulp": "^4.0.2",
-    "mocha": "^10.8.2",
+    "mocha": "^11.0.1",
     "typescript": "^5.7.2",
     "@iobroker/vis-2-widgets-testing": "^1.0.5"
   },
