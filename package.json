@@ -21,15 +21,14 @@
     "@alcalzone/release-script": "^3.8.0",
     "@alcalzone/release-script-plugin-iobroker": "^3.7.2",
     "@alcalzone/release-script-plugin-license": "^3.7.0",
-    "@iobroker/vis-2-widgets-react-dev": "^3.0.7",
-    "@types/gulp": "^4.0.17",
+    "@iobroker/build-tools": "^2.0.14",
+    "@iobroker/eslint-config": "^1.0.0",
+    "@iobroker/vis-2-widgets-react-dev": "^4.0.4",
+    "@iobroker/vis-2-widgets-testing": "^1.0.5",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.10.3",
-    "eslint": "^8.57.0",
-    "gulp": "^4.0.2",
-    "mocha": "^10.8.2",
-    "typescript": "^5.7.2",
-    "@iobroker/vis-2-widgets-testing": "^1.0.5"
+    "@types/node": "^22.10.9",
+    "mocha": "^11.1.0",
+    "typescript": "^5.7.3"
   },
   "files": [
     "admin/",
@@ -40,15 +39,15 @@
   ],
   "scripts": {
     "check": "tsc --noEmit -p tsconfig.check.json",
-    "prepublishOnly": "gulp",
+    "prepublishOnly": "npm run build",
     "lint": "eslint src-widgets/src/*.jsx",
-    "build": "gulp",
+    "build": "node tasks",
     "test": "mocha ./test/*.test.js",
     "release": "release-script",
     "release-patch": "release-script patch --yes",
     "release-minor": "release-script minor --yes",
     "release-major": "release-script major --yes",
-    "update-packages": "ncu --upgrade && cd src-widgets && ncu --upgrade && cd ..",
+    "update-packages": "npx -y npm-check-updates --upgrade && cd src-widgets && npx -y npm-check-updates --upgrade",
     "npm": "npm i && cd src-widgets && npm i -f"
   },
   "bugs": {
