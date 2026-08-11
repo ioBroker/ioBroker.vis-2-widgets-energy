@@ -28,7 +28,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.20.1",
     "mocha": "^11.7.6",
-    "typescript": "~6.0.3"
+    "typescript": "~7.0.2"
   },
   "files": [
     "admin/",
