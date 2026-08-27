@@ -1,18 +1,26 @@
+# Dependabot configuration
+# The monthly runs use a randomized cron schedule (day 13 of each month, 02:47 Europe/Berlin)
+# instead of "interval: monthly" so the load is spread over the month instead of hitting
+# GitHub on the 1st together with every other repository (X0000-randomDependabot).
+# Cooldown delays normal npm updates by 7 days; security updates are still processed immediately.
+# Note: cooldown is not supported for the github-actions ecosystem.
+# Reference: https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference
 version: 2
 updates:
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: monthly
-      time: "04:00"
+      interval: cron
+      cronjob: "47 2 13 * *"
       timezone: Europe/Berlin
+    open-pull-requests-limit: 15
 
   - package-ecosystem: npm
     directory: "/"
     schedule:
-      interval: monthly
-      time: "04:00"
+      interval: cron
+      cronjob: "47 2 13 * *"
       timezone: Europe/Berlin
     open-pull-requests-limit: 20
     versioning-strategy: increase
@@ -28,8 +36,8 @@ updates:
   - package-ecosystem: npm
     directory: "/src-widgets"
     schedule:
-      interval: monthly
-      time: "04:00"
+      interval: cron
+      cronjob: "47 2 13 * *"
       timezone: Europe/Berlin
     open-pull-requests-limit: 20
     versioning-strategy: increase
