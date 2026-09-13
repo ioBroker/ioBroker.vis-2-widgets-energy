@@ -19,7 +19,7 @@
     },
     "devDependencies": {
         "@iobroker/types-vis-2": "^2.15.4",
-        "@module-federation/vite": "^1.7.2",
+        "@module-federation/vite": "^1.21.3",
         "@types/react": "^18.3.24",
         "@types/react-dom": "^18.3.7",
         "@vitejs/plugin-react": "^5.0.4",
