@@ -18,7 +18,7 @@
         "react-dom": "^18.3.1"
     },
     "devDependencies": {
-        "@iobroker/types-vis-2": "^2.15.4",
+        "@iobroker/types-vis-2": "^2.20.1",
         "@module-federation/vite": "^1.7.2",
         "@types/react": "^18.3.24",
         "@types/react-dom": "^18.3.7",
