@@ -154,10 +154,14 @@
         "url": "vis-2-widgets-energy/customWidgets.js",
         "bundlerType": "module",
         "components": [
-          "ConsumptionComparison",
+          "Distribution",
           "Consumption",
+          "ConsumptionComparison",
           "IntervalSelector",
-          "Distribution"
+          "SelfSufficiency",
+          "Battery",
+          "EnergyCosts",
+          "DynamicPrice"
         ]
       }
     },

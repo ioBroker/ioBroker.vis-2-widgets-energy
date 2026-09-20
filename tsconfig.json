@@ -13,6 +13,6 @@
         "resolveJsonModule": true,
         "strict": false
     },
-    "include": ["src-widgets/src/**/*", "*.mjs"],
+    "include": ["src-widgets/src/**/*", "*.mjs", "tasks.ts"],
     "exclude": ["node_modules", "src-widgets/node_modules", "src-widgets/build", "widgets", "build", "tmp"]
 }

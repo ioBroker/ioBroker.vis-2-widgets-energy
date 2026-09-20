@@ -1,39 +1,20 @@
 // @ts-expect-error no types
 import react from '@vitejs/plugin-react';
-import commonjs from 'vite-plugin-commonjs';
-import vitetsConfigPaths from 'vite-tsconfig-paths';
 import { federation } from '@module-federation/vite';
+import { moduleFederationShared } from '@iobroker/types-vis-2/modulefederation.vis.config';
+import { readFileSync } from 'node:fs';
 import topLevelAwait from 'vite-plugin-top-level-await';
 
-const singleton = (
-    extra: Record<string, unknown> = {},
-): { singleton: true; requiredVersion: '*' } & Record<string, unknown> => ({
-    singleton: true,
-    requiredVersion: '*',
-    ...extra,
-});
-
-const sharedModules: Record<string, ReturnType<typeof singleton>> = {
-    react: singleton(),
-    'react-dom': singleton(),
-    'react-dom/client': singleton(),
-    '@mui/material': singleton(),
-    '@mui/icons-material': singleton(),
-    '@mui/system': singleton(),
-    'prop-types': singleton(),
-    '@iobroker/adapter-react-v5': singleton(),
-    '@iobroker/adapter-react-v5/i18n/de.json': singleton(),
-    '@iobroker/adapter-react-v5/i18n/en.json': singleton(),
-    '@iobroker/adapter-react-v5/i18n/es.json': singleton(),
-    '@iobroker/adapter-react-v5/i18n/ru.json': singleton(),
-    '@iobroker/adapter-react-v5/i18n/nl.json': singleton(),
-    '@iobroker/adapter-react-v5/i18n/it.json': singleton(),
-    '@iobroker/adapter-react-v5/i18n/pl.json': singleton(),
-    '@iobroker/adapter-react-v5/i18n/pt.json': singleton(),
-    '@iobroker/adapter-react-v5/i18n/fr.json': singleton(),
-    '@iobroker/adapter-react-v5/i18n/uk.json': singleton(),
-    '@iobroker/adapter-react-v5/i18n/zh-cn.json': singleton(),
-};
+// The shared modules come from @iobroker/types-vis-2, so this widget set always uses exactly the copies that the
+// vis-2 host provides: react, react-dom, the JSX runtime, moment, @emotion/react, @mui/private-theming,
+// @mui/material and @mui/system as singletons. Passing package.json filters the list down to the packages this
+// widget set really depends on.
+//
+// `react/jsx-runtime` is the entry that matters most: a widget set that bundles its own copy creates its
+// elements with the element symbol of ITS react version, and since react 19 renamed that symbol, a vis-2 on
+// react 19 rejects such a set outright (`visWidgetSetCompatibility.ts`) instead of loading it. That is why the
+// hand-written `sharedModules` list this file used before had to go - it shared react but not its JSX runtime.
+const pack = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
 const config = {
     plugins: [
@@ -46,10 +27,14 @@ const config = {
                 './ConsumptionComparison': './src/ConsumptionComparison',
                 './Distribution': './src/Distribution',
                 './IntervalSelector': './src/IntervalSelector',
+                './SelfSufficiency': './src/SelfSufficiency',
+                './Battery': './src/Battery',
+                './EnergyCosts': './src/EnergyCosts',
+                './DynamicPrice': './src/DynamicPrice',
                 './translations': './src/translations',
             },
             remotes: {},
-            shared: sharedModules,
+            shared: moduleFederationShared(pack),
             dts: false,
         }),
         topLevelAwait({
@@ -57,8 +42,6 @@ const config = {
             promiseImportName: (i: number): string => `__tla_${i}`,
         }),
         react(),
-        vitetsConfigPaths(),
-        commonjs(),
     ],
     server: {
         port: 4173,
@@ -76,15 +59,8 @@ const config = {
     },
     base: './',
     resolve: {
-        dedupe: [
-            'react',
-            'react-dom',
-            'prop-types',
-            '@mui/material',
-            '@mui/system',
-            '@mui/icons-material',
-            '@iobroker/adapter-react-v5',
-        ],
+        // Same set as the shared modules above: the fallback copies inside the widget bundle must be unique too
+        dedupe: ['react', 'react-dom', '@emotion/react', '@mui/material', '@mui/system', '@mui/icons-material'],
     },
     build: {
         target: 'chrome81',

@@ -78,7 +78,6 @@ export default [
             'widgets/**/*',
             'test/**/*',
             'build/**/*',
-            'tasks.js',
             'tmp/**/*',
             '.**/*',
         ],

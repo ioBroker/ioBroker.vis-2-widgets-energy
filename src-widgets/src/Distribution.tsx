@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Icon, Utils } from '@iobroker/adapter-react-v5';
+import { Icon, Utils } from '@iobroker/gui-components';
 import type {
     RxRenderWidgetProps,
     RxWidgetInfo,
@@ -11,6 +11,7 @@ import type {
 } from '@iobroker/types-vis-2';
 
 import Generic from './Generic';
+import { toNumber } from './Utils';
 
 type StoredObject = {
     common: ioBroker.StateCommon;
@@ -46,7 +47,6 @@ interface Circle {
 }
 
 interface DistributionState extends VisRxWidgetState {
-    offset: number;
     objects: Record<string, StoredObject>;
     units: Record<string, string | undefined>;
 }
@@ -60,6 +60,9 @@ interface DistributionRxData extends VisRxData {
     defaultFontSize: number | string;
     defaultRadiusSize: number | string;
     nodesCount: number;
+    lineWidth: number | string;
+    noAnimation: boolean;
+    rawValues: boolean;
 
     'home-oid': string;
     homeName: string;
@@ -148,15 +151,13 @@ function polarToCartesian(
 }
 
 class Distribution extends Generic<DistributionRxData, DistributionState> {
-    private readonly refCardContent: React.RefObject<HTMLDivElement> = React.createRef();
+    private readonly refCardContent: React.RefObject<HTMLDivElement | null> = React.createRef();
 
     private lastRxData?: string;
 
-    private offsetInterval?: ReturnType<typeof setInterval>;
-
     constructor(props: VisRxWidgetProps) {
         super(props);
-        this.state = { ...this.state, offset: 0, objects: {}, units: {} };
+        this.state = { ...this.state, objects: {}, units: {} };
     }
 
     static getWidgetInfo(): RxWidgetInfo {
@@ -165,6 +166,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
             visSet: 'vis-2-widgets-energy',
             visSetLabel: 'set_label', // Label of widget set
             visWidgetLabel: 'distribution', // Label of widget
+            visHelp: 'help_distribution', // Description in the palette
             visName: 'Distribution',
             visAttrs: [
                 {
@@ -173,17 +175,20 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                         {
                             name: 'noCard',
                             label: 'without_card',
+                            tooltip: 'without_card_tooltip',
                             type: 'checkbox',
                         },
                         {
                             name: 'widgetTitle',
                             label: 'name',
+                            tooltip: 'widget_title_tooltip',
                             hidden: '!!data.noCard',
                         },
                         {
                             name: 'defaultColor',
                             type: 'color',
                             label: 'default_color',
+                            tooltip: 'default_color_tooltip',
                         },
                         {
                             name: 'defaultCircleSize',
@@ -219,6 +224,28 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             min: 0,
                             max: 10,
                             label: 'nodes_count',
+                            tooltip: 'nodes_count_tooltip',
+                        },
+                        {
+                            name: 'lineWidth',
+                            type: 'slider',
+                            min: 1,
+                            max: 10,
+                            default: 3,
+                            label: 'line_width',
+                            tooltip: 'line_width_tooltip',
+                        },
+                        {
+                            name: 'noAnimation',
+                            type: 'checkbox',
+                            label: 'no_animation',
+                            tooltip: 'distribution_no_animation_tooltip',
+                        },
+                        {
+                            name: 'rawValues',
+                            type: 'checkbox',
+                            label: 'raw_values',
+                            tooltip: 'raw_values_tooltip',
                         },
                     ],
                 },
@@ -230,6 +257,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             name: 'home-oid',
                             type: 'id',
                             label: 'home_oid',
+                            tooltip: 'home_oid_tooltip',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name!]);
                                 if (object && object.common) {
@@ -243,21 +271,25 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                         {
                             name: 'homeName',
                             label: 'home_name',
+                            tooltip: 'home_name_tooltip',
                         },
                         {
                             name: 'homeColor',
                             type: 'color',
                             label: 'home_color',
+                            tooltip: 'home_color_tooltip',
                         },
                         {
                             name: 'homeTextColor',
                             type: 'color',
                             label: 'text_color',
+                            tooltip: 'text_color_tooltip',
                         },
                         {
                             name: 'homeStandardIcon',
                             type: 'icon64',
                             label: 'standard_icon',
+                            tooltip: 'standard_icon_tooltip',
                             hidden: (data: WidgetData) => !!data.homeIcon,
                             default:
                                 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0xOSA5LjNWNGgtM3YyLjZMMTIgM0wyIDEyaDN2OGg1di02aDR2Nmg1di04aDNsLTMtMi43em0tOSAuN2MwLTEuMS45LTIgMi0yczIgLjkgMiAyaC00eiIvPjwvc3ZnPg==',
@@ -267,6 +299,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             type: 'image',
                             hidden: (data: WidgetData) => !!data.homeStandardIcon,
                             label: 'custom_icon',
+                            tooltip: 'custom_icon_tooltip',
                         },
                         {
                             name: 'homeCircleSize',
@@ -302,6 +335,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                         {
                             name: 'homeUnit',
                             label: 'units',
+                            tooltip: 'units_tooltip',
                         },
                         {
                             name: 'homeFactor',
@@ -326,6 +360,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             min: 0,
                             max: 6,
                             label: 'round',
+                            tooltip: 'round_tooltip',
                             default: 2,
                         },
                     ],
@@ -338,6 +373,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             name: 'powerLine-oid',
                             type: 'id',
                             label: 'power_line_oid',
+                            tooltip: 'power_line_oid_tooltip',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name!]);
                                 if (object && object.common) {
@@ -353,6 +389,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             name: 'powerLineReturn-oid',
                             type: 'id',
                             label: 'power_line_return_oid',
+                            tooltip: 'power_line_return_oid_tooltip',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name!]);
                                 if (object && object.common) {
@@ -366,28 +403,33 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                         {
                             name: 'powerLineName',
                             label: 'power_line_name',
+                            tooltip: 'power_line_name_tooltip',
                         },
                         {
                             name: 'powerLineColor',
                             type: 'color',
                             label: 'power_line_color',
+                            tooltip: 'power_line_color_tooltip',
                         },
                         {
                             name: 'powerLineTextColor',
                             type: 'color',
                             label: 'text_color',
+                            tooltip: 'text_color_tooltip',
                         },
                         {
                             name: 'powerLineReturnColor',
                             hidden: (data: WidgetData) => !data['powerLineReturn-oid'],
                             type: 'color',
                             label: 'power_line_return_color',
+                            tooltip: 'power_line_return_color_tooltip',
                             default: '#208020',
                         },
                         {
                             name: 'powerLineStandardIcon',
                             type: 'icon64',
                             label: 'standard_icon',
+                            tooltip: 'standard_icon_tooltip',
                             default:
                                 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NzAgNDcwIiB3aWR0aD0iNDcwIiBoZWlnaHQ9IjQ3MCI+DQogICAgPHBhdGgNCiAgICAgICAgZmlsbD0iY3VycmVudENvbG9yIg0KICAgICAgICBkPSJNNDIwLjYzNCwxNjkuNDIyYy0wLjAwMi0wLjAyNS0wLjAwMy0wLjA1LTAuMDA2LTAuMDc0Yy0wLjA3Ni0wLjcyNS0wLjI1NS0xLjQxNi0wLjUyMy0yLjA2NQ0KYy0wLjAxNS0wLjAzNy0wLjAyOS0wLjA3My0wLjA0NS0wLjEwOWMtMC4yNjktMC42MjMtMC42MTctMS4xOTgtMS4wMzctMS43MmMtMC4wNDctMC4wNTktMC4wOTUtMC4xMTctMC4xNDQtMC4xNzQNCmMtMC4yNTItMC4yOTUtMC41MjUtMC41Ny0wLjgyLTAuODIzYy0wLjA0NC0wLjAzOC0wLjA4NC0wLjA3OS0wLjEyOS0wLjExNmMtMC4xNDItMC4xMTYtMC4yOS0wLjIyMy0wLjQ0LTAuMzI5DQpjLTAuMTE2LTAuMDgyLTAuMjM0LTAuMTU4LTAuMzU1LTAuMjMzYy0wLjE4MS0wLjExMy0wLjM2NC0wLjIxOS0wLjU1NS0wLjMxNmMtMC4xOTgtMC4xMDItMC40LTAuMTk2LTAuNjA3LTAuMjc5DQpjLTAuMDYxLTAuMDI0LTAuMTE3LTAuMDU5LTAuMTc4LTAuMDgybC0xMjEuMTU0LTUyLjExNVY2OS4yMTFoMTExLjAyOHYzMS40OWMwLDQuMTQyLDMuMzU4LDcuNSw3LjUsNy41czcuNS0zLjM1OCw3LjUtNy41VjYyLjEwOA0KYzAuMDA3LTAuMTMyLDAuMDItMC4yNjMsMC4wMi0wLjM5N2MwLTAuMjQzLTAuMDMzLTAuNDc2LTAuMDU2LTAuNzEzYy0wLjAwMi0wLjAyNS0wLjAwMy0wLjA1LTAuMDA2LTAuMDc0DQpjLTAuMDc2LTAuNzI1LTAuMjU1LTEuNDE2LTAuNTIzLTIuMDY1Yy0wLjAxNS0wLjAzNy0wLjAyOS0wLjA3My0wLjA0NS0wLjEwOWMtMC4yNjktMC42MjMtMC42MTctMS4xOTgtMS4wMzctMS43Mg0KYy0wLjA0Ny0wLjA1OS0wLjA5NS0wLjExNy0wLjE0NC0wLjE3NGMtMC4yNTItMC4yOTUtMC41MjUtMC41Ny0wLjgyLTAuODIzYy0wLjA0NC0wLjAzOC0wLjA4NC0wLjA3OS0wLjEyOS0wLjExNg0KYy0wLjE0Mi0wLjExNi0wLjI5LTAuMjIzLTAuNDQtMC4zMjljLTAuMTE2LTAuMDgyLTAuMjM0LTAuMTU4LTAuMzU1LTAuMjMzYy0wLjE4MS0wLjExMy0wLjM2NC0wLjIxOS0wLjU1NS0wLjMxNg0KYy0wLjE5OC0wLjEwMi0wLjQtMC4xOTYtMC42MDctMC4yNzljLTAuMDYxLTAuMDI0LTAuMTE3LTAuMDU5LTAuMTc4LTAuMDgyTDI5MC4xMDcsMC42MUMyODkuMTk1LDAuMjE5LDI4OC4xOTUsMCwyODcuMTQzLDBIMTgyLjgzNw0KYy0xLjA1MiwwLTIuMDUyLDAuMjE5LTIuOTYxLDAuNjA5QzE3OS44NzMsMC42MSw1My45Miw1NC43OSw1My45Miw1NC43OWMtMC4wMjMsMC4wMS0wLjA0NiwwLjAyLTAuMDY5LDAuMDMNCmMtMC4wODMsMC4wMzYtMC4xNTYsMC4wNzYtMC4yMzIsMC4xMTJjLTAuMTk4LDAuMDk0LTAuMzkxLDAuMTk0LTAuNTgsMC4zMDRjLTAuMTMxLDAuMDc2LTAuMjYyLDAuMTUyLTAuMzg3LDAuMjM1DQpjLTAuMDY1LDAuMDQzLTAuMTI1LDAuMDkxLTAuMTg5LDAuMTM2Yy0wLjEyNywwLjA5LTAuMjUyLDAuMTgxLTAuMzcyLDAuMjc4Yy0wLjA2LDAuMDQ5LTAuMTE4LDAuMTAxLTAuMTc3LDAuMTUyDQpjLTAuMTE2LDAuMS0wLjIyOSwwLjIwMS0wLjMzOCwwLjMwOGMtMC4wNTksMC4wNTctMC4xMTUsMC4xMTYtMC4xNzEsMC4xNzVjLTAuMTAxLDAuMTA1LTAuMTk5LDAuMjEyLTAuMjkzLDAuMzIzDQpjLTAuMDU4LDAuMDY3LTAuMTE0LDAuMTM2LTAuMTY5LDAuMjA1Yy0wLjA4NSwwLjEwNy0wLjE2NiwwLjIxNi0wLjI0NSwwLjMyN2MtMC4wNTYsMC4wNzgtMC4xMTEsMC4xNTYtMC4xNjQsMC4yMzYNCmMtMC4wNywwLjEwOC0wLjEzNSwwLjIxOS0wLjIsMC4zMjljLTAuMDUxLDAuMDg4LTAuMTA0LDAuMTc0LTAuMTUyLDAuMjY0Yy0wLjA2MSwwLjExNi0wLjExNSwwLjIzNS0wLjE3MSwwLjM1NA0KYy0wLjA2MSwwLjEzMi0wLjEyLDAuMjY1LTAuMTc0LDAuNGMtMC4wNjIsMC4xNTYtMC4xMjIsMC4zMTItMC4xNzMsMC40NzJjLTAuMDI5LDAuMDkxLTAuMDUyLDAuMTg1LTAuMDc3LDAuMjc4DQpjLTAuMDM3LDAuMTMyLTAuMDczLDAuMjY1LTAuMTAzLDAuMzk5Yy0wLjAyLDAuMDkxLTAuMDM1LDAuMTgzLTAuMDUyLDAuMjc1Yy0wLjAyNiwwLjE0NS0wLjA0OSwwLjI5LTAuMDY3LDAuNDM3DQpjLTAuMDEsMC4wODUtMC4wMTksMC4xNy0wLjAyNiwwLjI1NmMtMC4wMTQsMC4xNjItMC4wMjEsMC4zMjQtMC4wMjUsMC40ODdjLTAuMDAxLDAuMDUxLTAuMDA4LDAuMS0wLjAwOCwwLjE1djM4Ljk5DQpjMCw0LjE0MiwzLjM1OCw3LjUsNy41LDcuNXM3LjUtMy4zNTgsNy41LTcuNXYtMzEuNDloMTExLjAyOHY0MS43NzNMNTMuOTIsMTYzLjIxMmMtMC4wMjMsMC4wMS0wLjA0NiwwLjAyLTAuMDY5LDAuMDMNCmMtMC4wODMsMC4wMzYtMC4xNTYsMC4wNzYtMC4yMzIsMC4xMTJjLTAuMTk4LDAuMDk0LTAuMzkxLDAuMTk0LTAuNTgsMC4zMDRjLTAuMTMxLDAuMDc2LTAuMjYyLDAuMTUyLTAuMzg3LDAuMjM1DQpjLTAuMDY1LDAuMDQzLTAuMTI1LDAuMDkxLTAuMTg5LDAuMTM2Yy0wLjEyNywwLjA5LTAuMjUyLDAuMTgxLTAuMzcyLDAuMjc4Yy0wLjA2LDAuMDQ5LTAuMTE4LDAuMTAxLTAuMTc3LDAuMTUyDQpjLTAuMTE2LDAuMS0wLjIyOSwwLjIwMS0wLjMzOCwwLjMwOGMtMC4wNTksMC4wNTctMC4xMTUsMC4xMTYtMC4xNzEsMC4xNzVjLTAuMTAxLDAuMTA1LTAuMTk5LDAuMjEyLTAuMjkzLDAuMzIzDQpjLTAuMDU4LDAuMDY3LTAuMTE0LDAuMTM2LTAuMTY5LDAuMjA1Yy0wLjA4NSwwLjEwNy0wLjE2NiwwLjIxNi0wLjI0NSwwLjMyN2MtMC4wNTYsMC4wNzgtMC4xMTEsMC4xNTYtMC4xNjQsMC4yMzYNCmMtMC4wNywwLjEwOC0wLjEzNSwwLjIxOS0wLjIsMC4zMjljLTAuMDUxLDAuMDg4LTAuMTA0LDAuMTc0LTAuMTUyLDAuMjY0Yy0wLjA2MSwwLjExNi0wLjExNSwwLjIzNS0wLjE3MSwwLjM1NA0KYy0wLjA2MSwwLjEzMi0wLjEyLDAuMjY1LTAuMTc0LDAuNGMtMC4wNjIsMC4xNTYtMC4xMjIsMC4zMTItMC4xNzMsMC40NzJjLTAuMDI5LDAuMDkxLTAuMDUyLDAuMTg1LTAuMDc3LDAuMjc4DQpjLTAuMDM3LDAuMTMyLTAuMDczLDAuMjY1LTAuMTAzLDAuMzk5Yy0wLjAyLDAuMDkxLTAuMDM1LDAuMTgzLTAuMDUyLDAuMjc1Yy0wLjAyNiwwLjE0NS0wLjA0OSwwLjI5LTAuMDY3LDAuNDM3DQpjLTAuMDEsMC4wODUtMC4wMTksMC4xNy0wLjAyNiwwLjI1NmMtMC4wMTQsMC4xNjItMC4wMjEsMC4zMjQtMC4wMjUsMC40ODdjLTAuMDAxLDAuMDUxLTAuMDA4LDAuMS0wLjAwOCwwLjE1djM4Ljk5DQpjMCw0LjE0MiwzLjM1OCw3LjUsNy41LDcuNXM3LjUtMy4zNTgsNy41LTcuNXYtMzEuNDloMTA4LjMxN0w4NC4wMjMsNDYwLjI1NmMtMC4wMDgsMC4wMjYtMC4wMSwwLjA1My0wLjAxOCwwLjA3OQ0KYy0wLjEwNywwLjM1Ny0wLjE5LDAuNzIxLTAuMjQzLDEuMDg4Yy0wLjAwNCwwLjAyOC0wLjAxMSwwLjA1NS0wLjAxNSwwLjA4M2MtMC4wNDgsMC4zNTktMC4wNjIsMC43MjEtMC4wNTgsMS4wODMNCmMwLjAwMSwwLjA3MiwwLDAuMTQzLDAuMDAzLDAuMjE1YzAuMDE0LDAuMzUxLDAuMDUzLDAuNywwLjExNiwxLjA0N2MwLjAxMSwwLjA2LDAuMDI1LDAuMTE4LDAuMDM3LDAuMTc4DQpjMC4xNDgsMC43MTUsMC40MDMsMS40MTIsMC43NjMsMi4wN2MwLjAyOCwwLjA1MSwwLjA1NCwwLjEwMSwwLjA4MywwLjE1MWMwLjE3OCwwLjMwNywwLjM3OCwwLjYwNCwwLjYwMywwLjg5DQpjMC4wNDIsMC4wNTMsMC4wODgsMC4xMDMsMC4xMzEsMC4xNTVjMC4wOTIsMC4xMTEsMC4xOCwwLjIyNCwwLjI3OSwwLjMzYzAuMTI2LDAuMTM1LDAuMjYyLDAuMjU3LDAuMzk2LDAuMzgNCmMwLjA0MSwwLjAzOCwwLjA3OCwwLjA3OCwwLjEyLDAuMTE1YzAuMjg1LDAuMjUyLDAuNTg3LDAuNDc1LDAuODk5LDAuNjc2YzAuMDI1LDAuMDE2LDAuMDQ1LDAuMDM3LDAuMDcsMC4wNTMNCmMwLjAzNCwwLjAyMSwwLjA3LDAuMDM1LDAuMTA0LDAuMDU1YzAuMjQ4LDAuMTUsMC41MDEsMC4yODcsMC43NjEsMC40MDZjMC4wMzgsMC4wMTgsMC4wNzUsMC4wMzksMC4xMTQsMC4wNTYNCmMwLjI5NCwwLjEyOCwwLjU5MywwLjIzNiwwLjg5OCwwLjMyNmMwLjA2OSwwLjAyLDAuMTM5LDAuMDM1LDAuMjA5LDAuMDUzYzAuMjM3LDAuMDYyLDAuNDc3LDAuMTEzLDAuNzE4LDAuMTUxDQpjMC4wODgsMC4wMTQsMC4xNzYsMC4wMjksMC4yNjQsMC4wNGMwLjMwMiwwLjAzNywwLjYwNiwwLjA2MywwLjkxMSwwLjA2M2MxLjYyMSwwLDMuMjMzLTAuNTE0LDQuNTgxLTEuNTUyDQpjMC4xOTEtMC4xNDcsMC4zNzYtMC4zMDQsMC41NTUtMC40NzFsMjEzLjY2My0xOTkuOTYzbDUzLjE1MSwxNjkuNTM5bC0xMDEuMDU2LTk0LjU3NmMtMy4wMjUtMi44My03Ljc3MS0yLjY3My0xMC42MDEsMC4zNTENCnMtMi42NzMsNy43NzEsMC4zNTEsMTAuNjAxbDEyMS44NjIsMTE0LjA0N2MxLjQyOCwxLjMzNiwzLjI3MSwyLjAyNCw1LjEyNywyLjAyNGMxLjM3NywwLDIuNzYxLTAuMzc4LDMuOTg5LTEuMTUNCmMyLjg4NC0xLjgxMyw0LjE4NS01LjM0MiwzLjE2Ni04LjU5M2wtODguNjAyLTI4Mi42MjJoMTA4LjMxN3YzMS40OWMwLDQuMTQyLDMuMzU4LDcuNSw3LjUsNy41czcuNS0zLjM1OCw3LjUtNy41di0zOC41OTQNCmMwLjAwNy0wLjEzMiwwLjAyLTAuMjYzLDAuMDItMC4zOTdDNDIwLjY5MSwxNjkuODkyLDQyMC42NTgsMTY5LjY1OCw0MjAuNjM1LDE2OS40MjF6IE0xOTAuMzM3LDE2Mi42MzR2LTM5LjIxMWg4OS4zMDd2MzkuMjExDQpIMTkwLjMzN3ogTTI5NC42NDMsNTQuMjExVjE4Ljg5MWw4Mi4xMTIsMzUuMzIxSDI5NC42NDN6IE0xOTAuMzM3LDE1aDg5LjMwN3YzOS4yMTFoLTg5LjMwN1YxNXogTTkzLjIyNSw1NC4yMTFsODIuMTEyLTM1LjMyMQ0KdjM1LjMyMUg5My4yMjV6IE0yNzkuNjQzLDY5LjIxMXYzOS4yMTFoLTg5LjMwN1Y2OS4yMTFIMjc5LjY0M3ogTTE3NS4zMzcsMTI3LjMxM3YzNS4zMjFIOTMuMjI1TDE3NS4zMzcsMTI3LjMxM3ogTTE2MC4wMTIsMjY4LjAxMw0KbDY0LjAwMiw1OS44OThsLTExNy4xNTIsMTA5LjY0TDE2MC4wMTIsMjY4LjAxM3ogTTMwNC45ODksMjUyLjEyOWwtNjkuOTk5LDY1LjUxbC02OS45OTgtNjUuNTFsMjMuMzU0LTc0LjQ5NWg5My4yODkNCkwzMDQuOTg5LDI1Mi4xMjl6IE0yOTQuNjQzLDE2Mi42MzR2LTM1LjMyMWw4Mi4xMTIsMzUuMzIySDI5NC42NDR6Ig0KICAgIC8+DQo8L3N2Zz4=',
                             hidden: (data: WidgetData) => !!data.powerLineIcon,
@@ -397,6 +439,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             hidden: (data: WidgetData) => !!data.powerLineStandardIcon,
                             type: 'image',
                             label: 'custom_icon',
+                            tooltip: 'custom_icon_tooltip',
                         },
                         {
                             name: 'powerLineCircleSize',
@@ -432,6 +475,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                         {
                             name: 'powerUnit',
                             label: 'units',
+                            tooltip: 'units_tooltip',
                         },
                         {
                             name: 'powerFactor',
@@ -456,17 +500,20 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             min: 0,
                             max: 6,
                             label: 'round',
+                            tooltip: 'round_tooltip',
                             default: 2,
                         },
                         {
                             name: 'powerHideIfLess',
                             type: 'number',
                             label: 'hide_if_less',
+                            tooltip: 'hide_if_less_tooltip',
                         },
                         {
                             name: 'powerInvert',
                             type: 'checkbox',
                             label: 'invert_direction',
+                            tooltip: 'invert_direction_tooltip',
                         },
                         {
                             name: 'powerSpeed',
@@ -475,6 +522,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             max: 50,
                             default: 50,
                             label: 'motion_speed',
+                            tooltip: 'motion_speed_tooltip',
                         },
                     ],
                 },
@@ -488,6 +536,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             name: 'oid',
                             type: 'id',
                             label: 'oid',
+                            tooltip: 'node_oid_tooltip',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name!]);
                                 if (object && object.common) {
@@ -502,21 +551,25 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                         {
                             name: 'name',
                             label: 'name',
+                            tooltip: 'series_name_tooltip',
                         },
                         {
                             name: 'color',
                             type: 'color',
                             label: 'color',
+                            tooltip: 'series_color_tooltip',
                         },
                         {
                             name: 'textColor',
                             type: 'color',
                             label: 'text_color',
+                            tooltip: 'text_color_tooltip',
                         },
                         {
                             name: 'standardIcon',
                             type: 'icon64',
                             label: 'standard_icon',
+                            tooltip: 'standard_icon_tooltip',
                             hidden: (data, index) => !!data[`icon${index}`],
                             default: '',
                         },
@@ -525,6 +578,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             type: 'image',
                             hidden: (data, index) => !!data[`standardIcon${index}`],
                             label: 'custom_icon',
+                            tooltip: 'custom_icon_tooltip',
                         },
                         {
                             name: 'circleSize',
@@ -560,6 +614,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                         {
                             name: 'unit',
                             label: 'units',
+                            tooltip: 'units_tooltip',
                         },
                         {
                             name: 'factor',
@@ -584,17 +639,20 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             min: 0,
                             max: 6,
                             label: 'round',
+                            tooltip: 'round_tooltip',
                             default: 2,
                         },
                         {
                             name: 'hideIfLess',
                             type: 'number',
                             label: 'hide_if_less',
+                            tooltip: 'hide_if_less_tooltip',
                         },
                         {
                             name: 'invert',
                             type: 'checkbox',
                             label: 'invert_direction',
+                            tooltip: 'invert_direction_tooltip',
                         },
                         {
                             name: 'speed',
@@ -603,6 +661,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                             max: 50,
                             default: 50,
                             label: 'motion_speed',
+                            tooltip: 'motion_speed_tooltip',
                         },
                         {
                             name: 'value2Oid',
@@ -613,6 +672,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                         {
                             name: 'value2Unit',
                             label: 'value2_unit',
+                            tooltip: 'value2_unit_tooltip',
                         },
                     ],
                 },
@@ -639,13 +699,13 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
 
                 // read channel
                 const parentObject = await this.props.context.socket.getObject(idArray.slice(0, -1).join('.'));
-                if (!parentObject?.common?.icon && (object.type === 'state' || object.type === 'channel')) {
+                if (parentObject?.common?.icon) {
+                    object.common.icon = parentObject.common.icon;
+                } else if (object.type === 'state' || object.type === 'channel') {
                     const grandParentObject = await this.props.context.socket.getObject(idArray.slice(0, -2).join('.'));
                     if (grandParentObject?.common?.icon) {
                         object.common.icon = grandParentObject.common.icon;
                     }
-                } else {
-                    object.common.icon = parentObject.common.icon;
                 }
             }
             return { common: object.common as ioBroker.StateCommon, _id: object._id };
@@ -737,21 +797,9 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
         }
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         super.componentDidMount();
         this.propertiesUpdate();
-        this.offsetInterval = setInterval(() => {
-            let offset = this.state.offset + 1;
-            if (offset > 0x0fffffff) {
-                offset = 0;
-            }
-            this.setState({ offset });
-        }, 50);
-    }
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        clearInterval(this.offsetInterval);
     }
 
     onRxDataChanged() {
@@ -759,34 +807,82 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
     }
 
     getValue(oid: string, obj: StoredObject): { unit?: string; value?: string; iValue: number } {
-        let value;
-        if (oid) {
-            value = this.state.values[`${oid}.val`];
-            if (value === null || value === undefined) {
-                value = '--';
-            } else {
-                // string => float
-                value = parseFloat(value.toString().replace(',', '.')) || 0;
-                if (this.state.units[oid] === 'Wh') {
-                    value = Math.round(value / 10) / 100;
-                }
-                if (obj?.factor && obj.factor !== 1) {
-                    value *= obj.factor;
-                }
-                // @ts-expect-error types must be fixed in vis-2
-                value = this.formatValue(value, obj?.round ?? 2);
-            }
-            return {
-                unit: this.state.units[oid],
-                value,
-                iValue: parseFloat(value.toString().replace(',', '.')) || 0,
-            };
+        if (!oid) {
+            return { unit: undefined, value: undefined, iValue: 0 };
         }
+
+        let unit = this.state.units[oid];
+        const raw = this.state.values[`${oid}.val`];
+
+        if (raw === null || raw === undefined) {
+            return { unit, value: '--', iValue: 0 };
+        }
+
+        let value = toNumber(raw) ?? 0;
+
+        // Historic behaviour: a datapoint in Wh is shown in kWh. It used to divide the value but keep the
+        // unit "Wh", so 1500 Wh appeared as "1.5 Wh" - the unit is corrected together with the value now.
+        // `rawValues` switches the whole conversion off and shows the datapoint as it is.
+        if (!this.state.rxData.rawValues && unit === 'Wh') {
+            value = Math.round(value / 10) / 100;
+            unit = 'kWh';
+        }
+        if (obj?.factor && obj.factor !== 1) {
+            value *= obj.factor;
+        }
+        // @ts-expect-error types must be fixed in vis-2
+        const formatted: string = this.formatValue(value, obj?.round ?? 2);
+
         return {
-            unit: this.state.units[oid],
-            value: undefined,
-            iValue: 0,
+            unit,
+            value: formatted,
+            iValue: toNumber(formatted) ?? 0,
         };
+    }
+
+    /**
+     * Unit shown next to a value when neither the datapoint nor the widget configuration names one
+     *
+     * @returns `kWh` for the historic behaviour, nothing when the raw values were requested
+     */
+    getFallbackUnit(): string {
+        return this.state.rxData.rawValues ? '' : Generic.t('kwh');
+    }
+
+    /**
+     * Where and how fast the dot on a connection line moves.
+     *
+     * The speed follows the value exactly as before - `|value| / speed` pixels every 50 ms, capped at 2 px -
+     * but instead of moving the dot by hand on every tick, that step is converted into the time the dot needs
+     * for the whole line and the browser animates it.
+     *
+     * @param circle - the node the line belongs to
+     * @param index - position of the node, used to keep the dots out of sync
+     * @returns How to draw the dot, or null when there is no flow to show
+     */
+    getMotion(
+        circle: Circle,
+        index: number,
+    ): { duration: number; begin: number; toHome: boolean; dotRadius: number; animated: boolean } | null {
+        if (!circle.iValue || !Number.isFinite(circle.iValue)) {
+            return null;
+        }
+
+        const step = Math.min(Math.abs(circle.iValue) / circle.speed, 2);
+        const dotRadius = step < 0.5 ? 1.5 : step * 3;
+        // A positive value flows towards the home circle, unless the direction of the node was inverted
+        const toHome = circle.invert ? circle.iValue < 0 : circle.iValue > 0;
+
+        if (this.state.rxData.noAnimation || !step || !circle.distance) {
+            return { duration: 0, begin: 0, toHome, dotRadius, animated: false };
+        }
+
+        const duration = Math.max(Math.round((circle.distance / step) * 0.05 * 100) / 100, 0.1);
+        // A negative `begin` starts the animation as if it had been running for that long, which spreads the
+        // dots of the nodes over the cycle instead of letting them all start at the home circle together
+        const begin = -Math.round(((index % 5) * duration) / 5 * 100) / 100;
+
+        return { duration, begin, toHome, dotRadius, animated: true };
     }
 
     renderWidgetBody(props: RxRenderWidgetProps) {
@@ -809,7 +905,11 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
         size -= defaultFontSize * 2; // let place for upper and bottom labels
 
         const homeRadius = (size * (parseFloat(this.state.rxData.homeCircleSize as string) || defaultRadiusSize)) / 100;
-        const homeFontSize = defaultFontSize || parseFloat(this.state.rxData.homeFontSize as string);
+        // The per-circle font size wins over the default one. It used to be the other way round
+        // (`defaultFontSize || <own>`), and since the default has a default of 12 the own field never had any
+        // effect at all.
+        const homeFontSize = parseFloat(this.state.rxData.homeFontSize as string) || defaultFontSize;
+        const lineWidth = parseFloat(this.state.rxData.lineWidth as string) || 3;
         let homeIcon =
             this.state.rxData.homeStandardIcon || this.state.rxData.homeIcon || this.state.objects.home?.common?.icon;
 
@@ -840,9 +940,9 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                 distance:
                     (size * (parseFloat(this.state.rxData.powerLineDistanceSize as string) || defaultDistanceSize)) /
                     100,
-                fontSize: defaultFontSize || parseFloat(this.state.rxData.powerLineFontSize as string),
+                fontSize: parseFloat(this.state.rxData.powerLineFontSize as string) || defaultFontSize,
                 oid: this.state.rxData['powerLine-oid'],
-                unit: valueAndUnit.unit || Generic.t('kwh'),
+                unit: valueAndUnit.unit || this.getFallbackUnit(),
                 value: valueAndUnit.value,
                 iValue: valueAndUnit.iValue,
                 icon:
@@ -866,8 +966,10 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
 
         if (circles[0].radius > maxRadius) {
             maxRadius = circles[0].radius;
-            valuesSum += Number.isFinite(valueAndUnit.iValue) ? Math.abs(valueAndUnit.iValue) : 0;
         }
+        // The power line used to be counted into the sum only when its circle happened to be the biggest one,
+        // which left the segments of the home ring out of proportion in every other case.
+        valuesSum += Number.isFinite(valueAndUnit.iValue) ? Math.abs(valueAndUnit.iValue) : 0;
 
         // add all other nodes, like solar and so on
         for (let i = 1; i <= this.state.rxData.nodesCount; i++) {
@@ -879,9 +981,9 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                 radius: (size * (parseFloat(this.state.rxData[`circleSize${i}`] as string) || defaultRadiusSize)) / 100,
                 distance:
                     (size * (parseFloat(this.state.rxData[`distanceSize${i}`] as string) || defaultDistanceSize)) / 100,
-                fontSize: defaultFontSize || parseFloat(this.state.rxData[`fontSize${i}`] as string),
+                fontSize: parseFloat(this.state.rxData[`fontSize${i}`] as string) || defaultFontSize,
                 oid: this.state.rxData[`oid${i}`],
-                unit: _valueAndUnit.unit || Generic.t('kwh'),
+                unit: _valueAndUnit.unit || this.getFallbackUnit(),
                 value: _valueAndUnit.value,
                 iValue: _valueAndUnit.iValue,
                 icon:
@@ -995,7 +1097,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                                         ) : null}
                                         {circle.secondaryValue?.value !== undefined ? (
                                             <div style={{ color: this.state.rxData.powerLineReturnColor }}>
-                                                {`${circle.secondaryArrow}${circle.secondaryValue.value} ${circle.secondaryValue.unit || Generic.t('kwh')}`}
+                                                {`${circle.secondaryArrow}${circle.secondaryValue.value} ${circle.secondaryValue.unit || this.getFallbackUnit()}`}
                                             </div>
                                         ) : null}
                                         {circle.value !== undefined ? (
@@ -1049,7 +1151,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                                 />
                             ) : null}
                             {homeValueAndUnit.value !== undefined ? (
-                                <div>{`${homeValueAndUnit.value} ${homeValueAndUnit.unit || Generic.t('kwh')}`}</div>
+                                <div>{`${homeValueAndUnit.value} ${homeValueAndUnit.unit || this.getFallbackUnit()}`}</div>
                             ) : null}
                         </div>
                         {/* show home name at the bottom of the circle */}
@@ -1093,7 +1195,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                                                   transition: 'stroke-dashoffset 0.5s linear',
                                               }}
                                               transform={`translate(${xOffset}, 0), rotate(${Math.round((currentPart / valuesSum) * 360 + 135)},${halfSize},${halfSize})`}
-                                              strokeWidth="3"
+                                              strokeWidth={lineWidth}
                                           />
                                       );
                                       currentPart += Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) : 0;
@@ -1111,24 +1213,17 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                                 );
                                 const coordinatesFrom = polarToCartesian(0, 0, homeRadius, angle);
                                 const coordinatesTo = polarToCartesian(0, 0, homeRadius + circle.distance, angle);
-                                let step = Number.isFinite(circle.iValue) ? Math.abs(circle.iValue) / circle.speed : 0;
-                                if (step > 2) {
-                                    step = 2;
-                                }
-                                let offset = (this.state.offset * step + i * 10) % circle.distance;
-                                if (circle.invert) {
-                                    if (circle.iValue < 0) {
-                                        offset = circle.distance - offset;
-                                    }
-                                } else if (circle.iValue > 0) {
-                                    offset = circle.distance - offset;
-                                }
-
-                                const coordinatesOffset = polarToCartesian(0, 0, homeRadius + offset, angle);
+                                const motion = this.getMotion(circle, i);
                                 const color =
                                     circle.color ||
                                     this.state.rxData.defaultColor ||
                                     this.props.context.theme.palette.text.primary;
+
+                                // Absolute coordinates of both ends of the connection line. `animateMotion`
+                                // translates the dot along this path, so the path is given in the coordinate
+                                // system of the <svg> and not relative to the circle.
+                                const homeEnd = `${xOffset + halfSize + coordinatesFrom.x} ${halfSize + coordinatesFrom.y}`;
+                                const nodeEnd = `${xOffset + halfSize + coordinatesTo.x} ${halfSize + coordinatesTo.y}`;
 
                                 return (
                                     <React.Fragment key={i}>
@@ -1139,7 +1234,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                                             fill="none"
                                             opacity={circle.hide ? 0.3 : 1}
                                             stroke={color}
-                                            strokeWidth="3"
+                                            strokeWidth={lineWidth}
                                             transform={`translate(${xOffset + coordinates.x}, ${coordinates.y})`}
                                         />
                                         <line
@@ -1150,17 +1245,41 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                                             stroke={color}
                                             opacity={circle.hide ? 0.3 : 1}
                                         />
-                                        {circle.iValue ? (
+                                        {motion ? (
                                             <circle
-                                                cx="50%"
-                                                cy="50%"
-                                                r={step < 0.5 ? 1.5 : step * 3}
+                                                cx={0}
+                                                cy={0}
+                                                r={motion.dotRadius}
                                                 fill={color}
                                                 stroke={color}
-                                                strokeWidth="3"
+                                                strokeWidth={lineWidth}
                                                 opacity={circle.hide ? 0.3 : 1}
-                                                transform={`translate(${xOffset + coordinatesOffset.x}, ${coordinatesOffset.y})`}
-                                            />
+                                                transform={
+                                                    motion.animated
+                                                        ? undefined
+                                                        : `translate(${motion.toHome ? homeEnd.replace(' ', ', ') : nodeEnd.replace(' ', ', ')})`
+                                                }
+                                            >
+                                                {/*
+                                                    The dot used to be positioned by hand out of a state that
+                                                    was bumped every 50 ms, which re-rendered the whole widget
+                                                    20 times a second whether or not anything had changed. The
+                                                    browser now animates it on its own and the widget only
+                                                    re-renders when a value really changes.
+                                                */}
+                                                {motion.animated ? (
+                                                    <animateMotion
+                                                        dur={`${motion.duration}s`}
+                                                        begin={`${motion.begin}s`}
+                                                        repeatCount="indefinite"
+                                                        path={
+                                                            motion.toHome
+                                                                ? `M ${nodeEnd} L ${homeEnd}`
+                                                                : `M ${homeEnd} L ${nodeEnd}`
+                                                        }
+                                                    />
+                                                ) : null}
+                                            </circle>
                                         ) : null}
                                     </React.Fragment>
                                 );
@@ -1173,7 +1292,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                                 transform={`translate(${xOffset}, 0)`}
                                 fill="none"
                                 stroke={this.state.rxData.homeColor || this.props.context.theme.palette.text.primary}
-                                strokeWidth="3"
+                                strokeWidth={lineWidth}
                             />
                         </svg>
                     </div>

@@ -3,7 +3,7 @@ import React from 'react';
 import ReactEchartsCore from 'echarts-for-react';
 import moment from 'moment';
 
-import { I18n } from '@iobroker/adapter-react-v5';
+import { I18n } from '@iobroker/gui-components';
 import type {
     RxRenderWidgetProps,
     RxWidgetInfo,
@@ -16,24 +16,30 @@ import type {
 } from '@iobroker/types-vis-2';
 
 import Generic from './Generic';
-import { getFromToTime } from './Utils';
-import type { HTMLDiv } from './IntervalSelector';
+import { cleanOid, formatNumber, getFromToTime, getIntervalSteps, type TimeIntervalType } from './Utils';
+import { readSeries, type AggregateType, type HistoryPoint } from './History';
+import { TimeSelectorSubscriber } from './TimeWidget';
+import { SizeWatcher } from './SizeWatcher';
 
 interface ConsumptionState extends VisRxWidgetState {
     loading?: boolean;
-    [key: `history${number}`]: Array<{ ts: number; val: number }>;
+    chartHeight?: number;
+    [key: `history${number}`]: HistoryPoint[];
 }
 
 interface ConsumptionRxData extends VisRxData {
     noCard: boolean;
     stacked: boolean;
+    chartType: 'bar' | 'line' | 'area';
+    showLegend: boolean;
+    showToolbox: boolean;
+    decimals: number;
     widgetTitle: string;
     devicesCount: number;
     timeWidget: SingleWidgetId;
     'start-oid': string;
     'interval-oid': string;
-    aggregate:
-        'minmax' | 'max' | 'min' | 'average' | 'total' | 'count' | 'percentile' | 'quantile' | 'integral' | 'none';
+    aggregate: AggregateType;
     difference: boolean;
     percentile: number;
     quantile: number;
@@ -53,24 +59,36 @@ const styles: Record<string, React.CSSProperties> = {
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
+        height: '100%',
         overflow: 'hidden',
     },
 };
 
+/** Label format of the x-axis per period */
+const AXIS_FORMAT: Record<string, string> = {
+    year: 'MMM',
+    month: 'DD.MM',
+    week: 'ddd',
+    day: 'HH:00',
+};
+
+/** How often the chart of the running period is read again */
+const LIVE_UPDATE_MS = 10 * 60 * 1000;
+
 class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
-    private readonly refCardContent: React.RefObject<HTMLDivElement> = React.createRef();
+    private readonly refCardContent: React.RefObject<HTMLDivElement | null> = React.createRef();
 
-    private timeSelectorRegistered: false | string | null = false;
+    private readonly sizeWatcher = new SizeWatcher((_width, height) => {
+        if (height && height !== this.state.chartHeight) {
+            this.setState({ chartHeight: height });
+        }
+    });
 
-    private timeSelectorRegisterInterval?: ReturnType<typeof setInterval> | null = null;
+    private readonly timeSelector = new TimeSelectorSubscriber(() => this.readCharts());
 
     private readTimer?: ReturnType<typeof setTimeout> | null = null;
 
     private chartUpdateInterval?: ReturnType<typeof setInterval> | null = null;
-
-    private timeStart?: number;
-
-    private timeInterval?: number;
 
     private lastUpdate?: number;
 
@@ -79,6 +97,7 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
             id: 'tplEnergy2Consumption',
             visSet: 'vis-2-widgets-energy',
             visWidgetLabel: 'consumption', // Label of widget
+            visHelp: 'help_consumption', // Description in the palette
             visName: 'Consumption',
             visAttrs: [
                 {
@@ -88,28 +107,68 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
                             name: 'noCard',
                             label: 'without_card',
                             type: 'checkbox',
+                            tooltip: 'without_card_tooltip',
+                        },
+                        {
+                            name: 'widgetTitle',
+                            label: 'name',
+                            tooltip: 'widget_title_tooltip',
+                            hidden: '!!data.noCard',
+                        },
+                        {
+                            name: 'chartType',
+                            label: 'chart_type',
+                            type: 'select',
+                            tooltip: 'chart_type_tooltip',
+                            default: 'bar',
+                            options: [
+                                { value: 'bar', label: 'bar' },
+                                { value: 'line', label: 'line' },
+                                { value: 'area', label: 'area' },
+                            ],
                         },
                         {
                             name: 'stacked',
                             label: 'stacked',
                             type: 'checkbox',
+                            tooltip: 'stacked_tooltip',
                             default: true,
                         },
                         {
-                            name: 'widgetTitle',
-                            label: 'name',
-                            hidden: '!!data.noCard',
+                            name: 'showLegend',
+                            label: 'legend',
+                            type: 'checkbox',
+                            tooltip: 'consumption_legend_tooltip',
+                            default: true,
+                        },
+                        {
+                            name: 'showToolbox',
+                            label: 'show_toolbox',
+                            type: 'checkbox',
+                            tooltip: 'show_toolbox_tooltip',
+                            default: true,
+                        },
+                        {
+                            name: 'decimals',
+                            label: 'decimals',
+                            type: 'slider',
+                            min: 0,
+                            max: 4,
+                            default: 1,
+                            tooltip: 'decimals_tooltip',
                         },
                         {
                             name: 'devicesCount',
                             type: 'number',
                             label: 'devices_count',
+                            tooltip: 'devices_count_tooltip',
                             default: 1,
                         },
                         {
                             name: 'timeWidget',
                             type: 'widget',
                             label: 'time_widget',
+                            tooltip: 'time_widget_tooltip',
                             tpl: 'tplEnergy2IntervalSelector',
                         },
                         {
@@ -124,7 +183,7 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
                             type: 'id',
                             hidden: (data: WidgetData) => !data['start-oid'] || !!data.timeWidget,
                             label: 'interval_oid',
-                            tooltip: 'start_oid_tooltip',
+                            tooltip: 'interval_oid_tooltip',
                         },
                     ],
                 },
@@ -137,6 +196,7 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
                             label: 'aggregate',
                             type: 'select',
                             noTranslation: true,
+                            tooltip: 'aggregate_tooltip',
                             options: [
                                 'minmax',
                                 'max',
@@ -168,6 +228,7 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
                             default: 50,
                             type: 'number',
                             label: 'percentile',
+                            tooltip: 'percentile_tooltip',
                             hidden: (data: WidgetData) => data.aggregate !== 'percentile',
                         },
                         {
@@ -175,6 +236,7 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
                             default: 0.5,
                             type: 'number',
                             label: 'quantile',
+                            tooltip: 'quantile_tooltip',
                             hidden: (data: WidgetData) => data.aggregate !== 'quantile',
                         },
                         {
@@ -182,6 +244,7 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
                             default: 60,
                             type: 'number',
                             label: 'integral_unit',
+                            tooltip: 'integral_unit_tooltip',
                             hidden: (data: WidgetData) => data.aggregate !== 'integral',
                         },
                         {
@@ -190,6 +253,7 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
                             type: 'select',
                             options: ['linear', 'none'],
                             label: 'integral_interpolation',
+                            tooltip: 'integral_interpolation_tooltip',
                             hidden: (data: WidgetData) => data.aggregate !== 'integral',
                         },
                     ],
@@ -204,14 +268,18 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
                             name: 'oid',
                             type: 'hid',
                             label: 'oid',
+                            tooltip: 'consumption_oid_tooltip',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = await socket.getObject(data[field.name!]);
-                                if (object?.common) {
-                                    data[`color${field.index}`] = object.common.color ?? null;
+                                const common = object?.common as ioBroker.StateCommon | undefined;
+                                if (common) {
+                                    data[`color${field.index}`] = common.color ?? null;
                                     data[`name${field.index}`] =
-                                        object.common.name && typeof object.common.name === 'object'
-                                            ? object.common.name[I18n.getLanguage()]
-                                            : object.common.name;
+                                        common.name && typeof common.name === 'object'
+                                            ? common.name[I18n.getLanguage()]
+                                            : common.name;
+                                    // The unit of the datapoint is a good default for the axis label
+                                    data[`unit${field.index}`] ||= common.unit ?? '';
                                     changeData(data);
                                 }
                             },
@@ -219,15 +287,18 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
                         {
                             name: 'name',
                             label: 'name',
+                            tooltip: 'series_name_tooltip',
                         },
                         {
                             name: 'color',
                             type: 'color',
                             label: 'color',
+                            tooltip: 'series_color_tooltip',
                         },
                         {
                             name: 'unit',
                             label: 'unit',
+                            tooltip: 'series_unit_tooltip',
                         },
                         {
                             name: 'factor',
@@ -248,212 +319,15 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
         };
     }
 
-    getTimeWidget(wid?: string): HTMLDiv | null {
-        const el = window.document.getElementById(wid || this.state.rxData.timeWidget);
-        const div: HTMLDiv | null | undefined = el?.querySelector('.time-selector');
-        if (div?._addEventHandler) {
-            return div;
-        }
-
-        return null;
+    getWidgetInfo(): RxWidgetInfo {
+        return Consumption.getWidgetInfo();
     }
 
-    getHistory(
-        id: string,
-        options: ioBroker.GetHistoryOptions & { timeout?: number },
-    ): Promise<ioBroker.GetHistoryResult> {
-        if (options.timeout) {
-            return new Promise(resolve => {
-                let timeout: ReturnType<typeof setTimeout> | null = setTimeout(() => {
-                    if (timeout) {
-                        clearTimeout(timeout);
-                        timeout = null;
-                        resolve([]);
-                    }
-                }, options.timeout);
-
-                this.props.context.socket.getHistory(id, options).then(result => {
-                    if (timeout) {
-                        clearTimeout(timeout);
-                        timeout = null;
-                        resolve(result);
-                    } else {
-                        console.warn(`Too late answer for ${id}`);
-                    }
-                });
-            });
-        }
-
-        return this.props.context.socket.getHistory(id, options);
-    }
-
-    _readCharts(): void {
-        const intervalType = this.getTimeInterval();
-        const interval = getFromToTime(this.getTimeStart(), intervalType);
-
-        const types: Record<string, { count: number; format: string }> = {
-            year: {
-                count: 12,
-                format: 'MMM',
-            },
-            month: {
-                count: new Date(interval.from.getFullYear(), interval.from.getMonth(), 0).getDate(),
-                format: 'DD',
-            },
-            week: {
-                count: 7,
-                format: 'ddd',
-            },
-            day: {
-                count: 24,
-                format: 'HH',
-            },
-        };
-        const intervalCount = types[intervalType].count;
-        const times = new Array(intervalCount)
-            .fill(0)
-            .map(
-                (_, i) =>
-                    new Date(
-                        interval.from.getTime() +
-                            ((interval.to.getTime() - interval.from.getTime()) / intervalCount) * i +
-                            1,
-                    ),
-            );
-
-        if (this.state.rxData.difference) {
-            // add one more step at the beginning
-            if (intervalType === 'year') {
-                interval.from = new Date(interval.from.getFullYear(), interval.from.getMonth() - 1, 1);
-            } else if (intervalType === 'month') {
-                interval.from = new Date(
-                    interval.from.getFullYear(),
-                    interval.from.getMonth(),
-                    interval.from.getDate() - 1,
-                );
-            } else if (intervalType === 'week') {
-                interval.from = new Date(
-                    interval.from.getFullYear(),
-                    interval.from.getMonth(),
-                    interval.from.getDate() - 1,
-                );
-            } else if (intervalType === 'day') {
-                interval.from = new Date(
-                    interval.from.getFullYear(),
-                    interval.from.getMonth(),
-                    interval.from.getDate(),
-                    interval.from.getHours() - 1,
-                );
-            }
-        }
-
-        const options: ioBroker.GetHistoryOptions & { timeout?: number } = {
-            instance: this.props.context.systemConfig?.common?.defaultHistory || 'history.0',
-            start: interval.from.getTime(),
-            end: interval.to.getTime(),
-            count: this.state.rxData.difference ? intervalCount + 1 : intervalCount,
-            from: false,
-            ack: false,
-            q: false,
-            aggregate: this.state.rxData.aggregate || 'total',
-            percentile: this.state.rxData.percentile,
-            quantile: this.state.rxData.quantile,
-            integralUnit: this.state.rxData.integralUnit,
-            integralInterpolation: this.state.rxData.integralInterpolation,
-            timeout: 10000,
-        };
-
-        this.setState({ loading: true }, async () => {
-            if (interval.from !== interval.to) {
-                const newState: Partial<ConsumptionState> = { loading: false };
-                const format = types[this.getTimeInterval()].format;
-
-                for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
-                    if (this.state.rxData[`oid${i}`] && this.state.rxData[`oid${i}`] !== 'nothing_selected') {
-                        const values = await this.getHistory(this.state.rxData[`oid${i}`], options);
-                        const history = (values as Array<ioBroker.State & { id?: string; tsF: string; tsS: string }>)
-                            .sort((a, b) => (a.ts > b.ts ? 1 : -1))
-                            .filter(item => item && item.val !== undefined && item.val !== null);
-
-                        history.forEach(item => {
-                            item.tsF = moment(item.ts).format(format);
-                            item.tsS = moment(item.ts).format('YYYY-MM-DD HH:mm:ss'); // debug
-                        });
-
-                        if (this.state.rxData.difference) {
-                            let lastValue = history.findLast(item => item.ts < times[0].getTime()) || null;
-                            const data: Array<{ ts: number; val: number }> = [];
-                            newState[`history${i}`] = data;
-                            for (let t = 0; t < times.length - 1; t++) {
-                                const actual = times[t].getTime();
-                                const next = times[t + 1].getTime();
-                                const foundHistory = history.find(item => item.ts >= actual && item.ts < next);
-                                if (foundHistory) {
-                                    if (lastValue !== null) {
-                                        data.push({
-                                            ts: times[t].getTime(),
-                                            val: (foundHistory.val as number) - (lastValue.val as number),
-                                        });
-                                    } else {
-                                        data.push({ ts: times[t].getTime(), val: 0 });
-                                    }
-                                    lastValue = foundHistory;
-                                } else {
-                                    data.push({ ts: times[t].getTime(), val: 0 });
-                                }
-                            }
-                        } else {
-                            newState[`history${i}`] = times.map(time => {
-                                const timeStr = moment(time).format(format);
-                                const foundHistory: { val: number; ts: number } | undefined = history.findLast(
-                                    item => item.tsF === timeStr,
-                                ) as { val: number; ts: number } | undefined;
-                                return foundHistory || { ts: time.getTime(), val: 0 };
-                            });
-                        }
-                    }
-                }
-                this.setState(
-                    newState as ConsumptionState & { rxData: ConsumptionRxData } & VisBaseWidgetState,
-                );
-            }
-        });
-    }
-
-    readCharts() {
-        this.readTimer && clearTimeout(this.readTimer);
-        this.readTimer = setTimeout(() => {
-            this.readTimer = null;
-            this._readCharts();
-        }, 200);
-    }
-
-    registerTimeSelector() {
-        if (
-            !this.timeSelectorRegistered &&
-            this.state.rxData.timeWidget &&
-            this.props.context.views[this.props.view].widgets[this.state.rxData.timeWidget]
-        ) {
-            this.timeSelectorRegisterInterval ||= setInterval(() => {
-                if (!this.timeSelectorRegistered && this.state.rxData.timeWidget) {
-                    const el = this.getTimeWidget();
-
-                    if (el?._addEventHandler) {
-                        el._addEventHandler(this.onTimeFromWidgetChanged);
-                        this.timeSelectorRegistered = this.state.rxData.timeWidget;
-                    }
-                }
-
-                // stop interval
-                if (
-                    (!this.state.rxData.timeWidget || this.timeSelectorRegistered) &&
-                    this.timeSelectorRegisterInterval
-                ) {
-                    clearInterval(this.timeSelectorRegisterInterval);
-                    this.timeSelectorRegisterInterval = null;
-                }
-            }, 300);
-        }
+    componentDidMount(): void {
+        super.componentDidMount();
+        this.sizeWatcher.observe(this.refCardContent.current);
+        this.timeSelector.connect(this.state.rxData.timeWidget);
+        this.readCharts();
     }
 
     componentDidUpdate(
@@ -462,28 +336,19 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
     ): void {
         super.componentDidUpdate(prevProps, prevState);
 
+        this.sizeWatcher.observe(this.refCardContent.current);
+        this.timeSelector.connect(this.state.rxData.timeWidget);
+
         if (
-            this.state.rxData.timeWidget &&
-            this.props.context.views[this.props.view].widgets[this.state.rxData.timeWidget]
+            this.props.context.timeStart !== prevProps.context.timeStart ||
+            this.props.context.timeInterval !== prevProps.context.timeInterval
         ) {
-            if (this.timeSelectorRegistered && this.state.rxData.timeWidget !== this.timeSelectorRegistered) {
-                this.getTimeWidget(this.timeSelectorRegistered)?._removeEventHandler?.(this.onTimeFromWidgetChanged);
-                this.timeSelectorRegistered = null;
-                if (this.timeSelectorRegisterInterval) {
-                    clearInterval(this.timeSelectorRegisterInterval);
-                    this.timeSelectorRegisterInterval = null;
-                }
-            }
-            this.registerTimeSelector();
+            this.readCharts();
         }
 
-        if (this.props.context.timeStart !== prevProps.context.timeStart) {
-            this.readCharts();
-        } else if (this.props.context.timeInterval !== prevProps.context.timeInterval) {
-            this.readCharts();
-        }
+        // The running period has to be refreshed now and then; a period in the past never changes
         if (!this.getTimeStart() && !this.chartUpdateInterval) {
-            this.chartUpdateInterval = setInterval(() => this.readCharts(), 1000 * 60 * 10);
+            this.chartUpdateInterval = setInterval(() => this.readCharts(), LIVE_UPDATE_MS);
         }
         if (this.getTimeStart() && this.chartUpdateInterval) {
             clearInterval(this.chartUpdateInterval);
@@ -491,9 +356,9 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
         }
     }
 
-    componentWillUnmount() {
-        this.timeSelectorRegisterInterval && clearInterval(this.timeSelectorRegisterInterval);
-        this.timeSelectorRegisterInterval = null;
+    componentWillUnmount(): void {
+        this.timeSelector.destroy();
+        this.sizeWatcher.disconnect();
 
         this.readTimer && clearTimeout(this.readTimer);
         this.readTimer = null;
@@ -501,39 +366,10 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
         this.chartUpdateInterval && clearInterval(this.chartUpdateInterval);
         this.chartUpdateInterval = null;
 
-        // unregister from time selector
-        if (this.timeSelectorRegistered) {
-            this.getTimeWidget(this.timeSelectorRegistered)?._removeEventHandler?.(this.onTimeFromWidgetChanged);
-            this.timeSelectorRegistered = false;
-        }
-
         super.componentWillUnmount();
     }
 
-    onTimeFromWidgetChanged = (event: 'unmount' | 'update', value?: { start: number; interval: number }): void => {
-        if (event === 'unmount') {
-            if (this.timeSelectorRegistered) {
-                const el = window.document.getElementById(this.state.rxData.timeWidget);
-
-                if (el) {
-                    const div: HTMLDiv | null | undefined = el.querySelector('.time-selector');
-                    if (div) {
-                        div._removeEventHandler?.(this.onTimeFromWidgetChanged);
-                        this.timeSelectorRegistered = false;
-                    }
-                }
-            }
-            this.registerTimeSelector();
-        } else if (event === 'update' && value) {
-            if (this.timeStart !== value.start || this.timeInterval !== value.interval) {
-                this.timeStart = value.start;
-                this.timeInterval = value.interval;
-                setTimeout(() => this.readCharts(), 0);
-            }
-        }
-    };
-
-    onStateUpdated() {
+    onStateUpdated(): void {
         const interval = getFromToTime(this.getTimeStart(), this.getTimeInterval());
         // read only if interval is not in the past
         if (interval.to.getTime() >= Date.now() && (!this.lastUpdate || Date.now() - this.lastUpdate > 60_000)) {
@@ -542,50 +378,133 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
         }
     }
 
-    onRxDataChanged() {
+    onRxDataChanged(): void {
         this.readCharts();
     }
 
-    getWidgetInfo() {
-        return Consumption.getWidgetInfo();
+    getTimeStart(): number {
+        let result;
+        if (this.state.rxData.timeWidget) {
+            result = this.timeSelector.value?.start;
+        } else if (this.state.rxData['start-oid']) {
+            result = this.state.values[`${this.state.rxData['start-oid']}.val`];
+        } else {
+            result = this.props.context.timeStart;
+        }
+
+        return result || 0;
     }
 
-    /**
-     *
-     * @returns {echarts.EChartsOption}
-     */
-    getOption() {
-        const data = [];
-        // use the first configured device unit as the y-axis label (#451)
-        let axisUnit = '';
+    getTimeInterval(): TimeIntervalType {
+        let result;
+        if (this.state.rxData.timeWidget) {
+            result = this.timeSelector.value?.interval;
+        } else if (this.state.rxData['start-oid'] && this.state.rxData['interval-oid']) {
+            result = this.state.values[`${this.state.rxData['interval-oid']}.val`];
+        } else {
+            result = this.props.context.timeInterval;
+        }
+
+        return (result as TimeIntervalType) || 'day';
+    }
+
+    readCharts(): void {
+        this.readTimer && clearTimeout(this.readTimer);
+        this.readTimer = setTimeout(() => {
+            this.readTimer = null;
+            void this._readCharts();
+        }, 200);
+    }
+
+    async _readCharts(): Promise<void> {
+        const intervalType = this.getTimeInterval();
+        const interval = getFromToTime(this.getTimeStart(), intervalType);
+        const steps = getIntervalSteps(intervalType, interval.from);
+        const instance = this.props.context.systemConfig?.common?.defaultHistory || 'history.0';
+
+        this.setState({ loading: true });
+
+        const newState: Partial<ConsumptionState> = { loading: false };
+
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
-            if (!axisUnit && this.state.rxData[`unit${i}`]) {
-                axisUnit = this.state.rxData[`unit${i}`] as string;
+            const oid = cleanOid(this.state.rxData[`oid${i}`]);
+            if (!oid) {
+                newState[`history${i}`] = [];
+                continue;
             }
-            data.push({
-                name: this.state.rxData[`name${i}`] || '',
-                value: this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || '',
-                values: this.state[`history${i}`] || [],
-                color: this.state.rxData[`color${i}`] || '',
-                factor: parseFloat(this.state.rxData[`factor${i}`] as string) || 1,
+
+            newState[`history${i}`] = await readSeries({
+                socket: this.props.context.socket,
+                id: oid,
+                instance,
+                from: interval.from,
+                to: interval.to,
+                steps,
+                aggregate: this.state.rxData.aggregate || 'max',
+                difference: !!this.state.rxData.difference,
+                percentile: this.state.rxData.percentile,
+                quantile: this.state.rxData.quantile,
+                integralUnit: this.state.rxData.integralUnit,
+                integralInterpolation: this.state.rxData.integralInterpolation,
             });
         }
 
-        const timeTypes: Record<string, string> = {
-            year: 'MMM',
-            month: 'DD.MM',
-            week: 'ddd',
-            day: 'HH:00',
-        };
+        this.setState(newState as ConsumptionState & { rxData: ConsumptionRxData } & VisBaseWidgetState);
+    }
+
+    /** One entry per configured device, with the values already multiplied by the factor */
+    getSeriesData(): Array<{ name: string; unit: string; color: string; values: HistoryPoint[]; factor: number }> {
+        const data = [];
+        for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
+            const factor = parseFloat(this.state.rxData[`factor${i}`] as string) || 1;
+            data.push({
+                name: this.state.rxData[`name${i}`] || cleanOid(this.state.rxData[`oid${i}`]) || `#${i}`,
+                unit: this.state.rxData[`unit${i}`] || '',
+                color: this.state.rxData[`color${i}`] || '',
+                values: (this.state[`history${i}`] || []).map(point => ({
+                    ts: point.ts,
+                    val: point.val * factor,
+                })),
+                factor,
+            });
+        }
+        return data;
+    }
+
+    /**
+     * @returns The echarts option of the chart
+     */
+    getOption(): Record<string, any> {
+        const data = this.getSeriesData();
+        // use the first configured device unit as the y-axis label (#451)
+        const axisUnit = data.find(item => item.unit)?.unit || '';
+        const decimals = this.state.rxData.decimals ?? 1;
+        const chartType = this.state.rxData.chartType || 'bar';
+        const stacked = this.state.rxData.stacked !== false;
 
         const textStyle = {
             color: this.props.context.themeType === 'dark' ? '#ddd' : '#222',
         };
+        const showLegend = this.state.rxData.showLegend !== false;
 
         return {
             backgroundColor: 'transparent',
-            tooltip: {},
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: chartType === 'bar' ? 'shadow' : 'line' },
+                // The values of the series may have different units, so every row is formatted on its own
+                // instead of letting echarts append one unit to all of them
+                formatter: (params: Array<{ seriesIndex: number; axisValueLabel: string; value: number }>): string => {
+                    const rows = params.map(param => {
+                        const series = data[param.seriesIndex];
+                        const unit = series?.unit ? ` ${series.unit}` : '';
+                        return `${series?.name || ''}: ${formatNumber(param.value, decimals)}${unit}`;
+                    });
+                    return [params[0]?.axisValueLabel, ...rows].filter(row => row).join('<br/>');
+                },
+            },
             legend: {
+                show: showLegend,
                 top: 5,
                 left: 'center',
                 data: data.map(item => ({
@@ -594,6 +513,7 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
                 })),
             },
             toolbox: {
+                show: this.state.rxData.showToolbox !== false,
                 feature: {
                     magicType: {
                         type: ['stack'],
@@ -604,81 +524,55 @@ class Consumption extends Generic<ConsumptionRxData, ConsumptionState> {
             grid: {
                 containLabel: true,
                 left: 10,
-                top: 40,
+                top: showLegend ? 40 : 20,
                 right: 10,
                 bottom: 10,
             },
-            yAxis: { name: axisUnit },
+            yAxis: { name: axisUnit, axisLabel: { formatter: (value: number) => formatNumber(value, 0) } },
             xAxis: {
                 type: 'category',
                 data: data?.[0]?.values?.map(dateValue =>
-                    moment(dateValue.ts).format(timeTypes[this.getTimeInterval()]),
+                    moment(dateValue.ts).format(AXIS_FORMAT[this.getTimeInterval()]),
                 ),
             },
             series: data.map(item => ({
-                type: 'bar',
+                type: chartType === 'bar' ? 'bar' : 'line',
                 name: item.name,
+                smooth: chartType !== 'bar',
+                areaStyle: chartType === 'area' ? {} : undefined,
                 itemStyle: {
-                    color: item.color,
+                    color: item.color || undefined,
                 },
-                data: item.values?.map(dateValue => dateValue.val * item.factor),
-                stack: this.state.rxData.stacked === false ? undefined : 'one',
+                data: item.values?.map(dateValue => dateValue.val),
+                stack: stacked ? 'one' : undefined,
             })),
         };
     }
 
-    getTimeStart() {
-        let result;
-        if (this.state.rxData.timeWidget) {
-            result = this.timeStart;
-        } else if (this.state.rxData['start-oid']) {
-            result = this.state.values[`${this.state.rxData['start-oid']}.val`];
-        } else {
-            result = this.props.context.timeStart;
-        }
-
-        result ||= 0;
-
-        return result;
-    }
-
-    getTimeInterval() {
-        let result;
-        if (this.state.rxData.timeWidget) {
-            result = this.timeInterval;
-        } else if (this.state.rxData['start-oid'] && this.state.rxData['interval-oid']) {
-            result = this.state.values[`${this.state.rxData['interval-oid']}.val`];
-        } else {
-            result = this.props.context.timeInterval;
-        }
-        result ||= 'day';
-
-        return result;
-    }
-
-    renderWidgetBody(props: RxRenderWidgetProps) {
+    renderWidgetBody(props: RxRenderWidgetProps): React.JSX.Element | React.JSX.Element[] | null {
         super.renderWidgetBody(props);
 
-        let size;
+        // The very first render has no ref yet, so ask for one more to pick the height up
         if (!this.refCardContent.current) {
-            setTimeout(() => this.forceUpdate(), 50);
-        } else {
-            size = this.refCardContent.current.offsetHeight;
+            setTimeout(() => this.sizeWatcher.observe(this.refCardContent.current), 50);
         }
+        const size = this.state.chartHeight;
 
         const content = (
             <div
                 ref={this.refCardContent}
                 style={styles.cardContent}
             >
-                {size && (
+                {size ? (
                     <ReactEchartsCore
                         option={this.getOption()}
-                        theme={(this.props.context.themeType === 'dark' ? 'dark' : '')}
+                        notMerge
+                        showLoading={!!this.state.loading}
+                        theme={this.props.context.themeType === 'dark' ? 'dark' : ''}
                         style={{ height: `${size}px`, width: '100%' }}
                         opts={{ renderer: 'svg' }}
                     />
-                )}
+                ) : null}
             </div>
         );
 

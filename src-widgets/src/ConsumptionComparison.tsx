@@ -1,12 +1,16 @@
 import React from 'react';
 import { Box, type SxProps } from '@mui/material';
 
-import ReactEchartsCore, { type EChartsOption } from 'echarts-for-react';
+import ReactEchartsCore from 'echarts-for-react';
 import type { RxRenderWidgetProps, RxWidgetInfo, VisRxData, VisRxWidgetState, WidgetData } from '@iobroker/types-vis-2';
+
 import Generic from './Generic';
+import { cleanOid, formatNumber, toNumber } from './Utils';
+import { SizeWatcher } from './SizeWatcher';
 
 interface ConsumptionComparisonState extends VisRxWidgetState {
     units?: string[];
+    chartHeight?: number;
 }
 
 const styles: Record<string, SxProps> = {
@@ -16,6 +20,7 @@ const styles: Record<string, SxProps> = {
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
+        height: '100%',
         overflow: 'hidden',
         '& .vis-2-widgets-energy-chart': {
             width: '100%',
@@ -29,6 +34,10 @@ const styles: Record<string, SxProps> = {
 interface ConsumptionComparisonRxData extends VisRxData {
     noCard: boolean;
     type: 'bar' | 'pie';
+    orientation: 'horizontal' | 'vertical';
+    sort: 'none' | 'asc' | 'desc';
+    showValues: boolean;
+    decimals: number;
     noAnimation: boolean;
     animationDuration: string;
     innerRadius: string | number;
@@ -50,14 +59,29 @@ interface ConsumptionComparisonRxData extends VisRxData {
     [key: `factor${string}`]: string | number;
 }
 
+/** One configured device, ready to be drawn */
+interface ComparisonItem {
+    name: string;
+    value: number;
+    color?: string;
+    unit: string;
+}
+
 class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, ConsumptionComparisonState> {
     private readonly refCardContent: React.RefObject<HTMLDivElement | null> = React.createRef();
+
+    private readonly sizeWatcher = new SizeWatcher((_width, height) => {
+        if (height && height !== this.state.chartHeight) {
+            this.setState({ chartHeight: height });
+        }
+    });
 
     static getWidgetInfo(): RxWidgetInfo {
         return {
             id: 'tplEnergy2ConsumptionComparison',
             visSet: 'vis-2-widgets-energy',
             visWidgetLabel: 'consumption_comparison', // Label of widget
+            visHelp: 'help_consumption_comparison', // Description in the palette
             visName: 'Consumption comparison',
             visAttrs: [
                 {
@@ -67,11 +91,19 @@ class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, Consump
                             name: 'noCard',
                             label: 'without_card',
                             type: 'checkbox',
+                            tooltip: 'without_card_tooltip',
+                        },
+                        {
+                            name: 'widgetTitle',
+                            label: 'name',
+                            tooltip: 'widget_title_tooltip',
+                            hidden: '!!data.noCard',
                         },
                         {
                             name: 'type',
                             label: 'type',
                             type: 'select',
+                            tooltip: 'comparison_type_tooltip',
                             options: [
                                 { value: 'bar', label: 'bar' },
                                 { value: 'pie', label: 'pie' },
@@ -79,40 +111,103 @@ class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, Consump
                             default: 'bar',
                         },
                         {
+                            name: 'devicesCount',
+                            type: 'number',
+                            label: 'devices_count',
+                            tooltip: 'devices_count_tooltip',
+                            min: 2,
+                            default: 2,
+                        },
+                        {
+                            name: 'sort',
+                            label: 'sort',
+                            type: 'select',
+                            tooltip: 'sort_tooltip',
+                            default: 'none',
+                            options: [
+                                { value: 'none', label: 'sort_none' },
+                                { value: 'desc', label: 'sort_desc' },
+                                { value: 'asc', label: 'sort_asc' },
+                            ],
+                        },
+                        {
+                            name: 'decimals',
+                            label: 'decimals',
+                            type: 'slider',
+                            min: 0,
+                            max: 4,
+                            default: 2,
+                            tooltip: 'decimals_tooltip',
+                        },
+                        {
                             name: 'noAnimation',
                             label: 'no_animation',
                             type: 'checkbox',
+                            tooltip: 'no_animation_tooltip',
                         },
                         {
                             name: 'animationDuration',
                             label: 'animation_duration',
                             type: 'number',
+                            tooltip: 'animation_duration_tooltip',
                             default: 1000,
                             hidden: (data: WidgetData) => !!data.noAnimation,
                         },
+                    ],
+                },
+                {
+                    name: 'bar',
+                    label: 'group_bar',
+                    hidden: 'data.type !== "bar"',
+                    fields: [
+                        {
+                            name: 'orientation',
+                            label: 'orientation',
+                            type: 'select',
+                            tooltip: 'orientation_tooltip',
+                            default: 'horizontal',
+                            options: [
+                                { value: 'horizontal', label: 'orientation_horizontal' },
+                                { value: 'vertical', label: 'orientation_vertical' },
+                            ],
+                        },
+                        {
+                            name: 'showValues',
+                            label: 'show_values',
+                            type: 'checkbox',
+                            tooltip: 'show_values_tooltip',
+                        },
+                    ],
+                },
+                {
+                    name: 'pie',
+                    label: 'group_pie',
+                    hidden: 'data.type !== "pie"',
+                    fields: [
                         {
                             name: 'innerRadius',
                             label: 'inner_radius',
                             type: 'slider',
+                            tooltip: 'inner_radius_tooltip',
                             min: 0,
                             max: 80,
-                            hidden: 'data.type !== "pie"',
                         },
                         {
                             name: 'innerTitle',
                             label: 'inner_title',
                             type: 'text',
-                            hidden: 'data.type !== "pie"',
+                            tooltip: 'inner_title_tooltip',
                         },
                         {
                             name: 'inner_oid',
                             label: 'inner_oid',
                             type: 'id',
-                            hidden: 'data.type !== "pie"',
+                            tooltip: 'inner_oid_tooltip',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = data[field.name!] ? await socket.getObject(data[field.name!]) : null;
-                                if (object?.common?.unit) {
-                                    data.innerUnit = object.common.unit;
+                                const common = object?.common as ioBroker.StateCommon | undefined;
+                                if (common?.unit) {
+                                    data.innerUnit = common.unit;
                                     changeData(data);
                                 }
                             },
@@ -121,49 +216,40 @@ class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, Consump
                             name: 'innerUnit',
                             label: 'inner_unit',
                             type: 'text',
-                            hidden: 'data.type !== "pie" || !data.inner_oid',
+                            tooltip: 'inner_unit_tooltip',
+                            hidden: '!data.inner_oid',
                         },
                         {
                             name: 'legend',
                             label: 'legend',
                             type: 'checkbox',
-                            hidden: 'data.type !== "pie"',
+                            tooltip: 'legend_tooltip',
                         },
                         {
                             name: 'legendHeight',
                             label: 'legend_height',
                             type: 'slider',
+                            tooltip: 'legend_height_tooltip',
                             min: 5,
                             max: 30,
                             default: 10,
-                            hidden: 'data.type !== "pie" || !data.legend',
+                            hidden: '!data.legend',
                         },
                         {
                             name: 'hideLabels',
                             label: 'hide_Labels',
                             type: 'checkbox',
-                            hidden: 'data.type !== "pie"',
+                            tooltip: 'hide_labels_tooltip',
                         },
                         {
                             name: 'precision',
                             label: 'precision',
                             type: 'slider',
+                            tooltip: 'precision_tooltip',
                             min: 0,
                             max: 5,
                             default: 0,
-                            hidden: 'data.type !== "pie" || !!data.hideLabels',
-                        },
-                        {
-                            name: 'widgetTitle',
-                            label: 'name',
-                            hidden: '!!data.noCard',
-                        },
-                        {
-                            name: 'devicesCount',
-                            type: 'number',
-                            label: 'devices_count',
-                            min: 2,
-                            default: 2,
+                            hidden: '!!data.hideLabels',
                         },
                     ],
                 },
@@ -177,6 +263,7 @@ class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, Consump
                             name: 'oid',
                             type: 'id',
                             label: 'oid',
+                            tooltip: 'comparison_oid_tooltip',
                             onChange: async (field, data, changeData, socket) => {
                                 const object = data[field.name!] ? await socket.getObject(data[field.name!]) : null;
                                 if (object?.common) {
@@ -189,15 +276,18 @@ class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, Consump
                         {
                             name: 'name',
                             label: 'name',
+                            tooltip: 'series_name_tooltip',
                         },
                         {
                             name: 'color',
                             type: 'color',
                             label: 'color',
+                            tooltip: 'series_color_tooltip',
                         },
                         {
                             name: 'unit',
                             label: 'unit',
+                            tooltip: 'series_unit_tooltip',
                         },
                         {
                             name: 'factor',
@@ -214,6 +304,7 @@ class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, Consump
                                 { value: 0.001, label: '0.001' },
                             ],
                             default: '1',
+                            tooltip: 'factor_tooltip',
                         },
                     ],
                 },
@@ -227,25 +318,28 @@ class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, Consump
         };
     }
 
-    async propertiesUpdate() {
-        const units = [];
-        const ids = [];
+    getWidgetInfo(): RxWidgetInfo {
+        return ConsumptionComparison.getWidgetInfo();
+    }
+
+    async propertiesUpdate(): Promise<void> {
+        const units: string[] = [];
+        const ids: string[] = [];
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
-            if (
-                !this.state.rxData[`unit${i}`] &&
-                this.state.rxData[`oid${i}`] &&
-                this.state.rxData[`oid${i}`] !== 'nothing_selected'
-            ) {
-                ids.push(this.state.rxData[`oid${i}`]);
+            const oid = cleanOid(this.state.rxData[`oid${i}`]);
+            if (!this.state.rxData[`unit${i}`] && oid) {
+                ids.push(oid);
             }
         }
         const _objects = ids.length ? await this.props.context.socket.getObjectsById(ids) : {};
 
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
             if (!this.state.rxData[`unit${i}`]) {
-                const object = _objects[this.state.rxData[`oid${i}`]];
-                if (object?.common?.unit) {
-                    units[i] = object.common.unit;
+                const common = _objects?.[cleanOid(this.state.rxData[`oid${i}`])]?.common as
+                    | ioBroker.StateCommon
+                    | undefined;
+                if (common?.unit) {
+                    units[i] = common.unit;
                 }
             } else {
                 units[i] = this.state.rxData[`unit${i}`];
@@ -257,74 +351,121 @@ class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, Consump
         }
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         super.componentDidMount();
-        this.propertiesUpdate();
+        this.sizeWatcher.observe(this.refCardContent.current);
+        void this.propertiesUpdate();
     }
 
-    onRxDataChanged() {
-        this.propertiesUpdate();
+    componentDidUpdate(prevProps: any, prevState: any): void {
+        super.componentDidUpdate(prevProps, prevState);
+        this.sizeWatcher.observe(this.refCardContent.current);
     }
 
-    getWidgetInfo() {
-        return ConsumptionComparison.getWidgetInfo();
+    componentWillUnmount(): void {
+        this.sizeWatcher.disconnect();
+        super.componentWillUnmount();
     }
 
-    getBarOption(): EChartsOption {
-        const data: { name: string; value: number; color?: string }[] = [];
+    onRxDataChanged(): void {
+        void this.propertiesUpdate();
+    }
+
+    /**
+     * Read every configured device once, with its own unit attached.
+     *
+     * The unit travels WITH the item on purpose: the chart draws the devices in reverse order, and the two
+     * formatters used to look their unit up by the position in that reversed list (`units[dataIndex + 1]`).
+     * Every device therefore showed the unit of a different one as soon as more than one unit was in play.
+     *
+     * @returns One entry per configured device, in configuration order
+     */
+    getItems(): ComparisonItem[] {
+        const decimals = this.state.rxData.decimals ?? 2;
+        const items: ComparisonItem[] = [];
+
         for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
-            let value = this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || 0;
-            if (this.state.rxData[`factor${i}`] && this.state.rxData[`factor${i}`] !== 1) {
-                value *= parseFloat(this.state.rxData[`factor${i}`] as string);
-            }
-            value = Math.round(value * 100) / 100;
+            const factor = parseFloat(this.state.rxData[`factor${i}`] as string) || 1;
+            const raw = toNumber(this.state.values[`${cleanOid(this.state.rxData[`oid${i}`])}.val`]) ?? 0;
+            const rounded = Math.round(raw * factor * 10 ** decimals) / 10 ** decimals;
 
-            data.push({
-                name: this.state.rxData[`name${i}`] || '',
-                value,
+            items.push({
+                name: this.state.rxData[`name${i}`] || cleanOid(this.state.rxData[`oid${i}`]) || `#${i}`,
+                value: rounded,
                 color: this.state.rxData[`color${i}`] || undefined,
+                unit: this.state.units?.[i] || '',
             });
         }
 
-        data.reverse();
+        const sort = this.state.rxData.sort;
+        if (sort === 'asc') {
+            items.sort((a, b) => a.value - b.value);
+        } else if (sort === 'desc') {
+            items.sort((a, b) => b.value - a.value);
+        }
 
-        // Use the first configured/detected device unit as the x-axis label instead
-        // of the hard-coded "kWh" (this.state.unit was never set) (#243)
-        const axisUnit = (this.state.units && this.state.units.find(u => u)) || null;
+        return items;
+    }
+
+    /** Milliseconds one animation takes, 0 when animations are switched off */
+    getAnimationDuration(): number {
+        return parseInt(this.state.rxData.animationDuration, 10) || 1000;
+    }
+
+    /**
+     * Value with its unit, e.g. `12.30 kWh`
+     *
+     * @param item - the device to format
+     * @returns The formatted value
+     */
+    formatItem(item: ComparisonItem): string {
+        return `${formatNumber(item.value, this.state.rxData.decimals ?? 2)}${item.unit ? ` ${item.unit}` : ''}`;
+    }
+
+    getBarOption(items: ComparisonItem[]): Record<string, any> {
+        const vertical = this.state.rxData.orientation === 'vertical';
+        // `reverse()` puts the first configured device at the TOP of a horizontal bar chart, which is what a
+        // reader expects. A vertical chart reads left to right, so there it has to stay in configuration order.
+        const drawn = vertical ? items : [...items].reverse();
+        const axisUnit = items.find(item => item.unit)?.unit || Generic.t('kwh');
+
+        const valueAxis = {
+            type: 'value',
+            name: axisUnit,
+            axisLabel: { formatter: (value: number) => formatNumber(value, 0) },
+        };
+        const categoryAxis = { type: 'category', data: drawn.map(item => item.name) };
 
         return {
             tooltip: {
-                // formatter: '{b}: {c} kWh',
-                formatter: (params: {
-                    name: string;
-                    data: { value: number };
-                    dataIndex: number;
-                } /* , ticket, callback */) =>
-                    `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
+                formatter: (params: { name: string; dataIndex: number }): string =>
+                    `${params.name}: ${this.formatItem(drawn[params.dataIndex])}`,
             },
-            title: {
-                show: false,
-            },
-            legend: {
-                show: false,
-            },
+            title: { show: false },
+            legend: { show: false },
             backgroundColor: 'transparent',
             animation: !this.state.rxData.noAnimation,
-            animationDuration: parseInt(this.state.rxData.animationDuration, 10) || 1000,
-            animationDurationUpdate: parseInt(this.state.rxData.animationDuration, 10) || 1000,
+            animationDuration: this.getAnimationDuration(),
+            animationDurationUpdate: this.getAnimationDuration(),
             grid: {
                 containLabel: true,
                 left: 10,
                 top: 5,
-                right: 50,
+                right: vertical ? 10 : 50,
                 bottom: 10,
             },
-            xAxis: { type: 'value', name: axisUnit ? axisUnit : Generic.t('kwh') },
-            yAxis: { type: 'category', data: data.map(item => item.name) },
+            xAxis: vertical ? categoryAxis : valueAxis,
+            yAxis: vertical ? valueAxis : categoryAxis,
             series: [
                 {
                     type: 'bar',
-                    data: data.map(item => ({
+                    label: {
+                        show: !!this.state.rxData.showValues,
+                        position: vertical ? 'top' : 'right',
+                        formatter: (params: { dataIndex: number }) => this.formatItem(drawn[params.dataIndex]),
+                        color: this.props.context.themeType === 'dark' ? '#fff' : '#000',
+                    },
+                    data: drawn.map(item => ({
                         value: item.value,
                         itemStyle: {
                             color: item.color,
@@ -332,88 +473,57 @@ class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, Consump
                     })),
                 },
             ],
-        } as EChartsOption;
+        };
     }
 
-    getPieOption(): EChartsOption {
-        const data: { name: string; value: number; itemStyle?: { color?: string } }[] = [];
-        for (let i = 1; i <= this.state.rxData.devicesCount; i++) {
-            let value = this.state.values[`${this.state.rxData[`oid${i}`]}.val`] || 0;
-            this.state.rxData[`factor${i}`] = parseFloat(this.state.rxData[`factor${i}`] as string) || 1;
-            if (this.state.rxData[`factor${i}`] && this.state.rxData[`factor${i}`] !== 1) {
-                value *= this.state.rxData[`factor${i}`] as number;
-            }
-            value = Math.round(value * 100) / 100;
+    getPieOption(items: ComparisonItem[]): Record<string, any> {
+        const drawn = [...items].reverse();
+        const data = drawn.map(item => ({
+            name: item.name,
+            value: item.value,
+            itemStyle: { color: item.color },
+        }));
 
-            data.push({
-                name: this.state.rxData[`name${i}`] || '',
-                value,
-                itemStyle: {
-                    color: this.state.rxData[`color${i}`] || undefined,
-                },
-            });
+        const text = this.state.rxData.innerTitle || '';
+        let textValue: string | undefined;
+        if (cleanOid(this.state.rxData.inner_oid)) {
+            const value = toNumber(this.state.values[`${cleanOid(this.state.rxData.inner_oid)}.val`]) ?? 0;
+            textValue = formatNumber(value, this.state.rxData.decimals ?? 2) + (this.state.rxData.innerUnit || '');
         }
-        let text = '';
-        if (this.state.rxData.innerTitle) {
-            text = this.state.rxData.innerTitle;
-        }
-        let textValue;
-        if (this.state.rxData.inner_oid) {
-            let valueC = this.state.values[`${this.state.rxData.inner_oid}.val`] || 0;
-            valueC = Math.round(valueC * 100) / 100;
-            textValue = valueC + (this.state.rxData.innerUnit || '');
-        }
-
-        data.reverse();
-
-        const title = {
-            show: true,
-            text: [text, textValue].filter(t => t).join('\n'),
-            rich: {
-                text: {
-                    fontSize: 10,
-                },
-                value: {
-                    fontSize: 20,
-                },
-            },
-            left: 'center',
-            top: 'center',
-            textStyle: {
-                color: this.props.context.themeType === 'dark' ? '#c7c7c7' : '#3d3d3d',
-            },
-        };
 
         return {
             tooltip: {
                 trigger: 'item',
-                formatter: (params: any) =>
-                    `${params.name}: ${params.data.value}${this.state.units && this.state.units[params.dataIndex + 1] ? ` ${this.state.units[params.dataIndex + 1]}` : ''}`,
+                formatter: (params: { name: string; dataIndex: number }): string =>
+                    `${params.name}: ${this.formatItem(drawn[params.dataIndex])}`,
             },
-            title,
+            title: {
+                show: true,
+                text: [text, textValue].filter(t => t).join('\n'),
+                rich: {
+                    text: { fontSize: 10 },
+                    value: { fontSize: 20 },
+                },
+                left: 'center',
+                top: 'center',
+                textStyle: {
+                    color: this.props.context.themeType === 'dark' ? '#c7c7c7' : '#3d3d3d',
+                },
+            },
             backgroundColor: 'transparent',
             animation: !this.state.rxData.noAnimation,
-            animationDuration: parseInt(this.state.rxData.animationDuration, 10) || 1000,
-            animationDurationUpdate: parseInt(this.state.rxData.animationDuration, 10) || 1000,
-            grid: {
-                left: 10,
-                top: 0,
-                right: 10,
-                bottom: 0,
-            },
-            xAxis: {
-                show: false,
-            },
-            yAxis: {
-                show: false,
-            },
+            animationDuration: this.getAnimationDuration(),
+            animationDurationUpdate: this.getAnimationDuration(),
+            grid: { left: 10, top: 0, right: 10, bottom: 0 },
+            xAxis: { show: false },
+            yAxis: { show: false },
             legend: {
-                show: this.state.rxData.legend,
+                show: !!this.state.rxData.legend,
                 bottom: 0,
                 left: 'center',
-                formatter: (name: any) => {
-                    const i = data.findIndex(item => item.name === name);
-                    return `${name}: ${data[i].value}${this.state.units && this.state.units[i + 1] ? ` ${this.state.units[i + 1]}` : ''}`;
+                formatter: (name: string): string => {
+                    const item = drawn.find(entry => entry.name === name);
+                    return item ? `${name}: ${this.formatItem(item)}` : name;
                 },
                 textStyle: {
                     color: this.props.context.themeType === 'dark' ? '#fff' : '#000',
@@ -438,32 +548,32 @@ class ConsumptionComparison extends Generic<ConsumptionComparisonRxData, Consump
         };
     }
 
-    renderWidgetBody(props: RxRenderWidgetProps) {
+    renderWidgetBody(props: RxRenderWidgetProps): React.JSX.Element | React.JSX.Element[] | null {
         super.renderWidgetBody(props);
 
-        let size;
         if (!this.refCardContent.current) {
-            setTimeout(() => this.forceUpdate(), 50);
-        } else {
-            size = this.refCardContent.current.offsetHeight;
+            setTimeout(() => this.sizeWatcher.observe(this.refCardContent.current), 50);
         }
+        const size = this.state.chartHeight;
 
-        const option = this.state.rxData.type === 'pie' ? this.getPieOption() : this.getBarOption();
+        const items = this.getItems();
+        const option = this.state.rxData.type === 'pie' ? this.getPieOption(items) : this.getBarOption(items);
 
         const content = (
             <Box
                 ref={this.refCardContent}
                 sx={styles.cardContent}
             >
-                {size && (
+                {size ? (
                     <ReactEchartsCore
                         option={option}
+                        notMerge
                         theme={this.props.context.themeType === 'dark' ? 'dark' : ''}
                         className="vis-2-widgets-energy-chart"
                         opts={{ renderer: 'svg' }}
                         style={{ height: size }}
                     />
-                )}
+                ) : null}
             </Box>
         );
 
