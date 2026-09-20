@@ -1,4 +1,4 @@
-![Logo](admin/vis-2-widgets-energy.png)
+![Logo](admin/vis-2-widgets-energy.svg)
 # Vis 2 Energy widgets
 
 ![Number of Installations](http://iobroker.live/badges/vis-2-widgets-energy-installed.svg) ![Number of Installations](http://iobroker.live/badges/vis-2-widgets-energy-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.vis-2-widgets-energy.svg)](https://www.npmjs.com/package/iobroker.vis-2-widgets-energy)
