@@ -9,18 +9,18 @@ version: 2
 updates:
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: github-actions
-    directory: "/"
+    directory: '/'
     schedule:
       interval: cron
-      cronjob: "47 2 13 * *"
+      cronjob: '47 2 13 * *'
       timezone: Europe/Berlin
     open-pull-requests-limit: 15
 
   - package-ecosystem: npm
-    directory: "/"
+    directory: '/'
     schedule:
       interval: cron
-      cronjob: "47 2 13 * *"
+      cronjob: '47 2 13 * *'
       timezone: Europe/Berlin
     open-pull-requests-limit: 20
     versioning-strategy: increase
@@ -29,21 +29,21 @@ updates:
       default-days: 7
     # Do not raise PRs for major @types/node bumps (must match the Node.js runtime) (W8917)
     ignore:
-      - dependency-name: "@types/node"
+      - dependency-name: '@types/node'
         update-types:
-          - "version-update:semver-major"
+          - 'version-update:semver-major'
 
   - package-ecosystem: npm
-    directory: "/src-widgets"
+    directory: '/src-widgets'
     schedule:
       interval: cron
-      cronjob: "47 2 13 * *"
+      cronjob: '47 2 13 * *'
       timezone: Europe/Berlin
     open-pull-requests-limit: 20
     versioning-strategy: increase
     cooldown:
       default-days: 7
     ignore:
-      - dependency-name: "@types/node"
+      - dependency-name: '@types/node'
         update-types:
-          - "version-update:semver-major"
+          - 'version-update:semver-major'
