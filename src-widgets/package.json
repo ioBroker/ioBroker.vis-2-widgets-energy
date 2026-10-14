@@ -14,7 +14,7 @@
         "@iobroker/gui-components": "^10.2.3",
         "@iobroker/types-vis-2": "~2.20.1",
         "@iobroker/vis-2-widgets-react-dev": "^4.0.4",
-        "@module-federation/vite": "^1.21.3",
+        "@module-federation/vite": "^1.23.2",
         "@mui/icons-material": "^9.4.0",
         "@mui/material": "^9.4.0",
         "@mui/system": "^9.4.0",
