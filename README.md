@@ -51,8 +51,7 @@ adapter.
 -->
 
 ## Changelog
-
-### **WORK IN PROGRESS**
+### 3.0.0 (2026-10-16)
 * (@GermanBluefox) **BREAKING:** built with React 19 and MUI 9 - requires vis-2 2.20.1 or newer (React 19)
 * (@GermanBluefox) New widgets: self-sufficiency, battery storage, energy costs and dynamic electricity price
 * (@GermanBluefox) Tooltips for all configuration fields, a palette description for every widget and new documentation (docs/en, docs/de) with fresh screenshots
@@ -100,9 +99,6 @@ adapter.
 
 ### 0.3.11 (2024-02-16)
 * (bluefox) show value with green color if we feed back into power line
-
-### 0.3.9 (2023-11-10)
-* (bluefox) update packages
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

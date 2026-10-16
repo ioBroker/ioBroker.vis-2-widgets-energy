@@ -1,4 +1,7 @@
 # Older changes
+## 0.3.9 (2023-11-10)
+* (bluefox) update packages
+
 ## 0.3.8 (2023-09-20)
 * (bluefox) Added support of counters for consumption
 
