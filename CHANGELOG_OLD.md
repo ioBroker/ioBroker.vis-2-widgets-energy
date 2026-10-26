@@ -1,4 +1,7 @@
 # Older changes
+## 0.3.11 (2024-02-16)
+* (bluefox) show value with green color if we feed back into power line
+
 ## 0.3.9 (2023-11-10)
 * (bluefox) update packages
 

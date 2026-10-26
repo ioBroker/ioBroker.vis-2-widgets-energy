@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "3.0.1",
+    "version": "3.0.2",
     "news": {
+      "3.0.2": {
+        "en": "Fixed the widget integration test for `@iobroker/vis-2-widgets-testing` 2.x: `addWidget` now receives a numeric timeout instead of a boolean, which otherwise made the test fail immediately (\"truems exceeded\") and blocked the release from being published\nDistribution widget: the computed size is now clamped to zero so the circle radii derived from it never turn into invalid negative SVG `r` values at very small widget sizes\nupdated dependencies",
+        "de": "Der Widget-Integrationstest für `@iobroker /vis-2-widgets-testing` 2.x wurde behoben: `AddWidget` erhält jetzt ein numerisches Timeout statt eines booleschen Werts, wodurch der Test sofort fehlschlug („truems exceeded“) und die Veröffentlichung blockiert wurde\nVerteilungs-Widget: Die berechnete Größe ist jetzt auf Null begrenzt, sodass die daraus abgeleiteten Kreisradien bei sehr kleinen Widgets nie zu ungültigen SVG\nNeue Abhängigkeiten",
+        "ru": "Исправлен тест интеграции виджетов для `@iobroker /vis-2-widgets-testing` 2.x: теперь для `AddWidget` вместо булевого значения вводится числовой тайм-аут, что в противном случае приводило к немедленному завершению теста («превышение количества трюмов») и блокированию публикации релиза\nВиджет распределения: вычисленный размер теперь ограничен нулем, поэтому полученные на его основе радиусы окружностей никогда не превращаются в неверные отрицательные значения SVG `r` при очень малых размерах виджетов\nобновленные зависимости",
+        "pt": "Corrigido o teste de integração de widget para `@iobroker /vis-2-widgets-testing` 2.x: `addWidget` agora recebe um tempo limite numérico em vez de um booleano, o que fazia o teste falhar imediatamente (“truems excedido”) e impedir a publicação da versão\nWidget de distribuição: o tamanho calculado agora é fixado em zero para que os raios do círculo dele nunca se tornem valores SVG `r` inválidos em widgets muito pequenos\nnovas dependências",
+        "nl": "De widgetintegratietest voor `@iobroker /vis-2-widgets-testing` 2.x opgelost: `AddWidget` krijgt nu een numerieke time-out in plaats van een booleaanse waarde, waardoor de test anders onmiddellijk mislukte („truems overschreden”) en de publicatie van de release werd geblokkeerd\nDistributiewidget: de berekende grootte is nu op nul geklemd, zodat de cirkelradii die ervan worden afgeleid nooit veranderen in ongeldige negatieve SVG `r` waarden bij zeer kleine widgetgroottes\nbijgewerkte afhankelijkheden",
+        "fr": "Correction du test d'intégration des widgets pour @iobroker /vis-2-widgets-testing 2.x : « AddWidget » reçoit désormais un timeout numérique au lieu d'un booléen, sinon le test échouait immédiatement (« truems dépassés ») et bloquait la publication de la version\nWidget de distribution : la taille calculée est désormais limitée à zéro afin que les rayons des cercles qui en découlent ne deviennent jamais des valeurs SVG « r » négatives invalides\ndépendances mises à jour",
+        "it": "Risolto il test di integrazione dei widget per @iobroker /vis-2-widgets-testing 2.x: `addWidget` ora riceve un timeout numerico anziché booleano, che altrimenti falliva immediatamente («truems superato») e impediva la pubblicazione\nWidget di distribuzione: la dimensione calcolata è ora ridotta a zero, quindi i raggi del cerchio non si trasformano mai in valori SVG `r` negativi non validi\ndipendenze aggiornate",
+        "es": "Se ha corregido la prueba de integración de widgets para `@iobroker /vis-2-widgets-testing` 2.x: `AddWidget` recibe ahora un tiempo de espera numérico en lugar de un booleano, lo que hacía que la prueba fallara inmediatamente («se ha superado la verdad») e impide que se publique la versión\nWidget de distribución: el tamaño calculado ahora está fijado a cero, por lo que los radios de círculo que se derivan de él nunca se convierten en valores SVG «r» negativos no válidos en widgets muy pequeños\ndependencias actualizadas",
+        "pl": "Naprawiono test integracji widgetów dla `@iobroker /vis-2-widgets-testing` 2.x: `AddWidget` otrzymuje teraz liczbowy limit czasu zamiast logicznego, co w przeciwnym razie spowodowało natychmiastowe zakończenie testu (przekroczenie „truems”) i zablokowało publikację wydania\nWidżet dystrybucji: obliczony rozmiar jest teraz zaciśnięty do zera, więc pochodzące z niego promienie okręgu nigdy nie zamieniają się w nieprawidłowe ujemne wartości SVG `r` przy bardzo małych rozmiarach widżetów\nzaktualizowane zależności",
+        "uk": "Виправлено тест інтеграції віджетів для `@iobroker /vis-2-widgets-testing` 2.x: `AddWidget` тепер отримує числовий тайм-аут замість булевого, що в іншому випадку призвело до того, що тест негайно провалився («truems») і заблокував публікацію релізу\nВіджет розподілу: обчислений розмір тепер затиснутий до нуля, тому радіуси кола, отримані від нього, ніколи не перетворюються на недійсні від'ємні значення SVG `r` при дуже малих розмірах віджетів\nоновлені залежності",
+        "zh-cn": "修复了 `@iobroker /vis-2-widgets-testing` 2.x 的插件集成测试：`addWidget` 现在接收的是数字超时而不是布尔值，否则会使测试立即失败（“超出真实值”）并阻止发布版本\n分布控件：计算出的大小现在被限制为零，因此在非常小的控件大小下，从中得出的圆半径永远不会变成无效的负SVG `r`值\n更新的依赖关系"
+      },
       "3.0.1": {
         "en": "**BREAKING:** built with React 19 and MUI 9 - requires vis-2 2.20.1 or newer (React 19)\nNew widgets: self-sufficiency, battery storage, energy costs and dynamic electricity price\nTooltips for all configuration fields, a palette description for every widget and new documentation (docs/en, docs/de) with fresh screenshots\nDistribution widget: animation done by the browser (much less CPU load); new options for line width, animation and raw values; fixed font size, Wh/kWh unit and house ring segments\nConsumption widget: new chart types (line, area), legend, toolbox and decimals; fixed number of bars per month, missing last bar and bucket edges\nComparison widget: new options for sorting, decimals, vertical bars and value labels; fixed mixed-up units\nInterval selector: configurable periods, \"Now\" button and date format\nLayout fixes for large widgets; all charts follow the size of their container\nBuild: replaced adapter-react-v5 with gui-components, tasks.ts in TypeScript, federation manifest is shipped\nFixed missing translation of \"default radius size\" (#527) and addressed repository checker findings (#526)",
         "de": "**NEU: ** gebaut mit React 19 und MUI 9 — benötigt Vis-2 2.20.1 oder neuer (React 19)\nNeue Widgets: Autarkie, Akkuspeicher, Energiekosten und dynamischer Strompreis\nTooltips für alle Felder, eine Palettenbeschreibung für jedes Widget und neue Dokumentation (docs/en, docs/de) mit neuen Screenshots\nVerteilungs-Widget: Browseranimation (viel weniger CPU-Last); neue Optionen für Linienbreite, Animation und Rohwerte; feste Schriftgröße, Wh/kWh und Hausringsegmente\nVerbrauchs-Widget: neue Diagrammtypen (Linie, Fläche), Legende, Toolbox und Dezimalzahlen; feste Balkenanzahl pro Monat, ohne Balken und Rand\nVergleichs-Widget: neue Optionen für Sortierung, Dezimalzahlen, Balken und Werte; feste Einheiten\nIntervallwahl: Perioden, „Jetzt“ und Datumsformat\nLayoutkorrekturen für große Widgets; alle Charts folgen der Größe\nBuild: Adapter-React-V5 durch GUI-Components ersetzt, Tasks.ts in TypeScript, Verbundmanifest ist da\nFehlende Übersetzung von „Standardradiusgröße“ (#527) und Repository-Checker-Befund behoben (#526)",
@@ -80,19 +93,6 @@
         "pl": "pakiet aktualizacji",
         "uk": "оновлення пакетів",
         "zh-cn": "更新包"
-      },
-      "0.3.8": {
-        "en": "Added support of counters for consumption",
-        "de": "Unterstützung von Zählern für den Verbrauch",
-        "ru": "Добавлена поддержка счетчиков для потребления",
-        "pt": "Adicionado suporte de contadores para consumo",
-        "nl": "Vermeld ondersteuning voor consumptie",
-        "fr": "Appui accru aux comptoirs pour la consommation",
-        "it": "Aggiunto supporto di contatori per il consumo",
-        "es": "Apoyo adicional de contadores para consumo",
-        "pl": "Wsparcie dla przeciwników konsumpcji",
-        "uk": "Додано підтримку лічильників для споживання",
-        "zh-cn": "增加消费反补贴"
       }
     },
     "licenseInformation": {
