@@ -1,4 +1,7 @@
 # Older changes
+## 1.0.0 (2024-07-07)
+* (bluefox) Removed withStyles package
+
 ## 0.3.11 (2024-02-16)
 * (bluefox) show value with green color if we feed back into power line
 

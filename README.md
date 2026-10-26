@@ -51,7 +51,7 @@ adapter.
 -->
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.0.3 (2026-10-26)
 * (@GermanBluefox) Distribution widget: feed-in reported by a separate power line return OID now shows the moving dot from home to the grid and the green circle, like a negative power line value does (#227)
 
 ### 3.0.2 (2026-10-26)
@@ -101,9 +101,6 @@ adapter.
 
 ### 1.0.2 (2024-08-06)
 * (bluefox) updated packages
-
-### 1.0.0 (2024-07-07)
-* (bluefox) Removed withStyles package
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vis-2-widgets-energy",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "news": {
+      "3.0.3": {
+        "en": "Distribution widget: feed-in reported by a separate power line return OID now shows the moving dot from home to the grid and the green circle, like a negative power line value does (#227)",
+        "de": "Verteilungs-Widget: Eine separate Netzrücklauf-OID zeigt nun den Punkt vom Haus zum Netz und den grünen Kreis, wie bei einem negativen Netzwert (#227)",
+        "ru": "Виджет распределения: при подаче сигнала по отдельной линии электропередач OID теперь отображаются движущаяся точка от дома к сети и зеленый кружок, как и при отрицательном значении линии электропередачи (#227)",
+        "pt": "Widget de distribuição: a alimentação relatada por um OID separado agora mostra o ponto em movimento de casa para a rede e o círculo verde, como acontece com um valor negativo (#227)",
+        "nl": "Distributiewidget: de invoer, gerapporteerd door een afzonderlijke retour-OID van een hoogspanningslijn, toont nu de bewegende stip van thuis naar het net en de groene cirkel, zoals een negatieve waarde van het elektriciteitsnet dat doet (#227)",
+        "fr": "Widget de distribution : l'alimentation signalée par une ligne à haute tension séparée affiche désormais le point en mouvement entre le domicile et le réseau et le cercle vert, comme le fait une ligne à haute tension négative (#227)",
+        "it": "Widget di distribuzione: l'input segnalato da un OID separato ora mostra il punto in movimento da casa alla rete e il cerchio verde, come un valore negativo (#227)",
+        "es": "Widget de distribución: la alimentación notificada por otro OID de retorno de línea ahora muestra el punto que se mueve de casa a la red y el círculo verde, como hace un valor negativo en la línea eléctrica (#227)",
+        "pl": "Widżet dystrybucji: podanie zgłoszone przez oddzielny zwrot linii energetycznej OID pokazuje teraz przesuwającą się kropkę z domu do siatki i zielone koło, podobnie jak ujemna wartość linii energetycznej (#227)",
+        "uk": "Віджет розподілу: подача, про яку повідомляється окремим зворотним лінією електропередач, тепер показує точку, що рухається від дому до сітки та зелене коло, як це робить від'ємне значення лінії електропередачі (#227)",
+        "zh-cn": "分布小部件：由单独的电力线返回 OID 报告的馈电现在显示从家到电网的移动点和绿色圆圈，就像负的电力线值一样 (#227)"
+      },
       "3.0.2": {
         "en": "Fixed the widget integration test for `@iobroker/vis-2-widgets-testing` 2.x: `addWidget` now receives a numeric timeout instead of a boolean, which otherwise made the test fail immediately (\"truems exceeded\") and blocked the release from being published\nDistribution widget: the computed size is now clamped to zero so the circle radii derived from it never turn into invalid negative SVG `r` values at very small widget sizes\nupdated dependencies",
         "de": "Der Widget-Integrationstest für `@iobroker /vis-2-widgets-testing` 2.x wurde behoben: `AddWidget` erhält jetzt ein numerisches Timeout statt eines booleschen Werts, wodurch der Test sofort fehlschlug („truems exceeded“) und die Veröffentlichung blockiert wurde\nVerteilungs-Widget: Die berechnete Größe ist jetzt auf Null begrenzt, sodass die daraus abgeleiteten Kreisradien bei sehr kleinen Widgets nie zu ungültigen SVG\nNeue Abhängigkeiten",
@@ -80,19 +93,6 @@
         "pl": "pokaż wartość z zielonym kolorem jeśli podamy z powrotem do linii zasilania",
         "uk": "показати значення з зеленим кольором, якщо ми подаємо в лінію живлення",
         "zh-cn": "如果我们反馈回电线, 显示绿色值"
-      },
-      "0.3.9": {
-        "en": "update packages",
-        "de": "update-pakete",
-        "ru": "обновление пакетов",
-        "pt": "pacotes de atualização",
-        "nl": "vertaling:",
-        "fr": "mettre à jour les paquets",
-        "it": "pacchetti di aggiornamento",
-        "es": "actualizar paquetes",
-        "pl": "pakiet aktualizacji",
-        "uk": "оновлення пакетів",
-        "zh-cn": "更新包"
       }
     },
     "licenseInformation": {
