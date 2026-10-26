@@ -51,6 +51,12 @@ adapter.
 -->
 
 ## Changelog
+
+### **WORK IN PROGRESS**
+* (hombach) Fixed the widget integration test for `@iobroker/vis-2-widgets-testing` 2.x: `addWidget` now receives a numeric timeout instead of a boolean, which otherwise made the test fail immediately ("truems exceeded") and blocked the release from being published
+* (hombach) Distribution widget: the computed size is now clamped to zero so the circle radii derived from it never turn into invalid negative SVG `r` values at very small widget sizes
+* (hombach) updated dependencies
+
 ### 3.0.1 (2026-10-16)
 * (@GermanBluefox) **BREAKING:** built with React 19 and MUI 9 - requires vis-2 2.20.1 or newer (React 19)
 * (@GermanBluefox) New widgets: self-sufficiency, battery storage, energy costs and dynamic electricity price

@@ -902,7 +902,9 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
         const defaultDistanceSize = parseFloat(this.state.rxData.defaultDistanceSize as string) || 18;
         const defaultFontSize = parseFloat(this.state.rxData.defaultFontSize as string) || 12;
 
-        size -= defaultFontSize * 2; // let place for upper and bottom labels
+        // let place for upper and bottom labels; never let it go negative or the circle radii derived from it
+        // (homeRadius, circle.radius) turn into invalid negative SVG `r` values at very small widget sizes
+        size = Math.max(0, size - defaultFontSize * 2);
 
         const homeRadius = (size * (parseFloat(this.state.rxData.homeCircleSize as string) || defaultRadiusSize)) / 100;
         // The per-circle font size wins over the default one. It used to be the other way round
