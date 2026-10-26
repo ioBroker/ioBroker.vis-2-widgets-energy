@@ -50,7 +50,7 @@ Alles vom Heimatkreis, dazu:
 | Feld                      | Bedeutung                                                                                         |
 | ------------------------- | -------------------------------------------------------------------------------------------------- |
 | Stromleitung-OID          | Aus dem Netz bezogene Leistung. Ein **negativer** Wert bedeutet Einspeisung ins Netz.               |
-| Stromleitungsrückgabe-OID | Eigener Datenpunkt für die Einspeisung, falls der Zähler beide Richtungen getrennt meldet           |
+| Stromleitungsrückgabe-OID | Eigener Datenpunkt für die Einspeisung, falls der Zähler beide Richtungen getrennt meldet. Solange die Stromleitung-OID 0 ist und dieser Wert nicht, läuft der Punkt vom Haus zum Netz und der Kreis wird grün |
 | Energiefarbe zurückgeben  | Farbe des Einspeisewertes im Kreis                                                                  |
 | Ausblenden, wenn weniger als | Blendet den Kreis unterhalb dieses Wertes aus. Leer zeigt ihn immer. Im Editor bleibt er sichtbar. |
 | Richtung umkehren         | Dreht die Richtung des wandernden Punktes um                                                        |

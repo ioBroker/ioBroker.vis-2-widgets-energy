@@ -51,6 +51,9 @@ adapter.
 -->
 
 ## Changelog
+### **WORK IN PROGRESS**
+* (@GermanBluefox) Distribution widget: feed-in reported by a separate power line return OID now shows the moving dot from home to the grid and the green circle, like a negative power line value does (#227)
+
 ### 3.0.2 (2026-10-26)
 * (hombach) Fixed the widget integration test for `@iobroker/vis-2-widgets-testing` 2.x: `addWidget` now receives a numeric timeout instead of a boolean, which otherwise made the test fail immediately ("truems exceeded") and blocked the release from being published
 * (hombach) Distribution widget: the computed size is now clamped to zero so the circle radii derived from it never turn into invalid negative SVG `r` values at very small widget sizes

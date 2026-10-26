@@ -864,14 +864,22 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
         circle: Circle,
         index: number,
     ): { duration: number; begin: number; toHome: boolean; dotRadius: number; animated: boolean } | null {
-        if (!circle.iValue || !Number.isFinite(circle.iValue)) {
+        let value = circle.iValue;
+        let toHome: boolean;
+        if (value && Number.isFinite(value)) {
+            // A positive value flows towards the home circle, unless the direction of the node was inverted
+            toHome = circle.invert ? value < 0 : value > 0;
+        } else if (circle.secondaryValue?.iValue && Number.isFinite(circle.secondaryValue.iValue)) {
+            // Feed-in reported by its own datapoint (power line return OID): the power line itself is 0 then,
+            // which used to leave the line without any dot. The feed-in always flows away from home (#227).
+            value = circle.secondaryValue.iValue;
+            toHome = false;
+        } else {
             return null;
         }
 
-        const step = Math.min(Math.abs(circle.iValue) / circle.speed, 2);
+        const step = Math.min(Math.abs(value) / circle.speed, 2);
         const dotRadius = step < 0.5 ? 1.5 : step * 3;
-        // A positive value flows towards the home circle, unless the direction of the node was inverted
-        const toHome = circle.invert ? circle.iValue < 0 : circle.iValue > 0;
 
         if (this.state.rxData.noAnimation || !step || !circle.distance) {
             return { duration: 0, begin: 0, toHome, dotRadius, animated: false };
@@ -926,13 +934,20 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
         let valuesSum = 0;
         // prepare power line as first circle
         const valueAndUnit = this.getValue(this.state.rxData['powerLine-oid'], this.state.objects.powerLine);
+        const returnValueAndUnit = this.getValue(
+            this.state.rxData['powerLineReturn-oid'],
+            this.state.objects.powerLine,
+        );
+        // Feed-in is either a negative power line value or, with a separate return datapoint, a return value
+        // while the power line itself is 0 - both get the same green circle (#227)
+        const feedIn = valueAndUnit.iValue < 0 || (!valueAndUnit.iValue && !!returnValueAndUnit.iValue);
 
         // add power line
         let circles: Circle[] = [
             {
                 name: this.state.rxData.powerLineName,
                 color:
-                    valueAndUnit.iValue < 0
+                    feedIn
                         ? this.props.context.themeType === 'dark'
                             ? '#43d243'
                             : '#266e26'
@@ -952,7 +967,7 @@ class Distribution extends Generic<DistributionRxData, DistributionState> {
                     this.state.rxData.powerLineIcon ||
                     this.state.objects.powerLine?.common?.icon,
                 arrow: valueAndUnit.iValue >= 0 ? '→' : '←', // '↦',
-                secondaryValue: this.getValue(this.state.rxData['powerLineReturn-oid'], this.state.objects.powerLine),
+                secondaryValue: returnValueAndUnit,
                 secondaryArrow: '←',
                 iconSize: parseFloat(this.state.rxData.powerIconSize as string) || 33.3,
                 hide:
