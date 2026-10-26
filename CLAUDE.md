@@ -39,7 +39,7 @@ Widget dev server (from `src-widgets/`): `npm start` — Vite on **port 4173**. 
 
 **The test refuses to run when an ioBroker instance is already running on the machine** ("Cannot initiate the first run of test, because one instance of application is running on this PC") — and it still exits 0, so a green exit code is not proof that the test ran. Check the output for the actual mocha summary.
 
-The test installs the **published** vis-2 from npm. As long as that is 2.15.5 (react 18) it cannot load this widget set at all, because a react 19 build is rejected by the host and a react 18 host hands react 18 to a react 19 bundle. The integration test is therefore only meaningful once vis-2 2.20.1+ is on npm.
+The test installs the **published** vis-2 from npm. That is a react 19 one now (2.20.5 when 3.0.2 was released), so the test really loads this widget set. It uses `@iobroker/vis-2-widgets-testing` 2.x, where the third argument of `palette.addWidget(page, name, timeout)` is a timeout in ms: the boolean `true` left over from 1.x became a ~1 ms timeout and failed every run with "Waiting failed: truems exceeded", which kept 3.0.0 and 3.0.1 off npm.
 
 ## Architecture
 
@@ -55,7 +55,7 @@ The shared-module list is **not hand-written**: `vite.config.ts` calls `moduleFe
 
 The set is built with **react 19 and MUI 9**, and `@iobroker/gui-components` replaces `@iobroker/adapter-react-v5` (the latter is a react 18 / MUI 6 package and is no longer shared by vis-2). react, react-dom, MUI, emotion and gui-components live in `devDependencies` because the host provides them at runtime; only what is really bundled (`echarts`, `echarts-for-react`, `moment`) is a dependency. `window.visRxWidget` is likewise provided by vis-2; `Generic.tsx` types it via `@iobroker/types-vis-2` and every widget extends `Generic`. Never import a vis-2 base class directly.
 
-`io-package.json` keeps `common.dependencies: [{ "vis-2": ">=2.12.8" }]` — same convention as `ioBroker.vis-2-widgets-material`, which is also a react 19 build. **The floor is deliberately not raised**, so do not "fix" it: the declared dependency does not describe what actually runs. In practice this set needs a vis-2 on react 19 (2.20.1+, the first one that shares `react/jsx-runtime`), because a react 19 bundle handed the react 18 of an older host produces elements the host does not accept (`react.element` vs `react.transitional.element`). The mismatch is documented in the README and in `docs/*/README.md` instead of being enforced by the dependency.
+`io-package.json` declares `common.dependencies: [{ "vis-2": ">=2.20.0" }]` (raised from `>=2.12.8` with 3.0.1). The set really needs a vis-2 on react 19 (2.20.1+, the first one that shares `react/jsx-runtime`), because a react 19 bundle handed the react 18 of an older host produces elements the host does not accept (`react.element` vs `react.transitional.element`); the README and `docs/*/README.md` name 2.20.1. As long as no vis-2 2.20.x is in the **stable** repository, the repository checker reports `E4033` for this dependency, which can block stable updates of this adapter. That is expected and not something to fix in this repository.
 
 ### Build output
 
@@ -137,10 +137,15 @@ Use `npm run release-patch|release-minor|release-major` (`@alcalzone/release-scr
 
 Do not hand-edit version numbers or add changelog/news entries manually — note that `src-widgets/package.json` carries its own version field that mirrors the root one.
 
-The `2.0.0` release (shipped 2026-08) was a breaking one: the comparison widget no longer auto-converts W→Wh / kW→kWh nor divides Wh by 1000, so dashboards using Wh datapoints show values 1000× larger until the per-device `factor` is set. That is why the whole Vite/TypeScript modernization landed as a major. Current published version is `2.0.1`.
+The `2.0.0` release (shipped 2026-08) was a breaking one: the comparison widget no longer auto-converts W→Wh / kW→kWh nor divides Wh by 1000, so dashboards using Wh datapoints show values 1000× larger until the per-device `factor` is set. That is why the whole Vite/TypeScript modernization landed as a major.
 
 `Distribution` still carries that auto-conversion (a `Wh` datapoint is divided by 1000), on purpose — it is opt-out per widget via the `rawValues` attribute instead of a second breaking change. The unit label now follows the division, so a divided value is shown as `kWh` and no longer as `Wh`.
 
-The next release is breaking again: with react 19 / MUI 9 the set cannot be loaded by a vis-2 that still runs on react 18, even though the declared `vis-2` dependency does not say so.
+`3.0.0` was breaking again: with react 19 / MUI 9 the set cannot be loaded by a vis-2 that still runs on react 18. 3.0.0 and 3.0.1 were tagged but never reached npm, because `adapter-tests` failed and `deploy` depends on it; the first 3.x on npm is 3.0.2 (2026-10-26). Current published version is `3.0.3`.
+
+Two things that went wrong while releasing:
+
+- A failed tag build cannot be repaired by re-running it, because the tag still points at the broken commit. Fix `main` and release the next patch instead.
+- The release script's `commit:package` step ("updating lockfile...") re-extracted the root `node_modules/esbuild` (0.11.23, pulled in by `@iobroker/testing` via `@alcalzone/esbuild-register`) without its `esbuild.exe`. The *next* release then failed in `before_commit` with `spawn ...\node_modules\esbuild\esbuild.exe ENOENT`; the script rolls back (no commit, no tag). `npm rebuild esbuild` restores the binary.
 
 Dependency bumps arrive as Dependabot PRs against both `package.json` and `src-widgets/package.json` and are auto-merged; `npm run update-packages` does the same locally for both trees.
