@@ -12,7 +12,7 @@
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.1",
         "@iobroker/gui-components": "^10.4.3",
-        "@iobroker/types-vis-2": "~2.20.2",
+        "@iobroker/types-vis-2": "~2.20.6",
         "@iobroker/vis-2-widgets-react-dev": "^4.0.4",
         "@module-federation/vite": "^1.23.10",
         "@mui/icons-material": "^9.5.0",
